@@ -1,0 +1,12 @@
+{
+  "checkpoint": "models/LMVD_late_03_20__20_37/Fold_8/best_model_by_argmax_f1.pth",
+  "best_thr_from_json": 0.45999999999999996,
+  "dev_sweep_best_thr": 0.46,
+  "dev_sweep_best_macro_f1": 0.7342377991332203,
+  "dev_sweep_best_recall_class0": 0.6219512195121951,
+  "dev_sweep_best_recall_class1": 0.8536585365853658,
+  "dev_sweep_best_pred_pos_ratio": 0.6158536585365854,
+  "n_dev": 164,
+  "n_test": 183,
+  "n_test_false_positive_normals": 46
+}

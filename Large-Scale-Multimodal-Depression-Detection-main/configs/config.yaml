@@ -1,0 +1,70 @@
+data_dir: "../../data/"
+train_gender: both
+test_gender: both
+
+model: MultiModalDepDet # DepMamba #
+dataset: dvlog-dataset # dvlog-dataset or lmvd-dataset
+train: false
+epochs: 120
+batch_size: 16
+learning_rate: 8e-5
+optimizer: "Adam"
+lr_scheduler: cos #other #
+if_wandb: false
+save_dir: "../weights"
+device:
+  - "cuda"
+
+# device: ["cuda:1"]  # For two GPUs -- > device: ["cuda:0", "cuda:1"]  # For two GPUs
+num_heads: 8
+fusion: 'lt'
+num_folds: 10
+
+#D-Vlog
+dvlog:
+  audio_input_size: 25 
+  video_input_size: 136
+  mm_input_size: 256
+  mm_output_sizes: [128, 129, 256, 273, 768]
+
+#LMVD
+lmvd:
+  audio_input_size: 128
+  video_input_size: 136
+  mm_input_size: 256
+  mm_output_sizes: [128, 129, 256, 273, 768]
+
+# Mamba parameters
+mmmamba:
+  audio_input_size: 25 # LDDs for D-Vlog
+  video_input_size: 136
+  mm_input_size: 256
+  mm_output_sizes: [256]
+  dropout: 0.1
+  d_ffn: 1024 
+  num_layers: 1
+  activation: 'GELU'
+  causal: false
+
+  mamba_config:
+    d_state: 12 
+    expand: 4 
+    d_conv: 4 
+    bidirectional: true
+
+mmmamba_lmvd:
+  audio_input_size: 128 # VGGish for LMVD
+  video_input_size: 136
+  mm_input_size: 256
+  mm_output_sizes: [256]
+  dropout: 0.1
+  d_ffn: 1024 
+  num_layers: 1
+  activation: 'GELU'
+  causal: false
+
+  mamba_config:
+    d_state: 16 
+    expand: 4 
+    d_conv: 4 
+    bidirectional: true   

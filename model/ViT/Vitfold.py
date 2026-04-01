@@ -1,5 +1,6 @@
 import numpy as np
 from re import T
+import torch.nn.functional as F
 import torch
 import logging
 from kfoldLoader import MyDataLoader 
@@ -15,12 +16,35 @@ from sklearn.metrics import precision_score, recall_score, f1_score,confusion_ma
 from Vitmodel import ViT
 import pandas as pd
 from sklearn import metrics
+from sklearn.model_selection import train_test_split
+from numpy.random import beta
 import matplotlib.pyplot as plt
-lr = 0.00001
-epochSize = 200
-warmupEpoch = 0
+""" 实现K折交叉验证的全部逻辑，包括
+数据集索引划分、数据加载、模型初始化、训练、测试、性能指标记录和结果保存。 """
+# 视频特征路径
+VIDEO_FEATURE_PATH = "data/LMVD_Feature/tcnfeature" 
+# 音频特征路径
+AUDIO_FEATURE_PATH = "data/LMVD_Feature/Audio_feature" 
+# 标签路径
+LABEL_PATH = "label/label"
+
+# ----------------- 模型的超参数设置 -----------------
+T = 915            # 序列长度（来自 tcnfeature.py 中的 915）
+D_VIDEO = 171      # 视频特征维度
+D_AUDIO = 128     
+
+D_EMB = 256        # 嵌入维度 (dim)
+HEADS = 8          # 【优化】增加到8个头，提升多模态建模能力
+PATCH_SIZE = 15    # Patch 大小 
+DEPTH = 8          # Transformer 深度/层数
+DIM_MLP = 1024     # FFN 的隐藏层维度 (dim_mlp)
+
+
+lr = 7e-5                  # 【优化】进一步提升学习率，加速收敛
+epochSize = 300            # 【优化】从200增加到300，给模型更多学习机会
+warmupEpoch = 20           # 【优化】增加预热轮数，稳定训练初期
 testRows = 1
-schedule = 'consine'
+schedule = 'cyclic'        # 【优化】改为'cyclic'使用循环学习率调度器
 classes = ['Normal','Depression']
 ps = []
 rs = []
@@ -30,19 +54,24 @@ totals = []
 total_pre = []
 total_label = []
 
+# ----------------- 日志和保存路径的修复 -----------------
 tim = time.strftime('%m_%d__%H_%M', time.localtime())
-filepath = 'the log file path'+str(tim)
-savePath1 = "the model file path"+str(tim)
-
+# 实际的日志文件路径
+filepath = os.path.join('logs', str(tim)) 
+savePath1 = os.path.join('models', str(tim))
 if not os.path.exists(filepath):
         os.makedirs(filepath)
-
+if not os.path.exists(savePath1): # 确保模型保存路径也创建
+        os.makedirs(savePath1)
 logging.basicConfig(level=logging.NOTSET,
                     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
                     datefmt='%m-%d %H:%M',
-                    filename=filepath+'/'+'the log file name.log',
+                    # 修复日志文件路径
+                    filename=os.path.join(filepath, 'training.log'),
                     filemode='w')
 
+# 设备
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def plot_confusion_matrix(y_true, y_pred, labels_name, savename,title=None, thresh=0.6, axis_labels=None):
 
@@ -74,6 +103,32 @@ def plot_confusion_matrix(y_true, y_pred, labels_name, savename,title=None, thre
     plt.clf()
 
 
+class LabelSmoothingCrossEntropy(nn.Module):
+    """
+    手动实现支持 Label Smoothing 的交叉熵损失函数
+    适用于 PyTorch 版本 < 1.10 的环境
+    """
+    def __init__(self, smoothing=0.1):
+        super(LabelSmoothingCrossEntropy, self).__init__()
+        self.smoothing = smoothing
+
+    def forward(self, x, target):
+        # x: (batch_size, num_classes) -> 模型输出 (logits)
+        # target: (batch_size) -> 真实标签 (long)
+        
+        confidence = 1. - self.smoothing
+        logprobs = F.log_softmax(x, dim=-1)
+        
+        # 计算真实标签对应的 NLL Loss
+        nll_loss = -logprobs.gather(dim=-1, index=target.unsqueeze(1))
+        nll_loss = nll_loss.squeeze(1)
+        
+        # 计算平滑项 (即均匀分布的 CrossEntropy)
+        smooth_loss = -logprobs.mean(dim=-1)
+        
+        # 加权融合
+        loss = confidence * nll_loss + self.smoothing * smooth_loss
+        return loss.mean()
 
 class AffectnetSampler(torch.utils.data.sampler.Sampler):
 
@@ -121,31 +176,59 @@ def get_cosine_schedule_with_warmup(optimizer, num_warmup_steps, num_training_st
         return 0.5 * (cos(min((current_step - num_warmup_steps) / (num_training_steps - num_warmup_steps),1) * math.pi) + 1)
     return LambdaLR(optimizer, lr_lambda, last_epoch)
 
-def train(VideoPath, AudioPath,X_train,X_test,labelPath,numkfold):
+def train(VideoPath, AudioPath, X_train, X_dev, X_final_test, labelPath, fold_name):
     mytop = 0
-    topacc = 60
+    topacc = 0
     top_p=0
     top_r=0
     top_f1=0
     top_pre=[]
     top_label=[]
 
-    trainSet = MyDataLoader(VideoPath, AudioPath,X_train,labelPath,  "train")
-    trainLoader = DataLoader(trainSet, batch_size=15, shuffle=True)
-    devSet = MyDataLoader(VideoPath, AudioPath,X_test,labelPath,  "dev")
+    patience = 50           # 忍耐 50 个 epoch
+    counter = 0             # 计数器归零
+    best_loss = float('inf') # 初始化最佳 Loss 为无穷大
+
+    # 1. 加载训练集 (80%)
+    trainSet = MyDataLoader(X_train, VideoPath, AudioPath, labelPath, mode='train')
+    trainLoader = DataLoader(trainSet, batch_size=8, shuffle=True)
+    
+    # 2. 加载验证集 (10%) -> 这里的变量名原来叫 X_test，现在对应 X_dev
+    devSet = MyDataLoader(X_dev, VideoPath, AudioPath, labelPath, mode='test')
     devLoader = DataLoader(devSet, batch_size=4, shuffle=False)
-    print("trainLoader finish", len(trainLoader), len(devLoader))
+    
+    # 3. 加载最终测试集 (10%) -> 新增
+    finalTestSet = MyDataLoader(X_final_test, VideoPath, AudioPath, labelPath, mode='test')
+    finalTestLoader = DataLoader(finalTestSet, batch_size=4, shuffle=False)
+
+    print("DataLoaders Ready: Train={}, Dev={}, Test={}".format(
+        len(trainLoader), len(devLoader), len(finalTestLoader)))
+
+    # 创建模型并移动到 device（单 GPU 环境）
+    D_PROJECTION = D_EMB // 2 # 256 // 2 = 128
+    FEATURE_DIM_AFTER_CONCAT = D_PROJECTION * 2 # 128 * 2 = 256
 
     if torch.cuda.is_available():
-        model = ViT(spectra_size=128*2,patch_size=16,num_classes=2,dim=768,depth=4,heads=8,dim_mlp=128,channel=186,dim_head=8,dropout=0.5).cuda(1)
+        # 拼接后的特征维度: (186 + 128) = 314. 这是 PatchEmbdding 的 channel (c) 维度
+        FEATURE_DIM_AFTER_CONCAT = 256
+        model = ViT(
+            spectra_size=T, # T=915, 序列长度
+            patch_size=PATCH_SIZE, # 15
+            num_classes=2,
+            dim=D_EMB, # dim 修正为 256
+            depth=DEPTH, # depth 提升至 8 或 12
+            heads=HEADS,       # heads 设置为 4（已优化）
+            dim_mlp=DIM_MLP,  # dim_mlp 修正为 1024
+            # 修复: 这里的 channel 必须是特征融合后的维度256
+            channel=FEATURE_DIM_AFTER_CONCAT, 
+            # dim_head 必须满足 dim / heads = dim_head, 即 256 / 8 = 32
+            dim_head=D_EMB // HEADS, # 32（因为HEADS=8）
+            dropout=0.45  # 【优化】适度提高Dropout，控制过拟合
+        ).to(device)
 
-    lossFunc = nn.CrossEntropyLoss().cuda(1)
-
-    optimizer = torch.optim.Adam(model.parameters(), lr = lr,
-                                    betas=(0.9,0.999),
-                                    eps=1e-8,
-                                    weight_decay=0,
-                                    amsgrad=False
+    lossFunc = LabelSmoothingCrossEntropy(smoothing=0.05).to(device)  # 【优化】从0.1降低到0.05，减弱标签平滑
+    optimizer = torch.optim.AdamW(model.parameters(), lr = lr,
+                                    weight_decay=1e-2
                                     )
 
     train_steps = len(trainLoader)*epochSize
@@ -154,11 +237,24 @@ def train(VideoPath, AudioPath,X_train,X_test,labelPath,numkfold):
     
     if schedule == 'linear':
         scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=warmup_steps, num_training_steps=train_steps)
+    elif schedule == 'cyclic':
+        # 【优化】实现Cyclic LR调度器：帮助跳过局部最优点，适合训练振荡的情况
+        # base_lr: 最小学习率 (7e-5的1/10 = 7e-6)
+        # max_lr: 最大学习率 (已优化的7e-5)
+        # step_size_up: 上升步数(从base_lr到max_lr)，设置为5个epoch内的步数
+        scheduler = torch.optim.lr_scheduler.CyclicLR(
+            optimizer, 
+            base_lr=lr / 10,          # 7e-6
+            max_lr=lr,                 # 7e-5
+            step_size_up=len(trainLoader) * 8,  # 8个epoch内升到max_lr
+            step_size_down=len(trainLoader) * 8,  # 再8个epoch降回base_lr
+            cycle_momentum=False
+        )
     else:
         scheduler = get_cosine_schedule_with_warmup(optimizer, num_warmup_steps=warmup_steps, num_training_steps=target_steps)
 
-    logging.info('The {}  fold training begins！！'.format(numkfold))
-    savePath=str(savePath1)+'/'+str(numkfold)
+    logging.info('The {} training begins!'.format(fold_name))
+    savePath = os.path.join(str(savePath1), str(fold_name))
     if not os.path.exists(savePath):
         os.makedirs(savePath)
         
@@ -174,14 +270,35 @@ def train(VideoPath, AudioPath,X_train,X_test,labelPath,numkfold):
         model.train()
         for batch_idx, (videoData, audioData, label) in loop:
             if torch.cuda.is_available():
-                videoData, audioData, label = videoData.cuda(1), audioData.cuda(1), label.cuda(1)
+                videoData, audioData, label = videoData.to(device), audioData.to(device), label.to(device)
 
-            output = model(videoData, audioData)
-
-            traLoss = lossFunc(output, label.long())
+            # 1. 生成 Mixup 系数 lam (0到1之间)
+            alpha = 0.4
+            lam = beta(alpha, alpha)
+            
+            # 2. 生成随机打乱的索引
+            index = torch.randperm(videoData.size(0)).to(device)
+            
+            # 3. 混合输入 (Mix Data)
+            mixed_video = lam * videoData + (1 - lam) * videoData[index, :]
+            mixed_audio = lam * audioData + (1 - lam) * audioData[index, :]
+            
+            # 4. 混合标签 (Mix Labels)
+            label_a, label_b = label, label[index]
+            
+            # 5. 前向传播
+            output = model(mixed_video, mixed_audio)
+            
+            # 6. 计算 Mixup Loss
+            # Loss = lam * Loss(label_a) + (1-lam) * Loss(label_b)
+            traLoss = lam * lossFunc(output, label_a.long()) + (1 - lam) * lossFunc(output, label_b.long())
             traloss_one += traLoss
             optimizer.zero_grad()
             traLoss.backward()
+
+            # 梯度裁剪：限制梯度范数，防止数值爆炸
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0) #
+
             optimizer.step()
             scheduler.step()
             
@@ -211,7 +328,7 @@ def train(VideoPath, AudioPath,X_train,X_test,labelPath,numkfold):
                 loss_one = 0
                 for batch_idx, (videoData, audioData, label) in loop:
                     if torch.cuda.is_available():
-                        videoData, audioData,label = videoData.cuda(1), audioData.cuda(1),label.cuda(1)
+                        videoData, audioData,label = videoData.to(device), audioData.to(device),label.to(device)
                     devOutput = model(videoData, audioData)
                     loss = lossFunc(devOutput, label.long())
                     loss_one += loss
@@ -249,25 +366,108 @@ def train(VideoPath, AudioPath,X_train,X_test,labelPath,numkfold):
                 top_f1 = f1score
                 top_pre = pre2
                 top_label = label2
+            
+            # ================== 插入早停逻辑 (开始) ==================
+            # 计算当前 epoch 验证集的平均 loss
+            avg_dev_loss = loss_one / len(devLoader)
+            
+            # 打印一下，确认逻辑在运行
+            # print(f'Validation Loss: {avg_dev_loss:.4f}') 
+
+            if avg_dev_loss < best_loss:
+                best_loss = avg_dev_loss
+                counter = 0  # 如果 loss 创新低，重置计数器
+                # 这里通常不需要额外 save，因为后面有 acc > topacc 的保存逻辑
+                # 但如果你想基于 Loss 保存最佳模型，可以在这里 save
+            else:
+                counter += 1
+                logging.info(f'EarlyStopping counter: {counter} out of {patience}')
                 
+                if counter >= patience:
+                    logging.info("Early stopping triggered! Stop training.")
+                    print("Early stopping triggered!")
+                    break  # <--- 关键：跳出最外层的 epoch 循环
+            # ================== 插入早停逻辑 (结束) ==================
+
             if acc > topacc:
                 topacc = max(acc, topacc)
                 checkpoint = {'net':model.state_dict(), 'optimizer':optimizer.state_dict(), 'epoch':epoch, 'scheduler':scheduler.state_dict()}
                 torch.save(checkpoint, savePath+'/'+"mdn+tcn"+'_'+str(epoch)+'_'+ str(acc)+'_'+ str(p)+'_'+str(r)+'_'+str(f1score)+'.pth')
                 
-    top_pre = torch.cat(top_pre,axis=0).cpu()
-    top_label=torch.cat(top_label,axis=0).cpu()
+                torch.save(checkpoint, os.path.join(savePath, 'best_model.pth'))
     
-    totals.append(mytop)
-    ps.append(top_p)
-    rs.append(top_r)
-    f1s.append(top_f1)
-    logging.info('topacc:'.format(mytop))
-    logging.info('')
+    # ================== 【新增】加载最佳权重逻辑 ==================
+    print("Training Finished. Loading Best Model for Final Testing...")
+    best_model_path = os.path.join(savePath, 'best_model.pth')
     
-    print("train end")
+    if os.path.exists(best_model_path):
+        # 加载 checkpoint
+        checkpoint = torch.load(best_model_path)
+        # 覆盖当前模型的参数
+        model.load_state_dict(checkpoint['net'])
+        print(f"Successfully loaded best model (Acc: {topacc}%) from {best_model_path}")
+    else:
+        print("Warning: No best model found! Using model from last epoch.")
+
+    model.eval()
+    test_correct = 0
+    test_total = 0
+    test_label = []
+    test_pre = []
     
-    return top_label,top_pre
+    print("******* FINAL TEST ********")
+    with torch.no_grad():
+        for batch_idx, (videoData, audioData, label) in tqdm(enumerate(finalTestLoader)):
+            if torch.cuda.is_available():
+                videoData, audioData, label = videoData.to(device), audioData.to(device), label.to(device)
+            
+            output = model(videoData, audioData)
+            _, predicted = torch.max(output.data, 1)
+            
+            test_total += label.size(0)
+            test_correct += predicted.eq(label.data).cpu().sum()
+            
+            test_label += label.data.tolist()
+            test_pre += predicted.tolist()
+            
+    final_acc = 100.0 * test_correct / test_total
+    print(f"Final Test Accuracy: {final_acc:.2f}%")
+    
+    # 保存 Confusion Matrix
+    plot_confusion_matrix(test_label, test_pre, [0, 1], 
+                          savename=filepath + '/final_test_confusion_matrix.png',
+                          title=f'Final Test Acc: {final_acc:.2f}%')
+                          
+    # 计算最终测试集的各项指标
+    final_acc = 100.0 * test_correct / test_total
+    final_p = precision_score(test_label, test_pre, average='weighted')
+    final_r = recall_score(test_label, test_pre, average='weighted')
+    final_f1 = f1_score(test_label, test_pre, average='weighted')
+    
+    print(f"--- Fold Final Metrics ---")
+    print(f"Acc: {final_acc:.2f}%, Precision: {final_p:.4f}, Recall: {final_r:.4f}, F1: {final_f1:.4f}")
+    
+    # 关键修改：返回所有核心指标
+    return {
+        'acc': final_acc.item() if torch.is_tensor(final_acc) else final_acc,
+        'precision': final_p,
+        'recall': final_r,
+        'f1': final_f1
+    }
+    # top_pre = torch.cat(top_pre,axis=0).cpu()
+    # top_label=torch.cat(top_label,axis=0).cpu()
+    
+    # totals.append(mytop)
+    # ps.append(top_p)
+    # rs.append(top_r)
+    # f1s.append(top_f1)
+    # logging.info('topacc:'.format(mytop))
+    # logging.info('')
+    
+    # print("Training Finished. Loading Best Model for Final Testing...")
+    # print("train end")
+    
+    # return top_label,top_pre
 
 def count(string):
     dig = sum(1 for char in string if char.isdigit())
@@ -276,57 +476,71 @@ def count(string):
 if __name__ == '__main__':
     import random
     from sklearn.model_selection import KFold,StratifiedKFold
-    seed = 2222
+    seed = 42
     
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
     
-    tcn = "the tcnfeature path"
-    mdnAudioPath = "the audiofeature path"
-    labelPath="the label file path"
+    tcn = "data/LMVD_Feature/tcnfeature"
+    mdnAudioPath = "data/LMVD_Feature/Audio_feature"
+    labelPath="label/label"
 
     
-    Y = []
-    kf = StratifiedKFold(n_splits=10, shuffle=True, random_state = 42)
+    # 1. 加载所有样本路径和标签
     X = os.listdir(tcn)
-    X.sort(key = lambda x : int(x.split(".")[0]))
+    X.sort(key=lambda x: int(x.split(".")[0]))
     X = np.array(X)
     
+    Y = []
     for i in X:
-        file_csv = pd.read_csv(os.path.join(labelPath,(str(i.split('.npy')[0])+"_Depression.csv")))
-        bdi = int(file_csv.columns[0])
-        Y.append(bdi)
+        # 注意路径拼接逻辑需与你的文件夹匹配
+        file_csv = pd.read_csv(os.path.join(labelPath, (str(i.split('.npy')[0])+"_Depression.csv")))
+        Y.append(int(file_csv.columns[0]))
+    Y = np.array(Y)
 
-    numkfold  = 0
+    # 2. 【关键修改】首先切分出 10% 的“固定测试集”
+    # 使用 stratify=Y 确保测试集中的抑郁/正常比例与全集一致
+    X_train_val_pool, X_test_holdout, Y_train_val_pool, Y_test_holdout = train_test_split(
+        X, Y, test_size=0.10, stratify=Y, random_state=seed
+    )
 
-    for train_index, test_index in kf.split(X,Y):
-        X_train, X_test = X[train_index], X[test_index] 
-        numkfold +=1
-        logging.info('The {}  fold training set is:{}'.format(numkfold, X_train))
-        logging.info('The {}  fold test set is:{}'.format(numkfold, X_test))
-        total_label_0,total_pre_0 = train(tcn, mdnAudioPath,X_train,X_test,labelPath,numkfold)
-        total_pre.append(total_pre_0)
-        total_label.append(total_label_0)
+    print(f"Total: {len(X)}, Train-Val Pool: {len(X_train_val_pool)}, Fixed Test Set: {len(X_test_holdout)}")
+
+    # 3. 在剩下的 90% 数据上设置十折交叉验证
+    skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=seed)
+    
+    metrics_history = {'acc': [], 'precision': [], 'recall': [], 'f1': []}
+    
+    # 4. 开始 K-Fold 循环 (在池子内循环)
+    for fold, (train_idx, val_idx) in enumerate(skf.split(X_train_val_pool, Y_train_val_pool)):
+        print(f"\n{'='*20} Fold {fold+1} / 10 {'='*20}")
         
-    total_pre = torch.cat(total_pre,axis=0).cpu().numpy()
-    total_label=torch.cat(total_label,axis=0).cpu().numpy()
-    np.save(filepath+"/total_pre.npy",total_pre)
-    np.save(filepath+"/total_label.npy",total_label)
-    
-    plot_confusion_matrix(total_label,total_pre,[0,1],savename=filepath+'/confusion_matrix.png')
-    
-    logging.info('The accuracy is：{}'.format(totals))
-    logging.info('The average accuracy is：{}'.format(sum(totals)/len(totals)))
-    logging.info('The precision is：{}'.format(ps))
-    logging.info('The average precision is：{}'.format(sum(ps)/len(ps)))
-    logging.info('The recall is：{}'.format(rs))
-    logging.info('The average recall is：{}'.format(sum(rs)/len(rs)))
-    logging.info('The f1 is：{}'.format(f1s))
-    logging.info('The average f1 is：{}'.format(sum(f1s)/len(f1s)))
-    print(totals)
-    print(sum(totals)/len(totals))
+        # 从池子中提取当前折的训练集(81%)和验证集(9%)
+        X_train_fold = X_train_val_pool[train_idx]
+        X_val_fold = X_train_val_pool[val_idx]
+        
+        # 5. 执行训练
+        # 这里的 X_test_holdout 是全局固定的 10%
+        fold_results = train(tcn, mdnAudioPath, 
+                             X_train_fold,  # 训练用 (81%)
+                             X_val_fold,    # 验证/早停用 (9%)
+                             X_test_holdout, # 最终测试用 (固定 10%)
+                             labelPath, 
+                             fold_name=f"Fold_{fold+1}")
+        
+        # 记录指标
+        for key in metrics_history.keys():
+            metrics_history[key].append(fold_results[key])
 
-
-
+    # 5. 统计最终结果（均值和标准差）
+    print(f"\n{'*'*15} FINAL 10-FOLD CROSS VALIDATION RESULTS {'*'*15}")
+    for key, values in metrics_history.items():
+        mean_val = np.mean(values)
+        std_val = np.std(values)
+        # Accuracy 打印百分比，其他打印小数
+        if key == 'acc':
+            print(f"{key.upper():<10}: {mean_val:.2f}% (+/- {std_val:.2f}%)")
+        else:
+            print(f"{key.upper():<10}: {mean_val:.4f} (+/- {std_val:.4f})")

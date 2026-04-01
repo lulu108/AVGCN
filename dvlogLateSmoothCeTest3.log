@@ -1,0 +1,362 @@
+Dataset: DVLOG
+Video Path: data/dvlog-dataset/dvlog-dataset
+Audio Path: data/dvlog-dataset/dvlog-dataset
+Face Path: data/dvlog-dataset/dvlog-dataset
+Label Path: data/dvlog-dataset/dvlog-dataset/labels.csv
+labels.csv 过滤: 961 -> 961 (磁盘上存在的样本)
+
+--- DVLOG 固定划分统计 ---
+Train: 647 samples, 分布: {'depression': 375, 'normal': 272}
+Dev:   102 samples,   分布: {'depression': 57, 'normal': 45}
+Test:  212 samples,  分布: {'depression': 123, 'normal': 89}
+[set_all_seeds] seed=41, cudnn.deterministic=True, strict_deterministic_algos=True
+
+==================== Seed 41 ====================
+[ES-INIT] monitor=macro_f1 best_monitor=-inf ema_monitor=-inf ema_loss_val=None
+[IMPORT-CHECK] MultiModalDataLoader from /root/autodl-tmp/LMVD_new/model/vitGCN/kfoldLoader_multimodal.py
+[IMPORT-CHECK] collate_fn_multimodal from /root/autodl-tmp/LMVD_new/model/vitGCN/kfoldLoader_multimodal.py
+[IMPORT-CHECK] ViT_GCN_Fusion from /root/autodl-tmp/LMVD_new/model/vitGCN/Vit_gcnmodel.py
+[IMPORT-CHECK] MultiModalDataLoader.__init__ signature: (self, file_list, video_feature_path, audio_feature_path, face_landmark_path, label_path, T_target=915, mode='train', dataset='LMVD', uniform_ratio=0.5, dvlog_aug_noise_std=0.005, dvlog_audio_mask_ratio=0.03, segment_len=0)
+[IMPORT-CHECK] FocalBCELoss.forward signature: (self, logits, target, sample_weight=None)
+[MultiModalDataLoader] DVLOG 标签已缓存: 961 条
+[MultiModalDataLoader] DVLOG aug config: noise_std=0.005, audio_mask_ratio=0.03, uniform_ratio=0.7
+[MultiModalDataLoader] DVLOG train fixed segment_len=300, T_target=300
+[MultiModalDataLoader] DVLOG 标签已缓存: 961 条
+[MultiModalDataLoader] DVLOG aug config: noise_std=0.005, audio_mask_ratio=0.03, uniform_ratio=0.7
+[MultiModalDataLoader] DVLOG 标签已缓存: 961 条
+[MultiModalDataLoader] DVLOG aug config: noise_std=0.005, audio_mask_ratio=0.03, uniform_ratio=0.7
+DataLoaders Ready: Train=41, Dev=13, Test=27
+[SEG] train_T=300, train_segment_len=300, eval_sliding=True, eval_stride=128
+[Model] Fusion mode: late, sd=0.0, dropout=0.1
+[CFG-CHECK] FACE_VALID_THRESH=0.1
+[CFG-CHECK] model.face_valid_thresh=0.1
+[CFG-CHECK] gcn_branch.face_valid_thresh=0.1
+[CFG-CHECK] FACE_VALID_THRESH=0.1
+[CFG-CHECK] model.face_valid_thresh=0.1
+[CFG-CHECK] gcn_branch.face_valid_thresh=0.1
+[EMA] USE_MODEL_EMA=True, decay=0.995
+[AUG] DVLOG preset=weak, noise_std=0.005, audio_mask_ratio=0.03, uniform_ratio=0.7
+[MIL] USE_SEGMENT_MIL=False, seg_len=300, k_train=4, k_eval=8, train_agg=weighted_mean, eval_agg=weighted_mean
+[class_weight] counts=[272.0, 375.0]  weights=[1.0801090002059937, 0.9198910593986511]
+[train/seed_41] LOSS_MODE=smooth_ce  smoothing=0.05  class_w=[1.0801, 0.9199]
+[train/seed_41] eff_lr=1.00e-04  (base_lr=1.00e-04, fusion_mode=late, LOSS_MODE=smooth_ce)
+[SEG-GETITEM] apply center-jitter segment: start=190, end=490, seg_len=300, center=174, jitter=64
+[FaceValid][Train Epoch 1] valid_mean=0.756, low(<0.1)=0.244
+[Recon][Epoch 1] recon_v_mse=0.338272  recon_g_mse=0.767844  recon_total_weighted=0.022122  recon_lam=0.02  steps=41
+[SEG-CHECK][Epoch 1] seg_len_eff=300
+[SEG-CHECK][Epoch 1] first_batch_T=300
+[SEG-CHECK][Epoch 1] actual_lens_mean=274.09
+[SW-CHECK][Epoch 1] sw_mean=0.8939, sw_lt1_ratio=0.1326
+[FaceValid][Train Epoch 2] valid_mean=0.755, low(<0.1)=0.245
+[Recon][Epoch 2] recon_v_mse=0.356989  recon_g_mse=0.740160  recon_total_weighted=0.021943  recon_lam=0.02  steps=41
+[SEG-CHECK][Epoch 2] seg_len_eff=300
+[SEG-CHECK][Epoch 2] first_batch_T=300
+[SEG-CHECK][Epoch 2] actual_lens_mean=274.37
+[SW-CHECK][Epoch 2] sw_mean=0.8939, sw_lt1_ratio=0.1326
+[FaceValid][Train Epoch 3] valid_mean=0.754, low(<0.1)=0.246
+[Recon][Epoch 3] recon_v_mse=0.379168  recon_g_mse=0.659022  recon_total_weighted=0.020764  recon_lam=0.02  steps=41
+[SEG-CHECK][Epoch 3] seg_len_eff=300
+[SEG-CHECK][Epoch 3] first_batch_T=300
+[SEG-CHECK][Epoch 3] actual_lens_mean=274.15
+[SW-CHECK][Epoch 3] sw_mean=0.8951, sw_lt1_ratio=0.1311
+[FaceValid][Train Epoch 4] valid_mean=0.754, low(<0.1)=0.246
+[Recon][Epoch 4] recon_v_mse=0.439634  recon_g_mse=0.591094  recon_total_weighted=0.020615  recon_lam=0.02  steps=41
+[SEG-CHECK][Epoch 4] seg_len_eff=300
+[SEG-CHECK][Epoch 4] first_batch_T=300
+[SEG-CHECK][Epoch 4] actual_lens_mean=274.28
+[SW-CHECK][Epoch 4] sw_mean=0.8951, sw_lt1_ratio=0.1311
+[FaceValid][Train Epoch 5] valid_mean=0.751, low(<0.1)=0.249
+[Recon][Epoch 5] recon_v_mse=0.435420  recon_g_mse=0.432205  recon_total_weighted=0.017352  recon_lam=0.02  steps=41
+[SEG-CHECK][Epoch 5] seg_len_eff=300
+[SEG-CHECK][Epoch 5] first_batch_T=300
+[SEG-CHECK][Epoch 5] actual_lens_mean=274.26
+[SW-CHECK][Epoch 5] sw_mean=0.8963, sw_lt1_ratio=0.1296
+[FaceValid][Train Epoch 6] valid_mean=0.753, low(<0.1)=0.247
+[Recon][Epoch 6] recon_v_mse=0.394822  recon_g_mse=0.264275  recon_total_weighted=0.013182  recon_lam=0.02  steps=41
+[SEG-CHECK][Epoch 6] seg_len_eff=300
+[SEG-CHECK][Epoch 6] first_batch_T=300
+[SEG-CHECK][Epoch 6] actual_lens_mean=274.33
+[SW-CHECK][Epoch 6] sw_mean=0.8939, sw_lt1_ratio=0.1326
+[FaceValid][Train Epoch 7] valid_mean=0.749, low(<0.1)=0.251
+[Recon][Epoch 7] recon_v_mse=0.348188  recon_g_mse=0.144280  recon_total_weighted=0.009849  recon_lam=0.02  steps=41
+[SEG-CHECK][Epoch 7] seg_len_eff=300
+[SEG-CHECK][Epoch 7] first_batch_T=300
+[SEG-CHECK][Epoch 7] actual_lens_mean=273.99
+[SW-CHECK][Epoch 7] sw_mean=0.8908, sw_lt1_ratio=0.1365
+[FaceValid][Train Epoch 8] valid_mean=0.753, low(<0.1)=0.247
+[Recon][Epoch 8] recon_v_mse=0.365082  recon_g_mse=0.088060  recon_total_weighted=0.009063  recon_lam=0.02  steps=41
+[SEG-CHECK][Epoch 8] seg_len_eff=300
+[SEG-CHECK][Epoch 8] first_batch_T=300
+[SEG-CHECK][Epoch 8] actual_lens_mean=274.28
+[SW-CHECK][Epoch 8] sw_mean=0.8923, sw_lt1_ratio=0.1346
+[FaceValid][Train Epoch 9] valid_mean=0.753, low(<0.1)=0.247
+[Recon][Epoch 9] recon_v_mse=0.361984  recon_g_mse=0.068159  recon_total_weighted=0.008603  recon_lam=0.02  steps=41
+[SEG-CHECK][Epoch 9] seg_len_eff=300
+[SEG-CHECK][Epoch 9] first_batch_T=300
+[SEG-CHECK][Epoch 9] actual_lens_mean=274.35
+[SW-CHECK][Epoch 9] sw_mean=0.8923, sw_lt1_ratio=0.1346
+[FaceValid][Train Epoch 10] valid_mean=0.752, low(<0.1)=0.248
+[Recon][Epoch 10] recon_v_mse=0.431449  recon_g_mse=0.065609  recon_total_weighted=0.009941  recon_lam=0.02  steps=41
+[SEG-CHECK][Epoch 10] seg_len_eff=300
+[SEG-CHECK][Epoch 10] first_batch_T=300
+[SEG-CHECK][Epoch 10] actual_lens_mean=273.93
+[SW-CHECK][Epoch 10] sw_mean=0.8936, sw_lt1_ratio=0.1331
+*******dev********
+[EVAL-PATH][dev] using _forward_fusion_eval_logits (sliding=True, seg_len=300, stride=128)
+[EVAL-BATCH] T_cur=870, seg_len=300, max_valid_mean=616.12, actual_lens_mean=616.12, pad_ratio_excluded=0.2918
+[EVAL-WINDOW] T_cur=870, seg_len=300, max_valid=420, pad_ratio_excluded=0.5172, starts=5, kept=4, min_valid_ratio=0.4, weighted=True
+
+[DEV Epoch 10] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[43  2]
+ [51  6]]
+[DEV] Class-0(Normal)    : P=0.4574  R=0.9556  F1=0.6187
+[DEV] Class-1(Depression): P=0.7500  R=0.1053  F1=0.1846
+[DEV] Macro              : P=0.6037  R=0.5304  F1=0.4017
+
+[DEV] Threshold sweep: best_thr=0.21  sweep_F1=0.6762  argmax_F1=0.4017
+  [BestModel] argmax_F1=0.4017 @epoch 10 | thr=0.21
+Dev epoch:10, Loss:0.7607934245696435,Acc:48.039215087890625%
+[ES] epoch=10 monitor=macro_f1 cur_macro_f1=0.4017 ema_macro_f1=0.4017 best_macro_f1=-inf improved=True
+  [EMA] best_ema checkpoint saved at epoch 10 (EMA Macro-F1=0.4017)
+[FaceValid][Train Epoch 11] valid_mean=0.752, low(<0.1)=0.248
+[Recon][Epoch 11] recon_v_mse=0.397164  recon_g_mse=0.059170  recon_total_weighted=0.009127  recon_lam=0.02  steps=41
+[SEG-CHECK][Epoch 11] seg_len_eff=300
+[SEG-CHECK][Epoch 11] first_batch_T=300
+[SEG-CHECK][Epoch 11] actual_lens_mean=274.29
+[SW-CHECK][Epoch 11] sw_mean=0.8939, sw_lt1_ratio=0.1326
+*******dev********
+[EVAL-PATH][dev] using _forward_fusion_eval_logits (sliding=True, seg_len=300, stride=128)
+
+[DEV Epoch 11] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[26 19]
+ [16 41]]
+[DEV] Class-0(Normal)    : P=0.6190  R=0.5778  F1=0.5977
+[DEV] Class-1(Depression): P=0.6833  R=0.7193  F1=0.7009
+[DEV] Macro              : P=0.6512  R=0.6485  F1=0.6493
+
+[DEV] Threshold sweep: best_thr=0.58  sweep_F1=0.6960  argmax_F1=0.6493
+  [BestModel] argmax_F1=0.6493 @epoch 11 | thr=0.58
+Dev epoch:11, Loss:0.6447842281598312,Acc:65.68627166748047%
+[ES] epoch=11 monitor=macro_f1 cur_macro_f1=0.6493 ema_macro_f1=0.4759 best_macro_f1=0.4017 improved=True
+  [EMA] best_ema checkpoint saved at epoch 11 (EMA Macro-F1=0.4759)
+[FaceValid][Train Epoch 12] valid_mean=0.756, low(<0.1)=0.244
+[Recon][Epoch 12] recon_v_mse=0.571040  recon_g_mse=0.067641  recon_total_weighted=0.012774  recon_lam=0.02  steps=41
+[SEG-CHECK][Epoch 12] seg_len_eff=300
+[SEG-CHECK][Epoch 12] first_batch_T=300
+[SEG-CHECK][Epoch 12] actual_lens_mean=274.39
+[SW-CHECK][Epoch 12] sw_mean=0.8939, sw_lt1_ratio=0.1326
+*******dev********
+[EVAL-PATH][dev] using _forward_fusion_eval_logits (sliding=True, seg_len=300, stride=128)
+
+[DEV Epoch 12] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[36  9]
+ [29 28]]
+[DEV] Class-0(Normal)    : P=0.5538  R=0.8000  F1=0.6545
+[DEV] Class-1(Depression): P=0.7568  R=0.4912  F1=0.5957
+[DEV] Macro              : P=0.6553  R=0.6456  F1=0.6251
+
+[DEV] Threshold sweep: best_thr=0.25  sweep_F1=0.6762  argmax_F1=0.6251
+Dev epoch:12, Loss:0.6797064473995795,Acc:62.74509811401367%
+[ES] epoch=12 monitor=macro_f1 cur_macro_f1=0.6251 ema_macro_f1=0.5207 best_macro_f1=0.4759 improved=True
+  [EMA] best_ema checkpoint saved at epoch 12 (EMA Macro-F1=0.5207)
+[FaceValid][Train Epoch 13] valid_mean=0.753, low(<0.1)=0.247
+[Recon][Epoch 13] recon_v_mse=0.430846  recon_g_mse=0.066512  recon_total_weighted=0.009947  recon_lam=0.02  steps=41
+[SEG-CHECK][Epoch 13] seg_len_eff=300
+[SEG-CHECK][Epoch 13] first_batch_T=300
+[SEG-CHECK][Epoch 13] actual_lens_mean=274.39
+[SW-CHECK][Epoch 13] sw_mean=0.8923, sw_lt1_ratio=0.1346
+*******dev********
+[EVAL-PATH][dev] using _forward_fusion_eval_logits (sliding=True, seg_len=300, stride=128)
+
+[DEV Epoch 13] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[42  3]
+ [42 15]]
+[DEV] Class-0(Normal)    : P=0.5000  R=0.9333  F1=0.6512
+[DEV] Class-1(Depression): P=0.8333  R=0.2632  F1=0.4000
+[DEV] Macro              : P=0.6667  R=0.5982  F1=0.5256
+
+[DEV] Threshold sweep: best_thr=0.30  sweep_F1=0.6858  argmax_F1=0.5256
+Dev epoch:13, Loss:0.7057302273236788,Acc:55.882354736328125%
+[ES] epoch=13 monitor=macro_f1 cur_macro_f1=0.5256 ema_macro_f1=0.5222 best_macro_f1=0.5207 improved=True
+  [EMA] best_ema checkpoint saved at epoch 13 (EMA Macro-F1=0.5222)
+[FaceValid][Train Epoch 14] valid_mean=0.754, low(<0.1)=0.246
+[Recon][Epoch 14] recon_v_mse=0.425152  recon_g_mse=0.041585  recon_total_weighted=0.009335  recon_lam=0.02  steps=41
+[SEG-CHECK][Epoch 14] seg_len_eff=300
+[SEG-CHECK][Epoch 14] first_batch_T=300
+[SEG-CHECK][Epoch 14] actual_lens_mean=273.52
+[SW-CHECK][Epoch 14] sw_mean=0.8939, sw_lt1_ratio=0.1326
+*******dev********
+[EVAL-PATH][dev] using _forward_fusion_eval_logits (sliding=True, seg_len=300, stride=128)
+
+[DEV Epoch 14] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[24 21]
+ [11 46]]
+[DEV] Class-0(Normal)    : P=0.6857  R=0.5333  F1=0.6000
+[DEV] Class-1(Depression): P=0.6866  R=0.8070  F1=0.7419
+[DEV] Macro              : P=0.6861  R=0.6702  F1=0.6710
+
+[DEV] Threshold sweep: best_thr=0.52  sweep_F1=0.6737  argmax_F1=0.6710
+  [BestModel] argmax_F1=0.6710 @epoch 14 | thr=0.52
+Dev epoch:14, Loss:0.6613999559329107,Acc:68.62744903564453%
+[ES] epoch=14 monitor=macro_f1 cur_macro_f1=0.6710 ema_macro_f1=0.5668 best_macro_f1=0.5222 improved=True
+  [EMA] best_ema checkpoint saved at epoch 14 (EMA Macro-F1=0.5668)
+[FaceValid][Train Epoch 15] valid_mean=0.746, low(<0.1)=0.254
+[Recon][Epoch 15] recon_v_mse=0.360806  recon_g_mse=0.051291  recon_total_weighted=0.008242  recon_lam=0.02  steps=41
+[SEG-CHECK][Epoch 15] seg_len_eff=300
+[SEG-CHECK][Epoch 15] first_batch_T=300
+[SEG-CHECK][Epoch 15] actual_lens_mean=274.15
+[SW-CHECK][Epoch 15] sw_mean=0.8876, sw_lt1_ratio=0.1405
+*******dev********
+[EVAL-PATH][dev] using _forward_fusion_eval_logits (sliding=True, seg_len=300, stride=128)
+
+[DEV Epoch 15] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[36  9]
+ [31 26]]
+[DEV] Class-0(Normal)    : P=0.5373  R=0.8000  F1=0.6429
+[DEV] Class-1(Depression): P=0.7429  R=0.4561  F1=0.5652
+[DEV] Macro              : P=0.6401  R=0.6281  F1=0.6040
+
+[DEV] Threshold sweep: best_thr=0.17  sweep_F1=0.6762  argmax_F1=0.6040
+Dev epoch:15, Loss:0.7307122647762299,Acc:60.7843132019043%
+[ES] epoch=15 monitor=macro_f1 cur_macro_f1=0.6040 ema_macro_f1=0.5780 best_macro_f1=0.5668 improved=True
+  [EMA] best_ema checkpoint saved at epoch 15 (EMA Macro-F1=0.5780)
+[FaceValid][Train Epoch 16] valid_mean=0.753, low(<0.1)=0.247
+[Recon][Epoch 16] recon_v_mse=0.294789  recon_g_mse=0.040106  recon_total_weighted=0.006698  recon_lam=0.02  steps=41
+[SEG-CHECK][Epoch 16] seg_len_eff=300
+[SEG-CHECK][Epoch 16] first_batch_T=300
+[SEG-CHECK][Epoch 16] actual_lens_mean=274.04
+[SW-CHECK][Epoch 16] sw_mean=0.8923, sw_lt1_ratio=0.1346
+*******dev********
+[EVAL-PATH][dev] using _forward_fusion_eval_logits (sliding=True, seg_len=300, stride=128)
+
+[DEV Epoch 16] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[38  7]
+ [29 28]]
+[DEV] Class-0(Normal)    : P=0.5672  R=0.8444  F1=0.6786
+[DEV] Class-1(Depression): P=0.8000  R=0.4912  F1=0.6087
+[DEV] Macro              : P=0.6836  R=0.6678  F1=0.6436
+
+[DEV] Threshold sweep: best_thr=0.38  sweep_F1=0.7154  argmax_F1=0.6436
+Dev epoch:16, Loss:0.7033228805431953,Acc:64.70587921142578%
+[ES] epoch=16 monitor=macro_f1 cur_macro_f1=0.6436 ema_macro_f1=0.5977 best_macro_f1=0.5780 improved=True
+  [EMA] best_ema checkpoint saved at epoch 16 (EMA Macro-F1=0.5977)
+[FaceValid][Train Epoch 17] valid_mean=0.754, low(<0.1)=0.246
+[Recon][Epoch 17] recon_v_mse=0.293632  recon_g_mse=0.040027  recon_total_weighted=0.006673  recon_lam=0.02  steps=41
+[SEG-CHECK][Epoch 17] seg_len_eff=300
+[SEG-CHECK][Epoch 17] first_batch_T=300
+[SEG-CHECK][Epoch 17] actual_lens_mean=273.86
+[SW-CHECK][Epoch 17] sw_mean=0.8951, sw_lt1_ratio=0.1311
+*******dev********
+[EVAL-PATH][dev] using _forward_fusion_eval_logits (sliding=True, seg_len=300, stride=128)
+
+[DEV Epoch 17] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[38  7]
+ [30 27]]
+[DEV] Class-0(Normal)    : P=0.5588  R=0.8444  F1=0.6726
+[DEV] Class-1(Depression): P=0.7941  R=0.4737  F1=0.5934
+[DEV] Macro              : P=0.6765  R=0.6591  F1=0.6330
+
+[DEV] Threshold sweep: best_thr=0.33  sweep_F1=0.7154  argmax_F1=0.6330
+Dev epoch:17, Loss:0.6827873839781835,Acc:63.72549057006836%
+[ES] epoch=17 monitor=macro_f1 cur_macro_f1=0.6330 ema_macro_f1=0.6083 best_macro_f1=0.5977 improved=True
+  [EMA] best_ema checkpoint saved at epoch 17 (EMA Macro-F1=0.6083)
+[FaceValid][Train Epoch 18] valid_mean=0.749, low(<0.1)=0.251
+[Recon][Epoch 18] recon_v_mse=0.260176  recon_g_mse=0.034516  recon_total_weighted=0.005894  recon_lam=0.02  steps=41
+[SEG-CHECK][Epoch 18] seg_len_eff=300
+[SEG-CHECK][Epoch 18] first_batch_T=300
+[SEG-CHECK][Epoch 18] actual_lens_mean=274.37
+[SW-CHECK][Epoch 18] sw_mean=0.8892, sw_lt1_ratio=0.1385
+*******dev********
+[EVAL-PATH][dev] using _forward_fusion_eval_logits (sliding=True, seg_len=300, stride=128)
+
+[DEV Epoch 18] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[33 12]
+ [20 37]]
+[DEV] Class-0(Normal)    : P=0.6226  R=0.7333  F1=0.6735
+[DEV] Class-1(Depression): P=0.7551  R=0.6491  F1=0.6981
+[DEV] Macro              : P=0.6889  R=0.6912  F1=0.6858
+
+[DEV] Threshold sweep: best_thr=0.53  sweep_F1=0.6862  argmax_F1=0.6858
+  [BestModel] argmax_F1=0.6858 @epoch 18 | thr=0.53
+Dev epoch:18, Loss:0.6584121080545279,Acc:68.62744903564453%
+[ES] epoch=18 monitor=macro_f1 cur_macro_f1=0.6858 ema_macro_f1=0.6315 best_macro_f1=0.6083 improved=True
+  [EMA] best_ema checkpoint saved at epoch 18 (EMA Macro-F1=0.6315)
+[FaceValid][Train Epoch 19] valid_mean=0.755, low(<0.1)=0.245
+[Recon][Epoch 19] recon_v_mse=0.269687  recon_g_mse=0.035977  recon_total_weighted=0.006113  recon_lam=0.02  steps=41
+[SEG-CHECK][Epoch 19] seg_len_eff=300
+[SEG-CHECK][Epoch 19] first_batch_T=300
+[SEG-CHECK][Epoch 19] actual_lens_mean=274.21
+[SW-CHECK][Epoch 19] sw_mean=0.8927, sw_lt1_ratio=0.1341
+*******dev********
+[EVAL-PATH][dev] using _forward_fusion_eval_logits (sliding=True, seg_len=300, stride=128)
+
+[DEV Epoch 19] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[26 19]
+ [17 40]]
+[DEV] Class-0(Normal)    : P=0.6047  R=0.5778  F1=0.5909
+[DEV] Class-1(Depression): P=0.6780  R=0.7018  F1=0.6897
+[DEV] Macro              : P=0.6413  R=0.6398  F1=0.6403
+
+[DEV] Threshold sweep: best_thr=0.60  sweep_F1=0.6858  argmax_F1=0.6403
+Dev epoch:19, Loss:0.6629966703745035,Acc:64.70587921142578%
+[ES] epoch=19 monitor=macro_f1 cur_macro_f1=0.6403 ema_macro_f1=0.6342 best_macro_f1=0.6315 improved=True
+  [EMA] best_ema checkpoint saved at epoch 19 (EMA Macro-F1=0.6342)
+[FaceValid][Train Epoch 20] valid_mean=0.755, low(<0.1)=0.245
+[Recon][Epoch 20] recon_v_mse=0.274832  recon_g_mse=0.039292  recon_total_weighted=0.006282  recon_lam=0.02  steps=41
+[SEG-CHECK][Epoch 20] seg_len_eff=300
+[SEG-CHECK][Epoch 20] first_batch_T=300
+[SEG-CHECK][Epoch 20] actual_lens_mean=274.34
+[SW-CHECK][Epoch 20] sw_mean=0.8951, sw_lt1_ratio=0.1311
+*******dev********
+[EVAL-PATH][dev] using _forward_fusion_eval_logits (sliding=True, seg_len=300, stride=128)
+
+[DEV Epoch 20] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[37  8]
+ [27 30]]
+[DEV] Class-0(Normal)    : P=0.5781  R=0.8222  F1=0.6789
+[DEV] Class-1(Depression): P=0.7895  R=0.5263  F1=0.6316
+[DEV] Macro              : P=0.6838  R=0.6743  F1=0.6552
+
+[DEV] Threshold sweep: best_thr=0.20  sweep_F1=0.6819  argmax_F1=0.6552
+Dev epoch:20, Loss:0.7028100181084412,Acc:65.68627166748047%
+[ES] epoch=20 monitor=macro_f1 cur_macro_f1=0.6552 ema_macro_f1=0.6405 best_macro_f1=0.6342 improved=True
+  [EMA] best_ema checkpoint saved at epoch 20 (EMA Macro-F1=0.6405)
+[FaceValid][Train Epoch 21] valid_mean=0.752, low(<0.1)=0.248
+[Recon][Epoch 21] recon_v_mse=0.252584  recon_g_mse=0.035912  recon_total_weighted=0.005770  recon_lam=0.02  steps=41
+[SEG-CHECK][Epoch 21] seg_len_eff=300
+[SEG-CHECK][Epoch 21] first_batch_T=300
+[SEG-CHECK][Epoch 21] actual_lens_mean=274.03
+[SW-CHECK][Epoch 21] sw_mean=0.8936, sw_lt1_ratio=0.1331
+*******dev********
+[EVAL-PATH][dev] using _forward_fusion_eval_logits (sliding=True, seg_len=300, stride=128)
+
+[DEV Epoch 21] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[37  8]
+ [26 31]]
+[DEV] Class-0(Normal)    : P=0.5873  R=0.8222  F1=0.6852
+[DEV] Class-1(Depression): P=0.7949  R=0.5439  F1=0.6458
+[DEV] Macro              : P=0.6911  R=0.6830  F1=0.6655
+
+[DEV] Threshold sweep: best_thr=0.46  sweep_F1=0.7059  argmax_F1=0.6655
+Dev epoch:21, Loss:0.6881183890195993,Acc:66.66666412353516%
+[ES] epoch=21 monitor=macro_f1 cur_macro_f1=0.6655 ema_macro_f1=0.6480 best_macro_f1=0.6405 improved=True
+  [EMA] best_ema checkpoint saved at epoch 21 (EMA Macro-F1=0.6480)
+[FaceValid][Train Epoch 22] valid_mean=0.754, low(<0.1)=0.246
+[Recon][Epoch 22] recon_v_mse=0.248504  recon_g_mse=0.037090  recon_total_weighted=0.005712  recon_lam=0.02  steps=41
+[SEG-CHECK][Epoch 22] seg_len_eff=300
+[SEG-CHECK][Epoch 22] first_batch_T=300
+[SEG-CHECK][Epoch 22] actual_lens_mean=273.92
+[SW-CHECK][Epoch 22] sw_mean=0.8923, sw_lt1_ratio=0.1346
+*******dev********
+[EVAL-PATH][dev] using _forward_fusion_eval_logits (sliding=True, seg_len=300, stride=128)
+
+[DEV Epoch 22] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[38  7]
+ [30 27]]
+[DEV] Class-0(Normal)    : P=0.5588  R=0.8444  F1=0.6726
+[DEV] Class-1(Depression): P=0.7941  R=0.4737  F1=0.5934
+[DEV] Macro              : P=0.6765  R=0.6591  F1=0.6330
+
+[DEV] Threshold sweep: best_thr=0.14  sweep_F1=0.6937  argmax_F1=0.6330
+Dev epoch:22, Loss:0.8004623777591265,Acc:63.72549057006836%
+[ES] epoch=22 monitor=macro_f1 cur_macro_f1=0.6330 ema_macro_f1=0.6435 best_macro_f1=0.6480 improved=False
