@@ -82,6 +82,8 @@ class LMVDViTGCNFusion(nn.Module):
         audio_fixed_len=128,
         video_fixed_len=128,
         video_use_delta=True,
+        audio_strong_stem_kernel=3,
+        video_strong_stem_kernel=5,
     ):
         super().__init__()
         self.dim = dim
@@ -144,6 +146,8 @@ class LMVDViTGCNFusion(nn.Module):
             audio_fixed_len=audio_fixed_len,
             video_fixed_len=video_fixed_len,
             video_use_delta=video_use_delta,
+            audio_strong_stem_kernel=audio_strong_stem_kernel,
+            video_strong_stem_kernel=video_strong_stem_kernel,
         )
         self.vit_branch.classifier = nn.Identity()
 

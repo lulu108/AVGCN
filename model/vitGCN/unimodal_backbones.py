@@ -1,6 +1,83 @@
 import torch
 from torch import nn
 import torch.nn.functional as F
+from einops import rearrange
+
+
+class _FeedForward(nn.Module):
+    def __init__(self, dim_in, hidden_dim, dropout=0.0):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(dim_in, hidden_dim),
+            nn.GELU(),
+            nn.Dropout(dropout) if dropout > 0.0 else nn.Identity(),
+            nn.Linear(hidden_dim, dim_in),
+            nn.Dropout(dropout) if dropout > 0.0 else nn.Identity(),
+        )
+
+    def forward(self, x):
+        return self.net(x)
+
+
+class _Attention1d(nn.Module):
+    def __init__(self, dim_in, heads=8, dim_head=64, dropout=0.0):
+        super().__init__()
+        inner_dim = heads * dim_head
+        self.heads = heads
+        self.scale = dim_head ** -0.5
+        self.to_qkv = nn.Linear(dim_in, inner_dim * 3, bias=False)
+        self.to_out = nn.Sequential(
+            nn.Linear(inner_dim, dim_in),
+            nn.Dropout(dropout) if dropout > 0.0 else nn.Identity(),
+        )
+
+    def forward(self, x, mask=None):
+        qkv = self.to_qkv(x).chunk(3, dim=-1)
+        q, k, v = map(lambda t: rearrange(t, 'b n (h d) -> b h n d', h=self.heads), qkv)
+        dots = torch.einsum('b h i d, b h j d -> b h i j', q, k) * self.scale
+        dots = dots + mask if mask is not None else dots
+        attn = dots.softmax(dim=-1)
+        out = torch.einsum('b h i j, b h j d -> b h i d', attn, v)
+        out = rearrange(out, 'b h n d -> b n (h d)')
+        return self.to_out(out)
+
+
+class _TransformerBlock(nn.Module):
+    def __init__(self, dim, heads=8, dim_mlp=1024, dropout=0.0):
+        super().__init__()
+        self.norm1 = nn.LayerNorm(dim)
+        self.attn = _Attention1d(dim, heads=heads, dim_head=max(1, dim // heads), dropout=dropout)
+        self.norm2 = nn.LayerNorm(dim)
+        self.ff = _FeedForward(dim, dim_mlp, dropout=dropout)
+
+    def forward(self, x, mask=None):
+        x = x + self.attn(self.norm1(x), mask=mask)
+        x = x + self.ff(self.norm2(x))
+        return x
+
+
+class _TemporalTransformerStack(nn.Module):
+    def __init__(self, dim, depth, heads, dim_mlp, dropout=0.1):
+        super().__init__()
+        self.blocks = nn.ModuleList([
+            _TransformerBlock(dim=dim, heads=heads, dim_mlp=dim_mlp, dropout=dropout)
+            for _ in range(max(1, int(depth)))
+        ])
+
+    def forward(self, x, valid_mask=None):
+        attn_mask = None
+        if valid_mask is not None:
+            safe_mask = valid_mask.clone()
+            all_invalid = ~safe_mask.any(dim=1)
+            if all_invalid.any():
+                safe_mask[all_invalid] = True
+            attn_mask = (~safe_mask).float() * (-1e9)
+            attn_mask = attn_mask[:, None, None, :]
+        for blk in self.blocks:
+            x = blk(x, mask=attn_mask)
+        if valid_mask is not None:
+            x = x * valid_mask.unsqueeze(-1).float()
+        return x
 
 
 class _ResidualTemporalConvBlock(nn.Module):
@@ -98,15 +175,13 @@ class StrongAudioEncoder(nn.Module):
             for _ in range(max(1, int(local_blocks)))
         ])
         self.length_pool = nn.AdaptiveAvgPool1d(self.target_len)
-        enc_layer = nn.TransformerEncoderLayer(
-            d_model=model_dim,
-            nhead=heads,
-            dim_feedforward=dim_mlp,
+        self.global_encoder = _TemporalTransformerStack(
+            dim=model_dim,
+            depth=global_depth,
+            heads=heads,
+            dim_mlp=dim_mlp,
             dropout=dropout,
-            batch_first=True,
-            activation='gelu',
         )
-        self.global_encoder = nn.TransformerEncoder(enc_layer, num_layers=max(1, int(global_depth)))
         self.pool = _AttnPool1D(model_dim, dropout=dropout * 0.5)
 
     def forward(self, x, actual_lens=None):
@@ -119,12 +194,7 @@ class StrongAudioEncoder(nn.Module):
         x = self.length_pool(x)
         tokens = x.transpose(1, 2)
 
-        safe_mask = token_mask.clone()
-        all_invalid = ~safe_mask.any(dim=1)
-        if all_invalid.any():
-            safe_mask[all_invalid] = True
-        tokens = self.global_encoder(tokens, src_key_padding_mask=~safe_mask)
-        tokens = tokens * safe_mask.unsqueeze(-1).float()
+        tokens = self.global_encoder(tokens, valid_mask=token_mask)
         pooled, attn = self.pool(tokens, valid_mask=token_mask)
         return {
             'tokens': tokens,
@@ -171,15 +241,13 @@ class StrongLandmarkVideoEncoder(nn.Module):
             for i in range(max(1, int(local_blocks)))
         ])
         self.length_pool = nn.AdaptiveAvgPool1d(self.target_len)
-        enc_layer = nn.TransformerEncoderLayer(
-            d_model=model_dim,
-            nhead=heads,
-            dim_feedforward=dim_mlp,
+        self.global_encoder = _TemporalTransformerStack(
+            dim=model_dim,
+            depth=global_depth,
+            heads=heads,
+            dim_mlp=dim_mlp,
             dropout=dropout,
-            batch_first=True,
-            activation='gelu',
         )
-        self.global_encoder = nn.TransformerEncoder(enc_layer, num_layers=max(1, int(global_depth)))
         self.pool = _AttnPool1D(model_dim, dropout=dropout * 0.5)
 
     def forward(self, x, actual_lens=None):
@@ -196,12 +264,7 @@ class StrongLandmarkVideoEncoder(nn.Module):
         x = self.length_pool(x)
         tokens = x.transpose(1, 2)
 
-        safe_mask = token_mask.clone()
-        all_invalid = ~safe_mask.any(dim=1)
-        if all_invalid.any():
-            safe_mask[all_invalid] = True
-        tokens = self.global_encoder(tokens, src_key_padding_mask=~safe_mask)
-        tokens = tokens * safe_mask.unsqueeze(-1).float()
+        tokens = self.global_encoder(tokens, valid_mask=token_mask)
         pooled, attn = self.pool(tokens, valid_mask=token_mask)
         return {
             'tokens': tokens,

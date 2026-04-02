@@ -398,6 +398,8 @@ class AVBackboneCore(nn.Module):
                  audio_fixed_len=128,
                  video_fixed_len=128,
                  video_use_delta=True,
+                 audio_strong_stem_kernel=3,
+                 video_strong_stem_kernel=5,
                  **block_kwargs):
         super().__init__()
         self.name = name
@@ -417,6 +419,8 @@ class AVBackboneCore(nn.Module):
         self.audio_fixed_len = int(audio_fixed_len)
         self.video_fixed_len = int(video_fixed_len)
         self.video_use_delta = bool(video_use_delta)
+        self.audio_strong_stem_kernel = int(audio_strong_stem_kernel)
+        self.video_strong_stem_kernel = int(video_strong_stem_kernel)
         self.use_legacy_av_backbone = bool(use_legacy_av_backbone)
         self.use_feature_sequence_encoder = bool(use_feature_sequence_encoder)
         self.use_feature_sequence_encoder_effective = (
@@ -496,7 +500,7 @@ class AVBackboneCore(nn.Module):
                 global_depth=video_global_depth,
                 dim_mlp=dim_mlp,
                 dropout=dropout,
-                stem_kernel=5,
+                stem_kernel=self.video_strong_stem_kernel,
             )
         else:
             self.video_encoder = FeatureSequenceEncoder(
@@ -524,7 +528,7 @@ class AVBackboneCore(nn.Module):
                 global_depth=audio_global_depth,
                 dim_mlp=dim_mlp,
                 dropout=dropout,
-                stem_kernel=3,
+                stem_kernel=self.audio_strong_stem_kernel,
             )
         else:
             self.audio_encoder = FeatureSequenceEncoder(
@@ -721,6 +725,11 @@ class AVBackboneCore(nn.Module):
 
     def encode_feature_sequences(self, video_x, audio_x, actual_lens=None):
         if not self.use_feature_sequence_encoder_effective:
+            if self.single_modality_clean_path and self.modality_mode in {'audio_only', 'video_only'}:
+                video_x = video_x.permute(0, 2, 1)
+                audio_x = audio_x.permute(0, 2, 1)
+                audio_x = self.audio_tcn_encoder(audio_x)
+                return self._legacy_encode_unimodal_clean(video_x, audio_x, actual_lens, self.modality_mode)
             return self._encode_feature_sequences_legacy(video_x, audio_x, actual_lens=actual_lens)
 
         video_x = video_x.permute(0, 2, 1)

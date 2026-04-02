@@ -451,6 +451,8 @@ class ViT(nn.Module):
                  audio_fixed_len=128,
                  video_fixed_len=128,
                  video_use_delta=True,
+                 audio_strong_stem_kernel=3,
+                 video_strong_stem_kernel=5,
                  **block_kwargs):
         super(ViT, self).__init__()
         dataset_upper = str(dataset).upper()
@@ -502,6 +504,8 @@ class ViT(nn.Module):
             audio_fixed_len=audio_fixed_len,
             video_fixed_len=video_fixed_len,
             video_use_delta=video_use_delta,
+            audio_strong_stem_kernel=audio_strong_stem_kernel,
+            video_strong_stem_kernel=video_strong_stem_kernel,
             **block_kwargs,
         )
 
@@ -588,6 +592,8 @@ class ViT_GCN_Fusion(nn.Module):
                  audio_fixed_len=128,
                  video_fixed_len=128,
                  video_use_delta=True,
+                 audio_strong_stem_kernel=3,
+                 video_strong_stem_kernel=5,
                  face_valid_thresh=0.2,
                  region_scheme="legacy6",
                  region_fusion_mode='cross_attn',
@@ -657,6 +663,8 @@ class ViT_GCN_Fusion(nn.Module):
             audio_fixed_len=audio_fixed_len,
             video_fixed_len=video_fixed_len,
             video_use_delta=video_use_delta,
+            audio_strong_stem_kernel=audio_strong_stem_kernel,
+            video_strong_stem_kernel=video_strong_stem_kernel,
             face_valid_thresh=face_valid_thresh,
             region_scheme=region_scheme,
             region_fusion_mode=region_fusion_mode,

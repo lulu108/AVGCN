@@ -17,7 +17,7 @@ import os
 
 
 # Main switch: edit this value directly in file for daily use.
-FILE_EXPERIMENT = "fusion"  # 'fusion' | 'av_only_new' | 'av_only_legacy' | 'video_only' | 'audio_only' | 'gcn_only'
+FILE_EXPERIMENT = "av_only_new"  # 'fusion' | 'av_only_new' | 'av_only_legacy' | 'video_only' | 'audio_only' | 'gcn_only'
 
 # Optional override (e.g., train_dvlog.py --exp ... sets env var).
 EXPERIMENT = os.getenv("DVLOG_EXPERIMENT", FILE_EXPERIMENT).strip().lower()
@@ -37,6 +37,8 @@ _BASE = {
     "AUDIO_FIXED_LEN": 128,
     "VIDEO_FIXED_LEN": 128,
     "VIDEO_USE_DELTA": True,
+    "AUDIO_STRONG_STEM_KERNEL": 3,
+    "VIDEO_STRONG_STEM_KERNEL": 5,
     "USE_SEGMENT_MIL": False,
     "USE_SLIDING_SEGMENT_EVAL": True,
 }
@@ -48,7 +50,7 @@ _MODE_OVERRIDES = {
     "av_only_new": {
         "MODEL_MODE": "av_only",
         "USE_LEGACY_AV_BACKBONE": False,
-        "USE_FEATURE_SEQUENCE_ENCODER": True,
+        "USE_FEATURE_SEQUENCE_ENCODER": False,
     },
     "av_only_legacy": {
         "MODEL_MODE": "av_only",
@@ -59,11 +61,18 @@ _MODE_OVERRIDES = {
         "MODEL_MODE": "video_only",
         "USE_LEGACY_AV_BACKBONE": False,
         "USE_FEATURE_SEQUENCE_ENCODER": True,
+        "SINGLE_MODALITY_CLEAN_PATH": True,
+        "USE_STRONG_AUDIO_ENCODER": False,
+        "USE_STRONG_VIDEO_ENCODER": True,
+        "VIDEO_USE_DELTA": True,
     },
     "audio_only": {
         "MODEL_MODE": "audio_only",
         "USE_LEGACY_AV_BACKBONE": False,
         "USE_FEATURE_SEQUENCE_ENCODER": True,
+        "SINGLE_MODALITY_CLEAN_PATH": True,
+        "USE_STRONG_AUDIO_ENCODER": True,
+        "USE_STRONG_VIDEO_ENCODER": False,
     },
     "gcn_only": {
         "MODEL_MODE": "gcn_only",

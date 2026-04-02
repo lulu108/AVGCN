@@ -130,6 +130,8 @@ VIDEO_USE_DELTA = bool(PROFILE_OVERRIDES.get(
     'VIDEO_USE_DELTA',
     (True if DATASET_SELECT == "DVLOG" else False)
 ))
+AUDIO_STRONG_STEM_KERNEL = int(PROFILE_OVERRIDES.get('AUDIO_STRONG_STEM_KERNEL', 3))
+VIDEO_STRONG_STEM_KERNEL = int(PROFILE_OVERRIDES.get('VIDEO_STRONG_STEM_KERNEL', 5))
 
 # ==================== 融合模式开关（数据集感知）====================
 # 'late'       : Late Fusion (CLS-token + GCN pool, 门控融合，参数少，最稳)LMVD
@@ -845,6 +847,8 @@ def train(VideoPath, AudioPath, FacePath, X_train, X_dev, X_final_test, labelPat
                     audio_fixed_len=AUDIO_FIXED_LEN,
                     video_fixed_len=VIDEO_FIXED_LEN,
                     video_use_delta=VIDEO_USE_DELTA,
+                    audio_strong_stem_kernel=AUDIO_STRONG_STEM_KERNEL,
+                    video_strong_stem_kernel=VIDEO_STRONG_STEM_KERNEL,
                     # A4: 人脸有效度阈值（对照实验用）
                     face_valid_thresh=FACE_VALID_THRESH,
                     # 分区方案："legacy6" | "symptom7"
@@ -898,7 +902,8 @@ def train(VideoPath, AudioPath, FacePath, X_train, X_dev, X_final_test, labelPat
                 print(
                     f"[UNIMODAL-CLEAN] enabled={SINGLE_MODALITY_CLEAN_PATH}, mode={MODEL_MODE}, "
                     f"strong_audio={USE_STRONG_AUDIO_ENCODER}, strong_video={USE_STRONG_VIDEO_ENCODER}, "
-                    f"audio_len={AUDIO_FIXED_LEN}, video_len={VIDEO_FIXED_LEN}, video_delta={VIDEO_USE_DELTA}"
+                    f"audio_len={AUDIO_FIXED_LEN}, video_len={VIDEO_FIXED_LEN}, video_delta={VIDEO_USE_DELTA}, "
+                    f"a_stem_k={AUDIO_STRONG_STEM_KERNEL}, v_stem_k={VIDEO_STRONG_STEM_KERNEL}"
                 )
                 print(f"[AV-BACKBONE] legacy={USE_LEGACY_AV_BACKBONE}")
                 if FUSION_MODE == 'concat':
@@ -972,6 +977,8 @@ def train(VideoPath, AudioPath, FacePath, X_train, X_dev, X_final_test, labelPat
                     audio_fixed_len=AUDIO_FIXED_LEN,
                     video_fixed_len=VIDEO_FIXED_LEN,
                     video_use_delta=VIDEO_USE_DELTA,
+                    audio_strong_stem_kernel=AUDIO_STRONG_STEM_KERNEL,
+                    video_strong_stem_kernel=VIDEO_STRONG_STEM_KERNEL,
                 ).to(device)
                 print(f"[Model] mode={MODEL_MODE}, fusion_mode=av_backbone_only, sd={SD_RATE}, dropout={DROPOUT}")
                 print(
@@ -983,7 +990,8 @@ def train(VideoPath, AudioPath, FacePath, X_train, X_dev, X_final_test, labelPat
                 print(
                     f"[UNIMODAL-CLEAN] enabled={SINGLE_MODALITY_CLEAN_PATH}, mode={MODEL_MODE}, "
                     f"strong_audio={USE_STRONG_AUDIO_ENCODER}, strong_video={USE_STRONG_VIDEO_ENCODER}, "
-                    f"audio_len={AUDIO_FIXED_LEN}, video_len={VIDEO_FIXED_LEN}, video_delta={VIDEO_USE_DELTA}"
+                    f"audio_len={AUDIO_FIXED_LEN}, video_len={VIDEO_FIXED_LEN}, video_delta={VIDEO_USE_DELTA}, "
+                    f"a_stem_k={AUDIO_STRONG_STEM_KERNEL}, v_stem_k={VIDEO_STRONG_STEM_KERNEL}"
                 )
                 print(f"[AV-BACKBONE] legacy={USE_LEGACY_AV_BACKBONE}")
             print("[MODEL-INIT] done")
