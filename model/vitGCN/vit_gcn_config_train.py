@@ -5,8 +5,8 @@ import random
 import torch.nn.functional as F
 import torch
 import logging
-from kfoldLoader import MyDataLoader 
-from kfoldLoader_multimodal import MultiModalDataLoader, collate_fn_multimodal  # 【融合】导入多模态加载器
+from data.dvlog_loader import DVLOGMultiModalDataLoader, collate_fn_multimodal
+from data.lmvd_loader import LMVDMultiModalDataLoader, LMVDBasicDataLoader
 from torch.utils.data import DataLoader
 import math
 from torch.optim.lr_scheduler import LambdaLR,MultiStepLR
@@ -75,6 +75,12 @@ else:  # LMVD
     D_VIDEO = 171     # LMVD视频特征维度
     D_AUDIO = 128     # LMVD音频特征维度
     BATCH_SIZE = 8    # LMVD序列较长,使用小batch
+
+if DATASET_SELECT == "DVLOG":
+    MultiModalLoaderClass = DVLOGMultiModalDataLoader
+else:
+    MultiModalLoaderClass = LMVDMultiModalDataLoader
+BasicLoaderClass = LMVDBasicDataLoader
 
 # 视频特征路径
 VIDEO_FEATURE_PATH = VIDEO_FEATURE_PATH
@@ -574,15 +580,45 @@ def train(VideoPath, AudioPath, FacePath, X_train, X_dev, X_final_test, labelPat
 
     # 运行时来源与签名核验：防止同名旧文件被意外 import
     try:
-        _mm_sig = str(inspect.signature(MultiModalDataLoader.__init__))
+        _mm_init_sig_obj = inspect.signature(MultiModalLoaderClass.__init__)
+        _mm_sig = str(_mm_init_sig_obj)
+        _mm_params = _mm_init_sig_obj.parameters
+        _mm_accepts_kwargs = any(
+            p.kind == inspect.Parameter.VAR_KEYWORD for p in _mm_params.values()
+        )
+        _mm_has_segment_len = ('segment_len' in _mm_params)
+
+        _base_with_segment = None
+        _base_sig = None
+        if not _mm_has_segment_len:
+            for _base in getattr(MultiModalLoaderClass, '__mro__', [])[1:]:
+                if _base is object:
+                    continue
+                try:
+                    _sig_b = inspect.signature(_base.__init__)
+                except Exception:
+                    continue
+                if 'segment_len' in _sig_b.parameters:
+                    _base_with_segment = _base
+                    _base_sig = _sig_b
+                    _mm_has_segment_len = True
+                    break
+
         _fbce_sig = str(inspect.signature(rt.FocalBCELoss.forward))
-        print(f"[IMPORT-CHECK] MultiModalDataLoader from {inspect.getsourcefile(MultiModalDataLoader)}")
+        print(f"[IMPORT-CHECK] MultiModalLoaderClass from {inspect.getsourcefile(MultiModalLoaderClass)}")
         print(f"[IMPORT-CHECK] collate_fn_multimodal from {inspect.getsourcefile(collate_fn_multimodal)}")
         print(f"[IMPORT-CHECK] ViT_GCN_Fusion from {inspect.getsourcefile(ViT_GCN_Fusion)}")
-        print(f"[IMPORT-CHECK] MultiModalDataLoader.__init__ signature(defaults only): {_mm_sig}")
+        print(f"[IMPORT-CHECK] MultiModalLoaderClass.__init__ signature(defaults only): {_mm_sig}")
+        if _base_with_segment is not None:
+            print(
+                f"[IMPORT-CHECK] MultiModalLoaderClass wrapper detected; "
+                f"base={_base_with_segment.__name__}.__init__ signature: {_base_sig}"
+            )
         print(f"[IMPORT-CHECK] Runtime DATASET_SELECT={DATASET_SELECT}")
         print(f"[IMPORT-CHECK] FocalBCELoss.forward signature: {_fbce_sig}")
-        assert 'segment_len' in _mm_sig, f"[IMPORT-CHECK] segment_len missing in MultiModalDataLoader.__init__: {_mm_sig}"
+        assert (_mm_has_segment_len or _mm_accepts_kwargs), (
+            f"[IMPORT-CHECK] segment_len not supported by MultiModalLoaderClass.__init__: {_mm_sig}"
+        )
         assert 'sample_weight' in _fbce_sig, f"[IMPORT-CHECK] sample_weight missing in FocalBCELoss.forward: {_fbce_sig}"
     except Exception as _e:
         raise RuntimeError(f"[IMPORT-CHECK] failed: {_e}")
@@ -626,7 +662,7 @@ def train(VideoPath, AudioPath, FacePath, X_train, X_dev, X_final_test, labelPat
 
     if USE_FUSION_MODEL or DATASET_SELECT == "DVLOG":
         # DVLOG 无 .npy 平铺文件：即使纯 ViT 也使用多模态加载器读取
-        trainSet = MultiModalDataLoader(X_train, VideoPath, AudioPath, FacePath, labelPath, 
+        trainSet = MultiModalLoaderClass(X_train, VideoPath, AudioPath, FacePath, labelPath, 
                         T_target=train_t_target, mode='train', dataset=DATASET_SELECT,
                         uniform_ratio=DVLOG_UNIFORM_RATIO,
                         dvlog_aug_noise_std=DVLOG_AUG_NOISE_STD,
@@ -645,12 +681,12 @@ def train(VideoPath, AudioPath, FacePath, X_train, X_dev, X_final_test, labelPat
                         lmvd_face_cache_readonly=LMVD_FACE_CACHE_READONLY)
         trainLoader = DataLoader(trainSet, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_fn_multimodal, **loader_kwargs)
     else:
-        trainSet = MyDataLoader(X_train, VideoPath, AudioPath, labelPath, T_target=T, mode='train')
+        trainSet = BasicLoaderClass(X_train, VideoPath, AudioPath, labelPath, T_target=T, mode='train')
         trainLoader = DataLoader(trainSet, batch_size=BATCH_SIZE, shuffle=True, **loader_kwargs)
     
     # 2. 加载验证集 (10%) -> 这里的变量名原来叫 X_test，现在对应 X_dev
     if USE_FUSION_MODEL or DATASET_SELECT == "DVLOG":
-        devSet = MultiModalDataLoader(X_dev, VideoPath, AudioPath, FacePath, labelPath, 
+        devSet = MultiModalLoaderClass(X_dev, VideoPath, AudioPath, FacePath, labelPath, 
                           T_target=T, mode='test', dataset=DATASET_SELECT,
                           uniform_ratio=DVLOG_UNIFORM_RATIO,
                           dvlog_aug_noise_std=DVLOG_AUG_NOISE_STD,
@@ -666,12 +702,12 @@ def train(VideoPath, AudioPath, FacePath, X_train, X_dev, X_final_test, labelPat
                           lmvd_face_cache_readonly=LMVD_FACE_CACHE_READONLY)
         devLoader = DataLoader(devSet, batch_size=BATCH_SIZE//2, shuffle=False, collate_fn=collate_fn_multimodal, **loader_kwargs)
     else:
-        devSet = MyDataLoader(X_dev, VideoPath, AudioPath, labelPath, T_target=T, mode='test')
+        devSet = BasicLoaderClass(X_dev, VideoPath, AudioPath, labelPath, T_target=T, mode='test')
         devLoader = DataLoader(devSet, batch_size=BATCH_SIZE//2, shuffle=False, **loader_kwargs)
     
     # 3. 加载最终测试集 (10%) -> 新增
     if USE_FUSION_MODEL or DATASET_SELECT == "DVLOG":
-        finalTestSet = MultiModalDataLoader(X_final_test, VideoPath, AudioPath, FacePath, labelPath, 
+        finalTestSet = MultiModalLoaderClass(X_final_test, VideoPath, AudioPath, FacePath, labelPath, 
                            T_target=T, mode='test', dataset=DATASET_SELECT,
                            uniform_ratio=DVLOG_UNIFORM_RATIO,
                            dvlog_aug_noise_std=DVLOG_AUG_NOISE_STD,
@@ -687,7 +723,7 @@ def train(VideoPath, AudioPath, FacePath, X_train, X_dev, X_final_test, labelPat
                            lmvd_face_cache_readonly=LMVD_FACE_CACHE_READONLY)
         finalTestLoader = DataLoader(finalTestSet, batch_size=BATCH_SIZE//2, shuffle=False, collate_fn=collate_fn_multimodal, **loader_kwargs)
     else:
-        finalTestSet = MyDataLoader(X_final_test, VideoPath, AudioPath, labelPath, T_target=T, mode='test')
+        finalTestSet = BasicLoaderClass(X_final_test, VideoPath, AudioPath, labelPath, T_target=T, mode='test')
         finalTestLoader = DataLoader(finalTestSet, batch_size=BATCH_SIZE//2, shuffle=False, **loader_kwargs)
 
     print("DataLoaders Ready: Train={}, Dev={}, Test={}".format(

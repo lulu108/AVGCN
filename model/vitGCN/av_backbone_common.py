@@ -535,6 +535,11 @@ class AVBackboneCore(nn.Module):
     def _build_token_mask(self, actual_lens, token_count, device, batch_size):
         if actual_lens is None:
             return torch.ones(batch_size, token_count, dtype=torch.bool, device=device)
+        if not isinstance(actual_lens, torch.Tensor):
+            actual_lens = torch.as_tensor(actual_lens, device=device)
+        else:
+            actual_lens = actual_lens.to(device=device)
+        actual_lens = actual_lens.long()
         token_lens = ((actual_lens + self.patch_size - 1) // self.patch_size).clamp(min=1, max=token_count)
         return torch.arange(token_count, device=device).unsqueeze(0) < token_lens.unsqueeze(1)
 
