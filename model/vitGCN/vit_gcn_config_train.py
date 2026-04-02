@@ -115,6 +115,21 @@ FS_FUSION_DROPOUT = float(PROFILE_OVERRIDES.get(
     'FS_FUSION_DROPOUT',
     (0.05 if DATASET_SELECT == "DVLOG" else 0.10)
 ))
+SINGLE_MODALITY_CLEAN_PATH = bool(PROFILE_OVERRIDES.get('SINGLE_MODALITY_CLEAN_PATH', True))
+USE_STRONG_AUDIO_ENCODER = bool(PROFILE_OVERRIDES.get(
+    'USE_STRONG_AUDIO_ENCODER',
+    (True if DATASET_SELECT == "DVLOG" else False)
+))
+USE_STRONG_VIDEO_ENCODER = bool(PROFILE_OVERRIDES.get(
+    'USE_STRONG_VIDEO_ENCODER',
+    (True if DATASET_SELECT == "DVLOG" else False)
+))
+AUDIO_FIXED_LEN = int(PROFILE_OVERRIDES.get('AUDIO_FIXED_LEN', 128))
+VIDEO_FIXED_LEN = int(PROFILE_OVERRIDES.get('VIDEO_FIXED_LEN', 128))
+VIDEO_USE_DELTA = bool(PROFILE_OVERRIDES.get(
+    'VIDEO_USE_DELTA',
+    (True if DATASET_SELECT == "DVLOG" else False)
+))
 
 # ==================== 融合模式开关（数据集感知）====================
 # 'late'       : Late Fusion (CLS-token + GCN pool, 门控融合，参数少，最稳)LMVD
@@ -441,6 +456,8 @@ def _resolve_dvlog_experiment_key(model_mode, use_legacy):
 
 def _apply_av_only_submode(video_x, audio_x):
     """Apply ablation masking for ViT-only submodes."""
+    if SINGLE_MODALITY_CLEAN_PATH:
+        return video_x, audio_x
     if MODEL_MODE == 'video_only':
         return video_x, torch.zeros_like(audio_x)
     if MODEL_MODE == 'audio_only':
@@ -828,6 +845,12 @@ def train(VideoPath, AudioPath, FacePath, X_train, X_dev, X_final_test, labelPat
                     fs_audio_global_depth=FS_AUDIO_GLOBAL_DEPTH,
                     fs_dilated_audio=FS_DILATED_AUDIO,
                     fs_fusion_dropout=FS_FUSION_DROPOUT,
+                    single_modality_clean_path=SINGLE_MODALITY_CLEAN_PATH,
+                    use_strong_audio_encoder=USE_STRONG_AUDIO_ENCODER,
+                    use_strong_video_encoder=USE_STRONG_VIDEO_ENCODER,
+                    audio_fixed_len=AUDIO_FIXED_LEN,
+                    video_fixed_len=VIDEO_FIXED_LEN,
+                    video_use_delta=VIDEO_USE_DELTA,
                     # A4: 人脸有效度阈值（对照实验用）
                     face_valid_thresh=FACE_VALID_THRESH,
                     # 分区方案："legacy6" | "symptom7"
@@ -877,6 +900,11 @@ def train(VideoPath, AudioPath, FacePath, X_train, X_dev, X_final_test, labelPat
                     f"v_local={FS_VIDEO_LOCAL_BLOCKS}, a_local={FS_AUDIO_LOCAL_BLOCKS}, "
                     f"v_global={FS_VIDEO_GLOBAL_DEPTH}, a_global={FS_AUDIO_GLOBAL_DEPTH}, "
                     f"dilated_audio={FS_DILATED_AUDIO}, fusion_dropout={FS_FUSION_DROPOUT}"
+                )
+                print(
+                    f"[UNIMODAL-CLEAN] enabled={SINGLE_MODALITY_CLEAN_PATH}, mode={MODEL_MODE}, "
+                    f"strong_audio={USE_STRONG_AUDIO_ENCODER}, strong_video={USE_STRONG_VIDEO_ENCODER}, "
+                    f"audio_len={AUDIO_FIXED_LEN}, video_len={VIDEO_FIXED_LEN}, video_delta={VIDEO_USE_DELTA}"
                 )
                 print(f"[AV-BACKBONE] legacy={USE_LEGACY_AV_BACKBONE}")
                 if FUSION_MODE == 'concat':
@@ -943,6 +971,13 @@ def train(VideoPath, AudioPath, FacePath, X_train, X_dev, X_final_test, labelPat
                     fs_audio_global_depth=FS_AUDIO_GLOBAL_DEPTH,
                     fs_dilated_audio=FS_DILATED_AUDIO,
                     fs_fusion_dropout=FS_FUSION_DROPOUT,
+                    modality_mode=MODEL_MODE,
+                    single_modality_clean_path=SINGLE_MODALITY_CLEAN_PATH,
+                    use_strong_audio_encoder=USE_STRONG_AUDIO_ENCODER,
+                    use_strong_video_encoder=USE_STRONG_VIDEO_ENCODER,
+                    audio_fixed_len=AUDIO_FIXED_LEN,
+                    video_fixed_len=VIDEO_FIXED_LEN,
+                    video_use_delta=VIDEO_USE_DELTA,
                 ).to(device)
                 print(f"[Model] mode={MODEL_MODE}, fusion_mode=av_backbone_only, sd={SD_RATE}, dropout={DROPOUT}")
                 print(
@@ -950,6 +985,11 @@ def train(VideoPath, AudioPath, FacePath, X_train, X_dev, X_final_test, labelPat
                     f"v_local={FS_VIDEO_LOCAL_BLOCKS}, a_local={FS_AUDIO_LOCAL_BLOCKS}, "
                     f"v_global={FS_VIDEO_GLOBAL_DEPTH}, a_global={FS_AUDIO_GLOBAL_DEPTH}, "
                     f"dilated_audio={FS_DILATED_AUDIO}, fusion_dropout={FS_FUSION_DROPOUT}"
+                )
+                print(
+                    f"[UNIMODAL-CLEAN] enabled={SINGLE_MODALITY_CLEAN_PATH}, mode={MODEL_MODE}, "
+                    f"strong_audio={USE_STRONG_AUDIO_ENCODER}, strong_video={USE_STRONG_VIDEO_ENCODER}, "
+                    f"audio_len={AUDIO_FIXED_LEN}, video_len={VIDEO_FIXED_LEN}, video_delta={VIDEO_USE_DELTA}"
                 )
                 print(f"[AV-BACKBONE] legacy={USE_LEGACY_AV_BACKBONE}")
             print("[MODEL-INIT] done")

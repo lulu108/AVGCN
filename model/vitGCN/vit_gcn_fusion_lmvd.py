@@ -76,6 +76,12 @@ class LMVDViTGCNFusion(nn.Module):
         ia_dropout=0.05,
         ia_alpha_init=0.0,
         concat_blend_init=0.3,
+        single_modality_clean_path=True,
+        use_strong_audio_encoder=False,
+        use_strong_video_encoder=False,
+        audio_fixed_len=128,
+        video_fixed_len=128,
+        video_use_delta=True,
     ):
         super().__init__()
         self.dim = dim
@@ -131,6 +137,13 @@ class LMVDViTGCNFusion(nn.Module):
             fs_audio_global_depth=fs_audio_global_depth,
             fs_dilated_audio=fs_dilated_audio,
             fs_fusion_dropout=fs_fusion_dropout,
+            modality_mode=modality_mode,
+            single_modality_clean_path=single_modality_clean_path,
+            use_strong_audio_encoder=use_strong_audio_encoder,
+            use_strong_video_encoder=use_strong_video_encoder,
+            audio_fixed_len=audio_fixed_len,
+            video_fixed_len=video_fixed_len,
+            video_use_delta=video_use_delta,
         )
         self.vit_branch.classifier = nn.Identity()
 

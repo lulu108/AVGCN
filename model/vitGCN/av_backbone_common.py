@@ -6,6 +6,7 @@ from torch import nn, einsum
 import torch.nn.functional as F
 from einops import rearrange, repeat
 from einops.layers.torch import Rearrange
+from unimodal_backbones import StrongAudioEncoder, StrongLandmarkVideoEncoder
 
 
 def drop_path(x, drop_prob=0.0, training=False):
@@ -390,6 +391,13 @@ class AVBackboneCore(nn.Module):
                  fs_audio_global_depth=None,
                  fs_dilated_audio=True,
                  fs_fusion_dropout=None,
+                 modality_mode='fusion',
+                 single_modality_clean_path=True,
+                 use_strong_audio_encoder=False,
+                 use_strong_video_encoder=False,
+                 audio_fixed_len=128,
+                 video_fixed_len=128,
+                 video_use_delta=True,
                  **block_kwargs):
         super().__init__()
         self.name = name
@@ -399,6 +407,16 @@ class AVBackboneCore(nn.Module):
         self.use_av_cross_attn = use_av_cross_attn
         self.patch_size = patch_size
         self.dim = dim
+        self.modality_mode = str(modality_mode).lower()
+        valid_modes = {'fusion', 'av_only', 'video_only', 'audio_only', 'gcn_only'}
+        if self.modality_mode not in valid_modes:
+            raise ValueError(f"modality_mode must be one of {sorted(valid_modes)}")
+        self.single_modality_clean_path = bool(single_modality_clean_path)
+        self.use_strong_audio_encoder = bool(use_strong_audio_encoder)
+        self.use_strong_video_encoder = bool(use_strong_video_encoder)
+        self.audio_fixed_len = int(audio_fixed_len)
+        self.video_fixed_len = int(video_fixed_len)
+        self.video_use_delta = bool(video_use_delta)
         self.use_legacy_av_backbone = bool(use_legacy_av_backbone)
         self.use_feature_sequence_encoder = bool(use_feature_sequence_encoder)
         self.use_feature_sequence_encoder_effective = (
@@ -467,34 +485,62 @@ class AVBackboneCore(nn.Module):
         audio_global_depth = int(max(2, depth // 2) if fs_audio_global_depth is None else fs_audio_global_depth)
         audio_dilations = (1, 2, 4) if fs_dilated_audio else (1, 2)
 
-        self.video_encoder = FeatureSequenceEncoder(
-            input_dim=self.video_dim,
-            model_dim=dim,
-            patch_size=patch_size,
-            local_blocks=fs_video_local_blocks,
-            local_kernel=3,
-            dilations=(1, 2),
-            global_depth=video_global_depth,
-            heads=heads,
-            dim_mlp=dim_mlp,
-            dropout=dropout,
-            sd=sd,
-            stem_kernel=video_k,
-        )
-        self.audio_encoder = FeatureSequenceEncoder(
-            input_dim=self.audio_dim,
-            model_dim=dim,
-            patch_size=patch_size,
-            local_blocks=fs_audio_local_blocks,
-            local_kernel=3,
-            dilations=audio_dilations,
-            global_depth=audio_global_depth,
-            heads=heads,
-            dim_mlp=dim_mlp,
-            dropout=dropout,
-            sd=sd,
-            stem_kernel=audio_proj_k,
-        )
+        if self.use_strong_video_encoder:
+            self.video_encoder = StrongLandmarkVideoEncoder(
+                input_dim=self.video_dim,
+                model_dim=dim,
+                target_len=self.video_fixed_len,
+                use_delta=self.video_use_delta,
+                local_blocks=max(3, int(fs_video_local_blocks)),
+                heads=heads,
+                global_depth=video_global_depth,
+                dim_mlp=dim_mlp,
+                dropout=dropout,
+                stem_kernel=5,
+            )
+        else:
+            self.video_encoder = FeatureSequenceEncoder(
+                input_dim=self.video_dim,
+                model_dim=dim,
+                patch_size=patch_size,
+                local_blocks=fs_video_local_blocks,
+                local_kernel=3,
+                dilations=(1, 2),
+                global_depth=video_global_depth,
+                heads=heads,
+                dim_mlp=dim_mlp,
+                dropout=dropout,
+                sd=sd,
+                stem_kernel=video_k,
+            )
+
+        if self.use_strong_audio_encoder:
+            self.audio_encoder = StrongAudioEncoder(
+                input_dim=self.audio_dim,
+                model_dim=dim,
+                target_len=self.audio_fixed_len,
+                local_blocks=max(2, int(fs_audio_local_blocks)),
+                heads=heads,
+                global_depth=audio_global_depth,
+                dim_mlp=dim_mlp,
+                dropout=dropout,
+                stem_kernel=3,
+            )
+        else:
+            self.audio_encoder = FeatureSequenceEncoder(
+                input_dim=self.audio_dim,
+                model_dim=dim,
+                patch_size=patch_size,
+                local_blocks=fs_audio_local_blocks,
+                local_kernel=3,
+                dilations=audio_dilations,
+                global_depth=audio_global_depth,
+                heads=heads,
+                dim_mlp=dim_mlp,
+                dropout=dropout,
+                sd=sd,
+                stem_kernel=audio_proj_k,
+            )
 
         self.video_stem = self.video_encoder.input_proj
         self.video_local_encoder = self.video_encoder.local_encoder
@@ -566,6 +612,71 @@ class AVBackboneCore(nn.Module):
         x = self.legacy_embedding[3](x)
         return x
 
+    @staticmethod
+    def _resize_tokens(tokens, target_len):
+        if tokens.shape[1] == target_len:
+            return tokens
+        return F.adaptive_avg_pool1d(tokens.transpose(1, 2), target_len).transpose(1, 2)
+
+    @staticmethod
+    def _resize_mask(mask, target_len, device, batch_size):
+        if mask is None:
+            return torch.ones(batch_size, target_len, dtype=torch.bool, device=device)
+        if mask.shape[1] == target_len:
+            return mask
+        pooled = F.adaptive_avg_pool1d(mask.float().unsqueeze(1), target_len).squeeze(1)
+        return pooled > 0.0
+
+    def _run_video_encoder(self, video_x, token_mask=None, actual_lens=None):
+        if self.use_strong_video_encoder:
+            return self.video_encoder(video_x, actual_lens=actual_lens)
+        out = self.video_encoder(video_x, token_mask=token_mask)
+        out['token_mask'] = token_mask
+        return out
+
+    def _run_audio_encoder(self, audio_x, token_mask=None, actual_lens=None):
+        if self.use_strong_audio_encoder:
+            return self.audio_encoder(audio_x, actual_lens=actual_lens)
+        out = self.audio_encoder(audio_x, token_mask=token_mask)
+        out['token_mask'] = token_mask
+        return out
+
+    def _legacy_encode_unimodal_clean(self, video_x, audio_x, actual_lens, mode):
+        token_count = max(1, int(video_x.shape[-1] // self.patch_size))
+        token_mask = self._build_token_mask(actual_lens, token_count, video_x.device, video_x.size(0))
+        zero_repr = torch.zeros(video_x.size(0), self.dim // 2, device=video_x.device, dtype=video_x.dtype)
+
+        if mode == 'audio_only':
+            audio_proj = self.legacy_proj_audio(audio_x)
+            audio_tokens = F.adaptive_avg_pool1d(audio_proj, token_count).transpose(1, 2)
+            audio_repr = self._temporal_global_pool(audio_proj)
+            zero_tokens = torch.zeros_like(audio_tokens)
+            return {
+                'video_tokens': zero_tokens,
+                'audio_tokens': audio_tokens,
+                'av_tokens': audio_tokens,
+                'video_repr': zero_repr,
+                'audio_repr': audio_repr,
+                'av_repr': audio_repr,
+                'token_mask': token_mask,
+                'av_attn': None,
+            }
+
+        video_proj = self.legacy_proj_video(video_x)
+        video_tokens = F.adaptive_avg_pool1d(video_proj, token_count).transpose(1, 2)
+        video_repr = self._temporal_global_pool(video_proj)
+        zero_tokens = torch.zeros_like(video_tokens)
+        return {
+            'video_tokens': video_tokens,
+            'audio_tokens': zero_tokens,
+            'av_tokens': video_tokens,
+            'video_repr': video_repr,
+            'audio_repr': zero_repr,
+            'av_repr': video_repr,
+            'token_mask': token_mask,
+            'av_attn': None,
+        }
+
     def _encode_feature_sequences_legacy(self, video_x, audio_x, actual_lens=None):
         video_x = video_x.permute(0, 2, 1)
         audio_x = audio_x.permute(0, 2, 1)
@@ -617,16 +728,64 @@ class AVBackboneCore(nn.Module):
         audio_x = self.audio_tcn_encoder(audio_x)
 
         token_count = max(1, video_x.shape[-1] // self.patch_size)
-        token_mask = self._build_token_mask(actual_lens, token_count, video_x.device, video_x.size(0))
+        base_mask = self._build_token_mask(actual_lens, token_count, video_x.device, video_x.size(0))
 
-        video_out = self.video_encoder(video_x, token_mask=token_mask)
-        audio_out = self.audio_encoder(audio_x, token_mask=token_mask)
-        av_tokens = self.av_post_encoder_fusion(video_out['tokens'], audio_out['tokens'], token_mask=token_mask)
+        if self.single_modality_clean_path and self.modality_mode == 'audio_only':
+            audio_out = self._run_audio_encoder(audio_x, token_mask=base_mask, actual_lens=actual_lens)
+            audio_tokens = audio_out['tokens']
+            token_mask = audio_out.get('token_mask', None)
+            if token_mask is None:
+                token_mask = torch.ones(audio_tokens.shape[:2], dtype=torch.bool, device=audio_tokens.device)
+            zero_tokens = torch.zeros_like(audio_tokens)
+            zero_repr = torch.zeros(audio_tokens.size(0), self.dim, device=audio_tokens.device, dtype=audio_tokens.dtype)
+            return {
+                'video_tokens': zero_tokens,
+                'audio_tokens': audio_tokens,
+                'av_tokens': audio_tokens,
+                'video_repr': zero_repr,
+                'audio_repr': audio_out['repr'],
+                'av_repr': audio_out['repr'],
+                'token_mask': token_mask,
+                'av_attn': audio_out.get('attn', None),
+            }
+
+        if self.single_modality_clean_path and self.modality_mode == 'video_only':
+            video_out = self._run_video_encoder(video_x, token_mask=base_mask, actual_lens=actual_lens)
+            video_tokens = video_out['tokens']
+            token_mask = video_out.get('token_mask', None)
+            if token_mask is None:
+                token_mask = torch.ones(video_tokens.shape[:2], dtype=torch.bool, device=video_tokens.device)
+            zero_tokens = torch.zeros_like(video_tokens)
+            zero_repr = torch.zeros(video_tokens.size(0), self.dim, device=video_tokens.device, dtype=video_tokens.dtype)
+            return {
+                'video_tokens': video_tokens,
+                'audio_tokens': zero_tokens,
+                'av_tokens': video_tokens,
+                'video_repr': video_out['repr'],
+                'audio_repr': zero_repr,
+                'av_repr': video_out['repr'],
+                'token_mask': token_mask,
+                'av_attn': video_out.get('attn', None),
+            }
+
+        video_out = self._run_video_encoder(video_x, token_mask=base_mask, actual_lens=actual_lens)
+        audio_out = self._run_audio_encoder(audio_x, token_mask=base_mask, actual_lens=actual_lens)
+
+        t_video = int(video_out['tokens'].shape[1])
+        t_audio = int(audio_out['tokens'].shape[1])
+        target_len = min(t_video, t_audio)
+        video_tokens = self._resize_tokens(video_out['tokens'], target_len)
+        audio_tokens = self._resize_tokens(audio_out['tokens'], target_len)
+        v_mask = self._resize_mask(video_out.get('token_mask', None), target_len, video_tokens.device, video_tokens.size(0))
+        a_mask = self._resize_mask(audio_out.get('token_mask', None), target_len, video_tokens.device, video_tokens.size(0))
+        token_mask = v_mask & a_mask
+
+        av_tokens = self.av_post_encoder_fusion(video_tokens, audio_tokens, token_mask=token_mask)
         av_repr, av_attn = self.av_pool(av_tokens, valid_mask=token_mask)
 
         return {
-            'video_tokens': video_out['tokens'],
-            'audio_tokens': audio_out['tokens'],
+            'video_tokens': video_tokens,
+            'audio_tokens': audio_tokens,
             'av_tokens': av_tokens,
             'video_repr': video_out['repr'],
             'audio_repr': audio_out['repr'],
