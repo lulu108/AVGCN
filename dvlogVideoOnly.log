@@ -1,0 +1,3084 @@
+[PROFILE] loaded overrides from config_dvlog: ['DATASET_SELECT', 'FS_AUDIO_LOCAL_BLOCKS', 'FS_DILATED_AUDIO', 'FS_FUSION_DROPOUT', 'FS_VIDEO_LOCAL_BLOCKS', 'FUSION_MODE', 'MODEL_MODE', 'USE_FEATURE_SEQUENCE_ENCODER', 'USE_LEGACY_AV_BACKBONE', 'USE_SEGMENT_MIL', 'USE_SLIDING_SEGMENT_EVAL']
+Dataset: DVLOG
+Video Path: data/dvlog-dataset/dvlog-dataset
+Audio Path: data/dvlog-dataset/dvlog-dataset
+Face Path: data/dvlog-dataset/dvlog-dataset
+Label Path: data/dvlog-dataset/dvlog-dataset/labels.csv
+labels.csv 过滤: 961 -> 961 (磁盘上存在的样本)
+
+--- DVLOG 固定划分统计 ---
+Train: 647 samples, 分布: {'depression': 375, 'normal': 272}
+Dev:   102 samples,   分布: {'depression': 57, 'normal': 45}
+Test:  212 samples,  分布: {'depression': 123, 'normal': 89}
+[set_all_seeds] seed=41, cudnn.deterministic=True, strict_deterministic_algos=False
+
+==================== Seed 41 ====================
+[ES-INIT] monitor=macro_f1 best_monitor=-inf ema_monitor=-inf ema_loss_val=None
+[IMPORT-CHECK] MultiModalLoaderClass from /root/autodl-tmp/LMVD_new/model/vitGCN/data/dvlog_loader.py
+[IMPORT-CHECK] collate_fn_multimodal from /root/autodl-tmp/LMVD_new/model/vitGCN/kfoldLoader_multimodal.py
+[IMPORT-CHECK] ViT_GCN_Fusion from /root/autodl-tmp/LMVD_new/model/vitGCN/Vit_gcnmodel.py
+[IMPORT-CHECK] MultiModalLoaderClass.__init__ signature(defaults only): (self, *args, **kwargs)
+[IMPORT-CHECK] MultiModalLoaderClass wrapper detected; base=MultiModalDataLoader.__init__ signature: (self, file_list, video_feature_path, audio_feature_path, face_landmark_path, label_path, T_target=915, mode='train', dataset='LMVD', uniform_ratio=0.7, dvlog_aug_noise_std=0.005, dvlog_audio_mask_ratio=0.0, segment_len=0, use_two_clip_train=False, two_clip_mode='center_random', use_three_clip_train=False, three_clip_mode='center_lr', quality_candidate_count=5, region_partition_scheme='legacy6', enable_feature_cache=True, feature_cache_size=256, np_load_mmap=False, lmvd_face_region_cache_dir=None, lmvd_face_cache_readonly=False)
+[IMPORT-CHECK] Runtime DATASET_SELECT=DVLOG
+[IMPORT-CHECK] FocalBCELoss.forward signature: (self, logits, target, sample_weight=None)
+[DL-CFG] workers=8, pin_memory=True, persistent=True, prefetch_factor=4
+[CACHE-CFG] enable_feature_cache=True, feature_cache_size=256, np_load_mmap=False, lmvd_face_cache_dir=data/LMVD_Feature/face_regions_cache
+[MultiModalDataLoader] DVLOG 标签已缓存: 961 条
+[MultiModalDataLoader] DVLOG aug config: noise_std=0.005, audio_mask_ratio=0.0, uniform_ratio=0.7
+[MultiModalDataLoader] cache: enable=True, size=256, mmap=False
+[MultiModalDataLoader] DVLOG 标签已缓存: 961 条
+[MultiModalDataLoader] DVLOG aug config: noise_std=0.005, audio_mask_ratio=0.0, uniform_ratio=0.7
+[MultiModalDataLoader] cache: enable=True, size=256, mmap=False
+[MultiModalDataLoader] DVLOG 标签已缓存: 961 条
+[MultiModalDataLoader] DVLOG aug config: noise_std=0.005, audio_mask_ratio=0.0, uniform_ratio=0.7
+[MultiModalDataLoader] cache: enable=True, size=256, mmap=False
+DataLoaders Ready: Train=41, Dev=13, Test=27
+[DATASET-CHECK] trainSet.dataset=DVLOG, devSet.dataset=DVLOG, testSet.dataset=DVLOG
+[SEG] train_T=870, train_segment_len=0, eval_sliding_cfg=True, eval_sliding_effective=True, eval_stride=128, dataset=DVLOG, seg_len=300
+[EVAL-AGG-CFG] mode=meanmax, topk=2, meanmax_alpha=0.3
+[DEVICE] device=cuda, cuda_available=True
+[MODEL-INIT] start
+[Model] mode=video_only, fusion_mode=av_backbone_only, sd=0.0, dropout=0.1
+[FS-ENC] enabled=True, v_local=2, a_local=3, v_global=4, a_global=2, dilated_audio=True, fusion_dropout=0.05
+[AV-BACKBONE] legacy=False
+[MODEL-INIT] done
+[EMA] USE_MODEL_EMA=True, decay=0.995
+[VIT-STEM] temporal_conv_stem=True, for=audio, kernel=3, dvlog_only=True, effective=True
+[AUDIO-TCN] enabled=False, kernel=3, dropout=0.0, dvlog_only=False, effective=False
+[VIT-STEM] effective_conv video_k=(1,), video_p=(0,), audio_k=(3,), audio_p=(1,)
+[AUDIO-TCN] encoder=Identity
+[FS-ENC] path=single-modality encoders -> post-encoder AV fusion
+[AUG] DVLOG preset=weak, noise_std=0.005, audio_mask_ratio=0.0, uniform_ratio=0.7
+[MIL] USE_SEGMENT_MIL=False, seg_len=300, k_train=4, k_eval=4, train_agg=weighted_mean, eval_agg=weighted_mean
+[train/seed_41] FocalBCE  gamma=2.0  (no pos_weight, ViT-only)
+[train/seed_41] eff_lr=1.00e-04  (base_lr=1.00e-04, fusion_mode=concat, LOSS_MODE=focal_no_pw)
+[Recon][Epoch 1] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 2] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 3] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 4] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 5] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 6] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 7] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 8] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 9] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 10] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 10] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 0 45]
+ [ 0 57]]
+[DEV] Class-0(Normal)    : P=0.0000  R=0.0000  F1=0.0000
+[DEV] Class-1(Depression): P=0.5588  R=1.0000  F1=0.7170
+[DEV] Macro              : P=0.2794  R=0.5000  F1=0.3585
+
+[DEV] Threshold sweep: best_thr=0.58  sweep_F1=0.6238  argmax_F1=0.3585
+  [CKPT-A] argmax_F1=0.3585 @epoch 10 | thr=0.58
+  [CKPT-B] sweep_F1=0.6238 @epoch 10 | thr=0.58
+Dev epoch:10, Loss:0.18442682979198602,Acc:55.882354736328125%
+[ES] epoch=10 monitor=macro_f1 cur_macro_f1=0.3585 ema_macro_f1=0.3585 best_macro_f1=-inf improved=True
+  [CKPT-C] ema_macro_f1=0.3585 @epoch 10 | thr=0.58
+[Recon][Epoch 11] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 11] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[34 11]
+ [25 32]]
+[DEV] Class-0(Normal)    : P=0.5763  R=0.7556  F1=0.6538
+[DEV] Class-1(Depression): P=0.7442  R=0.5614  F1=0.6400
+[DEV] Macro              : P=0.6602  R=0.6585  F1=0.6469
+
+[DEV] Threshold sweep: best_thr=0.48  sweep_F1=0.6504  argmax_F1=0.6469
+  [CKPT-A] argmax_F1=0.6469 @epoch 11 | thr=0.48
+  [CKPT-B] sweep_F1=0.6504 @epoch 11 | thr=0.48
+Dev epoch:11, Loss:0.16387599592025465,Acc:64.70587921142578%
+[ES] epoch=11 monitor=macro_f1 cur_macro_f1=0.6469 ema_macro_f1=0.4450 best_macro_f1=0.3585 improved=True
+  [CKPT-C] ema_macro_f1=0.4450 @epoch 11 | thr=0.48
+[Recon][Epoch 12] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 12] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 2 43]
+ [ 1 56]]
+[DEV] Class-0(Normal)    : P=0.6667  R=0.0444  F1=0.0833
+[DEV] Class-1(Depression): P=0.5657  R=0.9825  F1=0.7179
+[DEV] Macro              : P=0.6162  R=0.5135  F1=0.4006
+
+[DEV] Threshold sweep: best_thr=0.58  sweep_F1=0.6620  argmax_F1=0.4006
+  [CKPT-B] sweep_F1=0.6620 @epoch 12 | thr=0.58
+Dev epoch:12, Loss:0.1775912969158246,Acc:56.86274337768555%
+[ES] epoch=12 monitor=macro_f1 cur_macro_f1=0.4006 ema_macro_f1=0.4317 best_macro_f1=0.4450 improved=False
+[Recon][Epoch 13] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 13] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[26 19]
+ [16 41]]
+[DEV] Class-0(Normal)    : P=0.6190  R=0.5778  F1=0.5977
+[DEV] Class-1(Depression): P=0.6833  R=0.7193  F1=0.7009
+[DEV] Macro              : P=0.6512  R=0.6485  F1=0.6493
+
+[DEV] Threshold sweep: best_thr=0.50  sweep_F1=0.6493  argmax_F1=0.6493
+  [CKPT-A] argmax_F1=0.6493 @epoch 13 | thr=0.50
+Dev epoch:13, Loss:0.16301979812291953,Acc:65.68627166748047%
+[ES] epoch=13 monitor=macro_f1 cur_macro_f1=0.6493 ema_macro_f1=0.4970 best_macro_f1=0.4450 improved=True
+  [CKPT-C] ema_macro_f1=0.4970 @epoch 13 | thr=0.50
+[Recon][Epoch 14] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 14] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[38  7]
+ [30 27]]
+[DEV] Class-0(Normal)    : P=0.5588  R=0.8444  F1=0.6726
+[DEV] Class-1(Depression): P=0.7941  R=0.4737  F1=0.5934
+[DEV] Macro              : P=0.6765  R=0.6591  F1=0.6330
+
+[DEV] Threshold sweep: best_thr=0.48  sweep_F1=0.6603  argmax_F1=0.6330
+Dev epoch:14, Loss:0.1648554910834019,Acc:63.72549057006836%
+[ES] epoch=14 monitor=macro_f1 cur_macro_f1=0.6330 ema_macro_f1=0.5378 best_macro_f1=0.4970 improved=True
+  [CKPT-C] ema_macro_f1=0.5378 @epoch 14 | thr=0.48
+[Recon][Epoch 15] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 15] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[10 35]
+ [ 3 54]]
+[DEV] Class-0(Normal)    : P=0.7692  R=0.2222  F1=0.3448
+[DEV] Class-1(Depression): P=0.6067  R=0.9474  F1=0.7397
+[DEV] Macro              : P=0.6880  R=0.5848  F1=0.5423
+
+[DEV] Threshold sweep: best_thr=0.53  sweep_F1=0.6665  argmax_F1=0.5423
+  [CKPT-B] sweep_F1=0.6665 @epoch 15 | thr=0.53
+Dev epoch:15, Loss:0.16442706607855284,Acc:62.74509811401367%
+[ES] epoch=15 monitor=macro_f1 cur_macro_f1=0.5423 ema_macro_f1=0.5391 best_macro_f1=0.5378 improved=True
+  [CKPT-C] ema_macro_f1=0.5391 @epoch 15 | thr=0.53
+[Recon][Epoch 16] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 16] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 7 38]
+ [ 3 54]]
+[DEV] Class-0(Normal)    : P=0.7000  R=0.1556  F1=0.2545
+[DEV] Class-1(Depression): P=0.5870  R=0.9474  F1=0.7248
+[DEV] Macro              : P=0.6435  R=0.5515  F1=0.4897
+
+[DEV] Threshold sweep: best_thr=0.54  sweep_F1=0.6646  argmax_F1=0.4897
+Dev epoch:16, Loss:0.1652039002913695,Acc:59.80392074584961%
+[ES] epoch=16 monitor=macro_f1 cur_macro_f1=0.4897 ema_macro_f1=0.5243 best_macro_f1=0.5391 improved=False
+[Recon][Epoch 17] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 17] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 0 45]
+ [ 0 57]]
+[DEV] Class-0(Normal)    : P=0.0000  R=0.0000  F1=0.0000
+[DEV] Class-1(Depression): P=0.5588  R=1.0000  F1=0.7170
+[DEV] Macro              : P=0.2794  R=0.5000  F1=0.3585
+
+[DEV] Threshold sweep: best_thr=0.54  sweep_F1=0.5644  argmax_F1=0.3585
+Dev epoch:17, Loss:0.1730873596209746,Acc:55.882354736328125%
+[ES] epoch=17 monitor=macro_f1 cur_macro_f1=0.3585 ema_macro_f1=0.4746 best_macro_f1=0.5391 improved=False
+[Recon][Epoch 18] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 18] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 6 39]
+ [ 3 54]]
+[DEV] Class-0(Normal)    : P=0.6667  R=0.1333  F1=0.2222
+[DEV] Class-1(Depression): P=0.5806  R=0.9474  F1=0.7200
+[DEV] Macro              : P=0.6237  R=0.5404  F1=0.4711
+
+[DEV] Threshold sweep: best_thr=0.53  sweep_F1=0.6568  argmax_F1=0.4711
+Dev epoch:18, Loss:0.16612565918610647,Acc:58.82352828979492%
+[ES] epoch=18 monitor=macro_f1 cur_macro_f1=0.4711 ema_macro_f1=0.4735 best_macro_f1=0.5391 improved=False
+[Recon][Epoch 19] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 19] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[36  9]
+ [26 31]]
+[DEV] Class-0(Normal)    : P=0.5806  R=0.8000  F1=0.6729
+[DEV] Class-1(Depression): P=0.7750  R=0.5439  F1=0.6392
+[DEV] Macro              : P=0.6778  R=0.6719  F1=0.6560
+
+[DEV] Threshold sweep: best_thr=0.48  sweep_F1=0.6985  argmax_F1=0.6560
+  [CKPT-A] argmax_F1=0.6560 @epoch 19 | thr=0.48
+  [CKPT-B] sweep_F1=0.6985 @epoch 19 | thr=0.48
+Dev epoch:19, Loss:0.16314155436479127,Acc:65.68627166748047%
+[ES] epoch=19 monitor=macro_f1 cur_macro_f1=0.6560 ema_macro_f1=0.5283 best_macro_f1=0.5391 improved=False
+[Recon][Epoch 20] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 20] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[19 26]
+ [12 45]]
+[DEV] Class-0(Normal)    : P=0.6129  R=0.4222  F1=0.5000
+[DEV] Class-1(Depression): P=0.6338  R=0.7895  F1=0.7031
+[DEV] Macro              : P=0.6234  R=0.6058  F1=0.6016
+
+[DEV] Threshold sweep: best_thr=0.51  sweep_F1=0.7049  argmax_F1=0.6016
+  [CKPT-B] sweep_F1=0.7049 @epoch 20 | thr=0.51
+Dev epoch:20, Loss:0.1646766089476072,Acc:62.74509811401367%
+[ES] epoch=20 monitor=macro_f1 cur_macro_f1=0.6016 ema_macro_f1=0.5503 best_macro_f1=0.5391 improved=True
+  [CKPT-C] ema_macro_f1=0.5503 @epoch 20 | thr=0.51
+[Recon][Epoch 21] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 21] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 8 37]
+ [ 3 54]]
+[DEV] Class-0(Normal)    : P=0.7273  R=0.1778  F1=0.2857
+[DEV] Class-1(Depression): P=0.5934  R=0.9474  F1=0.7297
+[DEV] Macro              : P=0.6603  R=0.5626  F1=0.5077
+
+[DEV] Threshold sweep: best_thr=0.53  sweep_F1=0.6528  argmax_F1=0.5077
+Dev epoch:21, Loss:0.16749636771587226,Acc:60.7843132019043%
+[ES] epoch=21 monitor=macro_f1 cur_macro_f1=0.5077 ema_macro_f1=0.5375 best_macro_f1=0.5503 improved=False
+[Recon][Epoch 22] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 22] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[42  3]
+ [45 12]]
+[DEV] Class-0(Normal)    : P=0.4828  R=0.9333  F1=0.6364
+[DEV] Class-1(Depression): P=0.8000  R=0.2105  F1=0.3333
+[DEV] Macro              : P=0.6414  R=0.5719  F1=0.4848
+
+[DEV] Threshold sweep: best_thr=0.44  sweep_F1=0.6937  argmax_F1=0.4848
+Dev epoch:22, Loss:0.17458713742402884,Acc:52.94117736816406%
+[ES] epoch=22 monitor=macro_f1 cur_macro_f1=0.4848 ema_macro_f1=0.5217 best_macro_f1=0.5503 improved=False
+[Recon][Epoch 23] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 23] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[28 17]
+ [21 36]]
+[DEV] Class-0(Normal)    : P=0.5714  R=0.6222  F1=0.5957
+[DEV] Class-1(Depression): P=0.6792  R=0.6316  F1=0.6545
+[DEV] Macro              : P=0.6253  R=0.6269  F1=0.6251
+
+[DEV] Threshold sweep: best_thr=0.49  sweep_F1=0.6560  argmax_F1=0.6251
+Dev epoch:23, Loss:0.16360426407593948,Acc:62.74509811401367%
+[ES] epoch=23 monitor=macro_f1 cur_macro_f1=0.6251 ema_macro_f1=0.5527 best_macro_f1=0.5503 improved=True
+  [CKPT-C] ema_macro_f1=0.5527 @epoch 23 | thr=0.49
+[Recon][Epoch 24] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 24] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 8 37]
+ [ 7 50]]
+[DEV] Class-0(Normal)    : P=0.5333  R=0.1778  F1=0.2667
+[DEV] Class-1(Depression): P=0.5747  R=0.8772  F1=0.6944
+[DEV] Macro              : P=0.5540  R=0.5275  F1=0.4806
+
+[DEV] Threshold sweep: best_thr=0.52  sweep_F1=0.6471  argmax_F1=0.4806
+Dev epoch:24, Loss:0.16969097978793657,Acc:56.86274337768555%
+[ES] epoch=24 monitor=macro_f1 cur_macro_f1=0.4806 ema_macro_f1=0.5311 best_macro_f1=0.5527 improved=False
+[Recon][Epoch 25] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 25] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[22 23]
+ [11 46]]
+[DEV] Class-0(Normal)    : P=0.6667  R=0.4889  F1=0.5641
+[DEV] Class-1(Depression): P=0.6667  R=0.8070  F1=0.7302
+[DEV] Macro              : P=0.6667  R=0.6480  F1=0.6471
+
+[DEV] Threshold sweep: best_thr=0.52  sweep_F1=0.6832  argmax_F1=0.6471
+Dev epoch:25, Loss:0.15637772816878098,Acc:66.66666412353516%
+[ES] epoch=25 monitor=macro_f1 cur_macro_f1=0.6471 ema_macro_f1=0.5659 best_macro_f1=0.5527 improved=True
+  [CKPT-C] ema_macro_f1=0.5659 @epoch 25 | thr=0.52
+[Recon][Epoch 26] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 26] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 9 36]
+ [ 1 56]]
+[DEV] Class-0(Normal)    : P=0.9000  R=0.2000  F1=0.3273
+[DEV] Class-1(Depression): P=0.6087  R=0.9825  F1=0.7517
+[DEV] Macro              : P=0.7543  R=0.5912  F1=0.5395
+
+[DEV] Threshold sweep: best_thr=0.56  sweep_F1=0.6727  argmax_F1=0.5395
+Dev epoch:26, Loss:0.1674883457330557,Acc:63.72549057006836%
+[ES] epoch=26 monitor=macro_f1 cur_macro_f1=0.5395 ema_macro_f1=0.5580 best_macro_f1=0.5659 improved=False
+[Recon][Epoch 27] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 27] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[28 17]
+ [16 41]]
+[DEV] Class-0(Normal)    : P=0.6364  R=0.6222  F1=0.6292
+[DEV] Class-1(Depression): P=0.7069  R=0.7193  F1=0.7130
+[DEV] Macro              : P=0.6716  R=0.6708  F1=0.6711
+
+[DEV] Threshold sweep: best_thr=0.50  sweep_F1=0.6711  argmax_F1=0.6711
+  [CKPT-A] argmax_F1=0.6711 @epoch 27 | thr=0.50
+Dev epoch:27, Loss:0.1595674237379661,Acc:67.64705657958984%
+[ES] epoch=27 monitor=macro_f1 cur_macro_f1=0.6711 ema_macro_f1=0.5919 best_macro_f1=0.5659 improved=True
+  [CKPT-C] ema_macro_f1=0.5919 @epoch 27 | thr=0.50
+[Recon][Epoch 28] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 28] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[18 27]
+ [19 38]]
+[DEV] Class-0(Normal)    : P=0.4865  R=0.4000  F1=0.4390
+[DEV] Class-1(Depression): P=0.5846  R=0.6667  F1=0.6230
+[DEV] Macro              : P=0.5356  R=0.5333  F1=0.5310
+
+[DEV] Threshold sweep: best_thr=0.52  sweep_F1=0.5680  argmax_F1=0.5310
+Dev epoch:28, Loss:0.16941185524830452,Acc:54.90196228027344%
+[ES] epoch=28 monitor=macro_f1 cur_macro_f1=0.5310 ema_macro_f1=0.5736 best_macro_f1=0.5919 improved=False
+[Recon][Epoch 29] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 29] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[26 19]
+ [17 40]]
+[DEV] Class-0(Normal)    : P=0.6047  R=0.5778  F1=0.5909
+[DEV] Class-1(Depression): P=0.6780  R=0.7018  F1=0.6897
+[DEV] Macro              : P=0.6413  R=0.6398  F1=0.6403
+
+[DEV] Threshold sweep: best_thr=0.52  sweep_F1=0.6552  argmax_F1=0.6403
+Dev epoch:29, Loss:0.16519742860243872,Acc:64.70587921142578%
+[ES] epoch=29 monitor=macro_f1 cur_macro_f1=0.6403 ema_macro_f1=0.5936 best_macro_f1=0.5919 improved=True
+  [CKPT-C] ema_macro_f1=0.5936 @epoch 29 | thr=0.52
+[Recon][Epoch 30] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 30] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[15 30]
+ [15 42]]
+[DEV] Class-0(Normal)    : P=0.5000  R=0.3333  F1=0.4000
+[DEV] Class-1(Depression): P=0.5833  R=0.7368  F1=0.6512
+[DEV] Macro              : P=0.5417  R=0.5351  F1=0.5256
+
+[DEV] Threshold sweep: best_thr=0.53  sweep_F1=0.5691  argmax_F1=0.5256
+Dev epoch:30, Loss:0.17612666235520288,Acc:55.882354736328125%
+[ES] epoch=30 monitor=macro_f1 cur_macro_f1=0.5256 ema_macro_f1=0.5732 best_macro_f1=0.5936 improved=False
+[Recon][Epoch 31] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 31] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 1 44]
+ [ 0 57]]
+[DEV] Class-0(Normal)    : P=1.0000  R=0.0222  F1=0.0435
+[DEV] Class-1(Depression): P=0.5644  R=1.0000  F1=0.7215
+[DEV] Macro              : P=0.7822  R=0.5111  F1=0.3825
+
+[DEV] Threshold sweep: best_thr=0.65  sweep_F1=0.5671  argmax_F1=0.3825
+Dev epoch:31, Loss:0.23345637837281594,Acc:56.86274337768555%
+[ES] epoch=31 monitor=macro_f1 cur_macro_f1=0.3825 ema_macro_f1=0.5160 best_macro_f1=0.5936 improved=False
+[Recon][Epoch 32] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 32] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[27 18]
+ [21 36]]
+[DEV] Class-0(Normal)    : P=0.5625  R=0.6000  F1=0.5806
+[DEV] Class-1(Depression): P=0.6667  R=0.6316  F1=0.6486
+[DEV] Macro              : P=0.6146  R=0.6158  F1=0.6146
+
+[DEV] Threshold sweep: best_thr=0.48  sweep_F1=0.6357  argmax_F1=0.6146
+Dev epoch:32, Loss:0.1689664526627614,Acc:61.764705657958984%
+[ES] epoch=32 monitor=macro_f1 cur_macro_f1=0.6146 ema_macro_f1=0.5456 best_macro_f1=0.5936 improved=False
+[Recon][Epoch 33] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 33] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[29 16]
+ [29 28]]
+[DEV] Class-0(Normal)    : P=0.5000  R=0.6444  F1=0.5631
+[DEV] Class-1(Depression): P=0.6364  R=0.4912  F1=0.5545
+[DEV] Macro              : P=0.5682  R=0.5678  F1=0.5588
+
+[DEV] Threshold sweep: best_thr=0.44  sweep_F1=0.6435  argmax_F1=0.5588
+Dev epoch:33, Loss:0.17236708047298285,Acc:55.882354736328125%
+[ES] epoch=33 monitor=macro_f1 cur_macro_f1=0.5588 ema_macro_f1=0.5496 best_macro_f1=0.5936 improved=False
+[Recon][Epoch 34] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 34] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[33 12]
+ [39 18]]
+[DEV] Class-0(Normal)    : P=0.4583  R=0.7333  F1=0.5641
+[DEV] Class-1(Depression): P=0.6000  R=0.3158  F1=0.4138
+[DEV] Macro              : P=0.5292  R=0.5246  F1=0.4889
+
+[DEV] Threshold sweep: best_thr=0.39  sweep_F1=0.5836  argmax_F1=0.4889
+Dev epoch:34, Loss:0.2114309794627703,Acc:50.0%
+[ES] epoch=34 monitor=macro_f1 cur_macro_f1=0.4889 ema_macro_f1=0.5314 best_macro_f1=0.5936 improved=False
+[Recon][Epoch 35] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 35] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[21 24]
+ [13 44]]
+[DEV] Class-0(Normal)    : P=0.6176  R=0.4667  F1=0.5316
+[DEV] Class-1(Depression): P=0.6471  R=0.7719  F1=0.7040
+[DEV] Macro              : P=0.6324  R=0.6193  F1=0.6178
+
+[DEV] Threshold sweep: best_thr=0.51  sweep_F1=0.6212  argmax_F1=0.6178
+Dev epoch:35, Loss:0.19001146119374496,Acc:63.72549057006836%
+[ES] epoch=35 monitor=macro_f1 cur_macro_f1=0.6178 ema_macro_f1=0.5573 best_macro_f1=0.5936 improved=False
+[Recon][Epoch 36] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 36] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[29 16]
+ [28 29]]
+[DEV] Class-0(Normal)    : P=0.5088  R=0.6444  F1=0.5686
+[DEV] Class-1(Depression): P=0.6444  R=0.5088  F1=0.5686
+[DEV] Macro              : P=0.5766  R=0.5766  F1=0.5686
+
+[DEV] Threshold sweep: best_thr=0.43  sweep_F1=0.6242  argmax_F1=0.5686
+Dev epoch:36, Loss:0.20011382779249778,Acc:56.86274337768555%
+[ES] epoch=36 monitor=macro_f1 cur_macro_f1=0.5686 ema_macro_f1=0.5607 best_macro_f1=0.5936 improved=False
+[Recon][Epoch 37] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 37] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[18 27]
+ [14 43]]
+[DEV] Class-0(Normal)    : P=0.5625  R=0.4000  F1=0.4675
+[DEV] Class-1(Depression): P=0.6143  R=0.7544  F1=0.6772
+[DEV] Macro              : P=0.5884  R=0.5772  F1=0.5723
+
+[DEV] Threshold sweep: best_thr=0.49  sweep_F1=0.6136  argmax_F1=0.5723
+Dev epoch:37, Loss:0.19310527180249876,Acc:59.80392074584961%
+[ES] epoch=37 monitor=macro_f1 cur_macro_f1=0.5723 ema_macro_f1=0.5642 best_macro_f1=0.5936 improved=False
+[Recon][Epoch 38] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 38] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[20 25]
+ [13 44]]
+[DEV] Class-0(Normal)    : P=0.6061  R=0.4444  F1=0.5128
+[DEV] Class-1(Depression): P=0.6377  R=0.7719  F1=0.6984
+[DEV] Macro              : P=0.6219  R=0.6082  F1=0.6056
+
+[DEV] Threshold sweep: best_thr=0.47  sweep_F1=0.6183  argmax_F1=0.6056
+Dev epoch:38, Loss:0.20400750980927393,Acc:62.74509811401367%
+[ES] epoch=38 monitor=macro_f1 cur_macro_f1=0.6056 ema_macro_f1=0.5766 best_macro_f1=0.5936 improved=False
+[Recon][Epoch 39] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 39] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[19 26]
+ [15 42]]
+[DEV] Class-0(Normal)    : P=0.5588  R=0.4222  F1=0.4810
+[DEV] Class-1(Depression): P=0.6176  R=0.7368  F1=0.6720
+[DEV] Macro              : P=0.5882  R=0.5795  F1=0.5765
+
+[DEV] Threshold sweep: best_thr=0.55  sweep_F1=0.6054  argmax_F1=0.5765
+Dev epoch:39, Loss:0.20190698080337965,Acc:59.80392074584961%
+[ES] epoch=39 monitor=macro_f1 cur_macro_f1=0.5765 ema_macro_f1=0.5766 best_macro_f1=0.5936 improved=False
+[Recon][Epoch 40] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 40] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[24 21]
+ [22 35]]
+[DEV] Class-0(Normal)    : P=0.5217  R=0.5333  F1=0.5275
+[DEV] Class-1(Depression): P=0.6250  R=0.6140  F1=0.6195
+[DEV] Macro              : P=0.5734  R=0.5737  F1=0.5735
+
+[DEV] Threshold sweep: best_thr=0.51  sweep_F1=0.5961  argmax_F1=0.5735
+Dev epoch:40, Loss:0.21957643845906624,Acc:57.843135833740234%
+[ES] epoch=40 monitor=macro_f1 cur_macro_f1=0.5735 ema_macro_f1=0.5757 best_macro_f1=0.5936 improved=False
+[Recon][Epoch 41] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 41] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[26 19]
+ [29 28]]
+[DEV] Class-0(Normal)    : P=0.4727  R=0.5778  F1=0.5200
+[DEV] Class-1(Depression): P=0.5957  R=0.4912  F1=0.5385
+[DEV] Macro              : P=0.5342  R=0.5345  F1=0.5292
+
+[DEV] Threshold sweep: best_thr=0.42  sweep_F1=0.5723  argmax_F1=0.5292
+Dev epoch:41, Loss:0.2204527843457002,Acc:52.94117736816406%
+[ES] epoch=41 monitor=macro_f1 cur_macro_f1=0.5292 ema_macro_f1=0.5617 best_macro_f1=0.5936 improved=False
+[Recon][Epoch 42] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 42] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[32 13]
+ [34 23]]
+[DEV] Class-0(Normal)    : P=0.4848  R=0.7111  F1=0.5766
+[DEV] Class-1(Depression): P=0.6389  R=0.4035  F1=0.4946
+[DEV] Macro              : P=0.5619  R=0.5573  F1=0.5356
+
+[DEV] Threshold sweep: best_thr=0.54  sweep_F1=0.5577  argmax_F1=0.5356
+Dev epoch:42, Loss:0.22123635617586282,Acc:53.92156982421875%
+[ES] epoch=42 monitor=macro_f1 cur_macro_f1=0.5356 ema_macro_f1=0.5539 best_macro_f1=0.5936 improved=False
+[Recon][Epoch 43] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 43] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[16 29]
+ [14 43]]
+[DEV] Class-0(Normal)    : P=0.5333  R=0.3556  F1=0.4267
+[DEV] Class-1(Depression): P=0.5972  R=0.7544  F1=0.6667
+[DEV] Macro              : P=0.5653  R=0.5550  F1=0.5467
+
+[DEV] Threshold sweep: best_thr=0.51  sweep_F1=0.5849  argmax_F1=0.5467
+Dev epoch:43, Loss:0.2349972644677529,Acc:57.843135833740234%
+[ES] epoch=43 monitor=macro_f1 cur_macro_f1=0.5467 ema_macro_f1=0.5517 best_macro_f1=0.5936 improved=False
+[Recon][Epoch 44] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 44] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[20 25]
+ [19 38]]
+[DEV] Class-0(Normal)    : P=0.5128  R=0.4444  F1=0.4762
+[DEV] Class-1(Depression): P=0.6032  R=0.6667  F1=0.6333
+[DEV] Macro              : P=0.5580  R=0.5556  F1=0.5548
+
+[DEV] Threshold sweep: best_thr=0.51  sweep_F1=0.5803  argmax_F1=0.5548
+Dev epoch:44, Loss:0.2104733162201368,Acc:56.86274337768555%
+[ES] epoch=44 monitor=macro_f1 cur_macro_f1=0.5548 ema_macro_f1=0.5526 best_macro_f1=0.5936 improved=False
+[Recon][Epoch 45] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 45] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[15 30]
+ [12 45]]
+[DEV] Class-0(Normal)    : P=0.5556  R=0.3333  F1=0.4167
+[DEV] Class-1(Depression): P=0.6000  R=0.7895  F1=0.6818
+[DEV] Macro              : P=0.5778  R=0.5614  F1=0.5492
+
+[DEV] Threshold sweep: best_thr=0.59  sweep_F1=0.6146  argmax_F1=0.5492
+Dev epoch:45, Loss:0.2160896022732441,Acc:58.82352828979492%
+[ES] epoch=45 monitor=macro_f1 cur_macro_f1=0.5492 ema_macro_f1=0.5516 best_macro_f1=0.5936 improved=False
+[Recon][Epoch 46] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 46] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[20 25]
+ [15 42]]
+[DEV] Class-0(Normal)    : P=0.5714  R=0.4444  F1=0.5000
+[DEV] Class-1(Depression): P=0.6269  R=0.7368  F1=0.6774
+[DEV] Macro              : P=0.5991  R=0.5906  F1=0.5887
+
+[DEV] Threshold sweep: best_thr=0.52  sweep_F1=0.5922  argmax_F1=0.5887
+Dev epoch:46, Loss:0.24260408316667265,Acc:60.7843132019043%
+[ES] epoch=46 monitor=macro_f1 cur_macro_f1=0.5887 ema_macro_f1=0.5627 best_macro_f1=0.5936 improved=False
+[Recon][Epoch 47] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 47] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[22 23]
+ [19 38]]
+[DEV] Class-0(Normal)    : P=0.5366  R=0.4889  F1=0.5116
+[DEV] Class-1(Depression): P=0.6230  R=0.6667  F1=0.6441
+[DEV] Macro              : P=0.5798  R=0.5778  F1=0.5778
+
+[DEV] Threshold sweep: best_thr=0.51  sweep_F1=0.5892  argmax_F1=0.5778
+Dev epoch:47, Loss:0.20760290783185226,Acc:58.82352828979492%
+[ES] epoch=47 monitor=macro_f1 cur_macro_f1=0.5778 ema_macro_f1=0.5673 best_macro_f1=0.5936 improved=False
+[Recon][Epoch 48] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 48] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[17 28]
+ [13 44]]
+[DEV] Class-0(Normal)    : P=0.5667  R=0.3778  F1=0.4533
+[DEV] Class-1(Depression): P=0.6111  R=0.7719  F1=0.6822
+[DEV] Macro              : P=0.5889  R=0.5749  F1=0.5678
+
+[DEV] Threshold sweep: best_thr=0.60  sweep_F1=0.5842  argmax_F1=0.5678
+Dev epoch:48, Loss:0.224195373746065,Acc:59.80392074584961%
+[ES] epoch=48 monitor=macro_f1 cur_macro_f1=0.5678 ema_macro_f1=0.5674 best_macro_f1=0.5936 improved=False
+[Recon][Epoch 49] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 49] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[17 28]
+ [14 43]]
+[DEV] Class-0(Normal)    : P=0.5484  R=0.3778  F1=0.4474
+[DEV] Class-1(Depression): P=0.6056  R=0.7544  F1=0.6719
+[DEV] Macro              : P=0.5770  R=0.5661  F1=0.5596
+
+[DEV] Threshold sweep: best_thr=0.61  sweep_F1=0.6176  argmax_F1=0.5596
+Dev epoch:49, Loss:0.20688206129349196,Acc:58.82352828979492%
+[ES] epoch=49 monitor=macro_f1 cur_macro_f1=0.5596 ema_macro_f1=0.5651 best_macro_f1=0.5936 improved=False
+Early stopping triggered! (EMA Macro-F1=0.5651)
+Training Finished. Running A/B/C checkpoint comparison on Final Test...
+[CKPT-LOAD] A(argmax): epoch=27, path=models/DVLOG_concat_04_02__11_13/seed_41/best_model_by_argmax_f1.pth
+[THR] A(argmax): thr=0.50 from models/DVLOG_concat_04_02__11_13/seed_41/best_thr_for_best_argmax_model.json
+******* FINAL TEST A(argmax) ********
+[FINAL-A(argmax)] Acc=65.57% P=0.6525 R=0.6557 F1=0.6534 thr=0.50 epoch=27
+[CKPT-LOAD] B(sweep): epoch=20, path=models/DVLOG_concat_04_02__11_13/seed_41/best_model_by_sweep_f1.pth
+[THR] B(sweep): thr=0.51 from models/DVLOG_concat_04_02__11_13/seed_41/best_thr_for_best_sweep_model.json
+******* FINAL TEST B(sweep) ********
+[FINAL-B(sweep)] Acc=63.68% P=0.6399 R=0.6368 F1=0.6380 thr=0.51 epoch=20
+[CKPT-LOAD] C(ema_macro): epoch=29, path=models/DVLOG_concat_04_02__11_13/seed_41/best_model_by_ema_macro_f1.pth
+[THR] C(ema_macro): thr=0.52 from models/DVLOG_concat_04_02__11_13/seed_41/best_thr_for_best_ema_macro_f1_model.json
+******* FINAL TEST C(ema_macro) ********
+[FINAL-C(ema_macro)] Acc=36.32% P=0.3434 R=0.3632 F1=0.2888 thr=0.52 epoch=29
+
+--- Final Test Comparison (A/B/C) ---
+A(argmax): Acc=65.57%  P=0.6525  R=0.6557  F1=0.6534  thr=0.50  epoch=27
+B(sweep): Acc=63.68%  P=0.6399  R=0.6368  F1=0.6380  thr=0.51  epoch=20
+C(ema_macro): Acc=36.32%  P=0.3434  R=0.3632  F1=0.2888  thr=0.52  epoch=29
+[FINAL-DECISION] 本 fold 最优 test checkpoint = A(argmax)
+[set_all_seeds] seed=42, cudnn.deterministic=True, strict_deterministic_algos=False
+
+==================== Seed 42 ====================
+[ES-INIT] monitor=macro_f1 best_monitor=-inf ema_monitor=-inf ema_loss_val=None
+[IMPORT-CHECK] MultiModalLoaderClass from /root/autodl-tmp/LMVD_new/model/vitGCN/data/dvlog_loader.py
+[IMPORT-CHECK] collate_fn_multimodal from /root/autodl-tmp/LMVD_new/model/vitGCN/kfoldLoader_multimodal.py
+[IMPORT-CHECK] ViT_GCN_Fusion from /root/autodl-tmp/LMVD_new/model/vitGCN/Vit_gcnmodel.py
+[IMPORT-CHECK] MultiModalLoaderClass.__init__ signature(defaults only): (self, *args, **kwargs)
+[IMPORT-CHECK] MultiModalLoaderClass wrapper detected; base=MultiModalDataLoader.__init__ signature: (self, file_list, video_feature_path, audio_feature_path, face_landmark_path, label_path, T_target=915, mode='train', dataset='LMVD', uniform_ratio=0.7, dvlog_aug_noise_std=0.005, dvlog_audio_mask_ratio=0.0, segment_len=0, use_two_clip_train=False, two_clip_mode='center_random', use_three_clip_train=False, three_clip_mode='center_lr', quality_candidate_count=5, region_partition_scheme='legacy6', enable_feature_cache=True, feature_cache_size=256, np_load_mmap=False, lmvd_face_region_cache_dir=None, lmvd_face_cache_readonly=False)
+[IMPORT-CHECK] Runtime DATASET_SELECT=DVLOG
+[IMPORT-CHECK] FocalBCELoss.forward signature: (self, logits, target, sample_weight=None)
+[DL-CFG] workers=8, pin_memory=True, persistent=True, prefetch_factor=4
+[CACHE-CFG] enable_feature_cache=True, feature_cache_size=256, np_load_mmap=False, lmvd_face_cache_dir=data/LMVD_Feature/face_regions_cache
+[MultiModalDataLoader] DVLOG 标签已缓存: 961 条
+[MultiModalDataLoader] DVLOG aug config: noise_std=0.005, audio_mask_ratio=0.0, uniform_ratio=0.7
+[MultiModalDataLoader] cache: enable=True, size=256, mmap=False
+[MultiModalDataLoader] DVLOG 标签已缓存: 961 条
+[MultiModalDataLoader] DVLOG aug config: noise_std=0.005, audio_mask_ratio=0.0, uniform_ratio=0.7
+[MultiModalDataLoader] cache: enable=True, size=256, mmap=False
+[MultiModalDataLoader] DVLOG 标签已缓存: 961 条
+[MultiModalDataLoader] DVLOG aug config: noise_std=0.005, audio_mask_ratio=0.0, uniform_ratio=0.7
+[MultiModalDataLoader] cache: enable=True, size=256, mmap=False
+DataLoaders Ready: Train=41, Dev=13, Test=27
+[DATASET-CHECK] trainSet.dataset=DVLOG, devSet.dataset=DVLOG, testSet.dataset=DVLOG
+[SEG] train_T=870, train_segment_len=0, eval_sliding_cfg=True, eval_sliding_effective=True, eval_stride=128, dataset=DVLOG, seg_len=300
+[EVAL-AGG-CFG] mode=meanmax, topk=2, meanmax_alpha=0.3
+[DEVICE] device=cuda, cuda_available=True
+[MODEL-INIT] start
+[Model] mode=video_only, fusion_mode=av_backbone_only, sd=0.0, dropout=0.1
+[FS-ENC] enabled=True, v_local=2, a_local=3, v_global=4, a_global=2, dilated_audio=True, fusion_dropout=0.05
+[AV-BACKBONE] legacy=False
+[MODEL-INIT] done
+[EMA] USE_MODEL_EMA=True, decay=0.995
+[VIT-STEM] temporal_conv_stem=True, for=audio, kernel=3, dvlog_only=True, effective=True
+[AUDIO-TCN] enabled=False, kernel=3, dropout=0.0, dvlog_only=False, effective=False
+[VIT-STEM] effective_conv video_k=(1,), video_p=(0,), audio_k=(3,), audio_p=(1,)
+[AUDIO-TCN] encoder=Identity
+[FS-ENC] path=single-modality encoders -> post-encoder AV fusion
+[AUG] DVLOG preset=weak, noise_std=0.005, audio_mask_ratio=0.0, uniform_ratio=0.7
+[MIL] USE_SEGMENT_MIL=False, seg_len=300, k_train=4, k_eval=4, train_agg=weighted_mean, eval_agg=weighted_mean
+[train/seed_42] FocalBCE  gamma=2.0  (no pos_weight, ViT-only)
+[train/seed_42] eff_lr=1.00e-04  (base_lr=1.00e-04, fusion_mode=concat, LOSS_MODE=focal_no_pw)
+[Recon][Epoch 1] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 2] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 3] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 4] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 5] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 6] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 7] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 8] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 9] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 10] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 10] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[43  2]
+ [51  6]]
+[DEV] Class-0(Normal)    : P=0.4574  R=0.9556  F1=0.6187
+[DEV] Class-1(Depression): P=0.7500  R=0.1053  F1=0.1846
+[DEV] Macro              : P=0.6037  R=0.5304  F1=0.4017
+
+[DEV] Threshold sweep: best_thr=0.43  sweep_F1=0.6762  argmax_F1=0.4017
+  [CKPT-A] argmax_F1=0.4017 @epoch 10 | thr=0.43
+  [CKPT-B] sweep_F1=0.6762 @epoch 10 | thr=0.43
+Dev epoch:10, Loss:0.17683898714872506,Acc:48.039215087890625%
+[ES] epoch=10 monitor=macro_f1 cur_macro_f1=0.4017 ema_macro_f1=0.4017 best_macro_f1=-inf improved=True
+  [CKPT-C] ema_macro_f1=0.4017 @epoch 10 | thr=0.43
+[Recon][Epoch 11] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 11] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[16 29]
+ [10 47]]
+[DEV] Class-0(Normal)    : P=0.6154  R=0.3556  F1=0.4507
+[DEV] Class-1(Depression): P=0.6184  R=0.8246  F1=0.7068
+[DEV] Macro              : P=0.6169  R=0.5901  F1=0.5787
+
+[DEV] Threshold sweep: best_thr=0.52  sweep_F1=0.6542  argmax_F1=0.5787
+  [CKPT-A] argmax_F1=0.5787 @epoch 11 | thr=0.52
+Dev epoch:11, Loss:0.16133514046669006,Acc:61.764705657958984%
+[ES] epoch=11 monitor=macro_f1 cur_macro_f1=0.5787 ema_macro_f1=0.4548 best_macro_f1=0.4017 improved=True
+  [CKPT-C] ema_macro_f1=0.4548 @epoch 11 | thr=0.52
+[Recon][Epoch 12] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 12] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[18 27]
+ [13 44]]
+[DEV] Class-0(Normal)    : P=0.5806  R=0.4000  F1=0.4737
+[DEV] Class-1(Depression): P=0.6197  R=0.7719  F1=0.6875
+[DEV] Macro              : P=0.6002  R=0.5860  F1=0.5806
+
+[DEV] Threshold sweep: best_thr=0.51  sweep_F1=0.6421  argmax_F1=0.5806
+  [CKPT-A] argmax_F1=0.5806 @epoch 12 | thr=0.51
+Dev epoch:12, Loss:0.16173730733302924,Acc:60.7843132019043%
+[ES] epoch=12 monitor=macro_f1 cur_macro_f1=0.5806 ema_macro_f1=0.4925 best_macro_f1=0.4548 improved=True
+  [CKPT-C] ema_macro_f1=0.4925 @epoch 12 | thr=0.51
+[Recon][Epoch 13] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 13] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[34 11]
+ [24 33]]
+[DEV] Class-0(Normal)    : P=0.5862  R=0.7556  F1=0.6602
+[DEV] Class-1(Depression): P=0.7500  R=0.5789  F1=0.6535
+[DEV] Macro              : P=0.6681  R=0.6673  F1=0.6568
+
+[DEV] Threshold sweep: best_thr=0.50  sweep_F1=0.6568  argmax_F1=0.6568
+  [CKPT-A] argmax_F1=0.6568 @epoch 13 | thr=0.50
+Dev epoch:13, Loss:0.16504951738394225,Acc:65.68627166748047%
+[ES] epoch=13 monitor=macro_f1 cur_macro_f1=0.6568 ema_macro_f1=0.5418 best_macro_f1=0.4925 improved=True
+  [CKPT-C] ema_macro_f1=0.5418 @epoch 13 | thr=0.50
+[Recon][Epoch 14] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 14] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 3 42]
+ [ 1 56]]
+[DEV] Class-0(Normal)    : P=0.7500  R=0.0667  F1=0.1224
+[DEV] Class-1(Depression): P=0.5714  R=0.9825  F1=0.7226
+[DEV] Macro              : P=0.6607  R=0.5246  F1=0.4225
+
+[DEV] Threshold sweep: best_thr=0.58  sweep_F1=0.6568  argmax_F1=0.4225
+Dev epoch:14, Loss:0.1739447626930017,Acc:57.843135833740234%
+[ES] epoch=14 monitor=macro_f1 cur_macro_f1=0.4225 ema_macro_f1=0.5060 best_macro_f1=0.5418 improved=False
+[Recon][Epoch 15] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 15] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[19 26]
+ [16 41]]
+[DEV] Class-0(Normal)    : P=0.5429  R=0.4222  F1=0.4750
+[DEV] Class-1(Depression): P=0.6119  R=0.7193  F1=0.6613
+[DEV] Macro              : P=0.5774  R=0.5708  F1=0.5681
+
+[DEV] Threshold sweep: best_thr=0.52  sweep_F1=0.6469  argmax_F1=0.5681
+Dev epoch:15, Loss:0.1644272838647549,Acc:58.82352828979492%
+[ES] epoch=15 monitor=macro_f1 cur_macro_f1=0.5681 ema_macro_f1=0.5247 best_macro_f1=0.5418 improved=False
+[Recon][Epoch 16] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 16] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[20 25]
+ [15 42]]
+[DEV] Class-0(Normal)    : P=0.5714  R=0.4444  F1=0.5000
+[DEV] Class-1(Depression): P=0.6269  R=0.7368  F1=0.6774
+[DEV] Macro              : P=0.5991  R=0.5906  F1=0.5887
+
+[DEV] Threshold sweep: best_thr=0.53  sweep_F1=0.6465  argmax_F1=0.5887
+Dev epoch:16, Loss:0.16229131187383944,Acc:60.7843132019043%
+[ES] epoch=16 monitor=macro_f1 cur_macro_f1=0.5887 ema_macro_f1=0.5439 best_macro_f1=0.5418 improved=True
+  [CKPT-C] ema_macro_f1=0.5439 @epoch 16 | thr=0.53
+[Recon][Epoch 17] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 17] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 7 38]
+ [ 3 54]]
+[DEV] Class-0(Normal)    : P=0.7000  R=0.1556  F1=0.2545
+[DEV] Class-1(Depression): P=0.5870  R=0.9474  F1=0.7248
+[DEV] Macro              : P=0.6435  R=0.5515  F1=0.4897
+
+[DEV] Threshold sweep: best_thr=0.55  sweep_F1=0.6330  argmax_F1=0.4897
+Dev epoch:17, Loss:0.16662011524805656,Acc:59.80392074584961%
+[ES] epoch=17 monitor=macro_f1 cur_macro_f1=0.4897 ema_macro_f1=0.5276 best_macro_f1=0.5439 improved=False
+[Recon][Epoch 18] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 18] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[42  3]
+ [36 21]]
+[DEV] Class-0(Normal)    : P=0.5385  R=0.9333  F1=0.6829
+[DEV] Class-1(Depression): P=0.8750  R=0.3684  F1=0.5185
+[DEV] Macro              : P=0.7067  R=0.6509  F1=0.6007
+
+[DEV] Threshold sweep: best_thr=0.47  sweep_F1=0.6552  argmax_F1=0.6007
+Dev epoch:18, Loss:0.16847671453769392,Acc:61.764705657958984%
+[ES] epoch=18 monitor=macro_f1 cur_macro_f1=0.6007 ema_macro_f1=0.5496 best_macro_f1=0.5439 improved=True
+  [CKPT-C] ema_macro_f1=0.5496 @epoch 18 | thr=0.47
+[Recon][Epoch 19] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 19] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 3 42]
+ [12 45]]
+[DEV] Class-0(Normal)    : P=0.2000  R=0.0667  F1=0.1000
+[DEV] Class-1(Depression): P=0.5172  R=0.7895  F1=0.6250
+[DEV] Macro              : P=0.3586  R=0.4281  F1=0.3625
+
+[DEV] Threshold sweep: best_thr=0.52  sweep_F1=0.5660  argmax_F1=0.3625
+Dev epoch:19, Loss:0.174431667304956,Acc:47.05882263183594%
+[ES] epoch=19 monitor=macro_f1 cur_macro_f1=0.3625 ema_macro_f1=0.4934 best_macro_f1=0.5496 improved=False
+[Recon][Epoch 20] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 20] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[15 30]
+ [15 42]]
+[DEV] Class-0(Normal)    : P=0.5000  R=0.3333  F1=0.4000
+[DEV] Class-1(Depression): P=0.5833  R=0.7368  F1=0.6512
+[DEV] Macro              : P=0.5417  R=0.5351  F1=0.5256
+
+[DEV] Threshold sweep: best_thr=0.53  sweep_F1=0.6269  argmax_F1=0.5256
+Dev epoch:20, Loss:0.16709391944683516,Acc:55.882354736328125%
+[ES] epoch=20 monitor=macro_f1 cur_macro_f1=0.5256 ema_macro_f1=0.5031 best_macro_f1=0.5496 improved=False
+[Recon][Epoch 21] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 21] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[14 31]
+ [11 46]]
+[DEV] Class-0(Normal)    : P=0.5600  R=0.3111  F1=0.4000
+[DEV] Class-1(Depression): P=0.5974  R=0.8070  F1=0.6866
+[DEV] Macro              : P=0.5787  R=0.5591  F1=0.5433
+
+[DEV] Threshold sweep: best_thr=0.55  sweep_F1=0.6568  argmax_F1=0.5433
+Dev epoch:21, Loss:0.1646197741994491,Acc:58.82352828979492%
+[ES] epoch=21 monitor=macro_f1 cur_macro_f1=0.5433 ema_macro_f1=0.5151 best_macro_f1=0.5496 improved=False
+[Recon][Epoch 22] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 22] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[13 32]
+ [13 44]]
+[DEV] Class-0(Normal)    : P=0.5000  R=0.2889  F1=0.3662
+[DEV] Class-1(Depression): P=0.5789  R=0.7719  F1=0.6617
+[DEV] Macro              : P=0.5395  R=0.5304  F1=0.5139
+
+[DEV] Threshold sweep: best_thr=0.55  sweep_F1=0.6560  argmax_F1=0.5139
+Dev epoch:22, Loss:0.16993742951980004,Acc:55.882354736328125%
+[ES] epoch=22 monitor=macro_f1 cur_macro_f1=0.5139 ema_macro_f1=0.5148 best_macro_f1=0.5496 improved=False
+[Recon][Epoch 23] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 23] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[36  9]
+ [26 31]]
+[DEV] Class-0(Normal)    : P=0.5806  R=0.8000  F1=0.6729
+[DEV] Class-1(Depression): P=0.7750  R=0.5439  F1=0.6392
+[DEV] Macro              : P=0.6778  R=0.6719  F1=0.6560
+
+[DEV] Threshold sweep: best_thr=0.47  sweep_F1=0.6727  argmax_F1=0.6560
+Dev epoch:23, Loss:0.1714082767183964,Acc:65.68627166748047%
+[ES] epoch=23 monitor=macro_f1 cur_macro_f1=0.6560 ema_macro_f1=0.5572 best_macro_f1=0.5496 improved=True
+  [CKPT-C] ema_macro_f1=0.5572 @epoch 23 | thr=0.47
+[Recon][Epoch 24] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 24] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[30 15]
+ [23 34]]
+[DEV] Class-0(Normal)    : P=0.5660  R=0.6667  F1=0.6122
+[DEV] Class-1(Depression): P=0.6939  R=0.5965  F1=0.6415
+[DEV] Macro              : P=0.6300  R=0.6316  F1=0.6269
+
+[DEV] Threshold sweep: best_thr=0.51  sweep_F1=0.6273  argmax_F1=0.6269
+Dev epoch:24, Loss:0.16881820444877332,Acc:62.74509811401367%
+[ES] epoch=24 monitor=macro_f1 cur_macro_f1=0.6269 ema_macro_f1=0.5781 best_macro_f1=0.5572 improved=True
+  [CKPT-C] ema_macro_f1=0.5781 @epoch 24 | thr=0.51
+[Recon][Epoch 25] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 25] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[14 31]
+ [11 46]]
+[DEV] Class-0(Normal)    : P=0.5600  R=0.3111  F1=0.4000
+[DEV] Class-1(Depression): P=0.5974  R=0.8070  F1=0.6866
+[DEV] Macro              : P=0.5787  R=0.5591  F1=0.5433
+
+[DEV] Threshold sweep: best_thr=0.56  sweep_F1=0.6065  argmax_F1=0.5433
+Dev epoch:25, Loss:0.16681069135665894,Acc:58.82352828979492%
+[ES] epoch=25 monitor=macro_f1 cur_macro_f1=0.5433 ema_macro_f1=0.5676 best_macro_f1=0.5781 improved=False
+[Recon][Epoch 26] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 26] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[36  9]
+ [33 24]]
+[DEV] Class-0(Normal)    : P=0.5217  R=0.8000  F1=0.6316
+[DEV] Class-1(Depression): P=0.7273  R=0.4211  F1=0.5333
+[DEV] Macro              : P=0.6245  R=0.6105  F1=0.5825
+
+[DEV] Threshold sweep: best_thr=0.46  sweep_F1=0.6222  argmax_F1=0.5825
+Dev epoch:26, Loss:0.17485008789942816,Acc:58.82352828979492%
+[ES] epoch=26 monitor=macro_f1 cur_macro_f1=0.5825 ema_macro_f1=0.5721 best_macro_f1=0.5781 improved=False
+[Recon][Epoch 27] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 27] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[17 28]
+ [14 43]]
+[DEV] Class-0(Normal)    : P=0.5484  R=0.3778  F1=0.4474
+[DEV] Class-1(Depression): P=0.6056  R=0.7544  F1=0.6719
+[DEV] Macro              : P=0.5770  R=0.5661  F1=0.5596
+
+[DEV] Threshold sweep: best_thr=0.57  sweep_F1=0.6065  argmax_F1=0.5596
+Dev epoch:27, Loss:0.17259282274888113,Acc:58.82352828979492%
+[ES] epoch=27 monitor=macro_f1 cur_macro_f1=0.5596 ema_macro_f1=0.5683 best_macro_f1=0.5781 improved=False
+[Recon][Epoch 28] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 28] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[13 32]
+ [12 45]]
+[DEV] Class-0(Normal)    : P=0.5200  R=0.2889  F1=0.3714
+[DEV] Class-1(Depression): P=0.5844  R=0.7895  F1=0.6716
+[DEV] Macro              : P=0.5522  R=0.5392  F1=0.5215
+
+[DEV] Threshold sweep: best_thr=0.60  sweep_F1=0.5892  argmax_F1=0.5215
+Dev epoch:28, Loss:0.1857881872699811,Acc:56.86274337768555%
+[ES] epoch=28 monitor=macro_f1 cur_macro_f1=0.5215 ema_macro_f1=0.5543 best_macro_f1=0.5781 improved=False
+[Recon][Epoch 29] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 29] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[21 24]
+ [19 38]]
+[DEV] Class-0(Normal)    : P=0.5250  R=0.4667  F1=0.4941
+[DEV] Class-1(Depression): P=0.6129  R=0.6667  F1=0.6387
+[DEV] Macro              : P=0.5690  R=0.5667  F1=0.5664
+
+[DEV] Threshold sweep: best_thr=0.49  sweep_F1=0.5718  argmax_F1=0.5664
+Dev epoch:29, Loss:0.21059458760114816,Acc:57.843135833740234%
+[ES] epoch=29 monitor=macro_f1 cur_macro_f1=0.5664 ema_macro_f1=0.5579 best_macro_f1=0.5781 improved=False
+[Recon][Epoch 30] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 30] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[39  6]
+ [41 16]]
+[DEV] Class-0(Normal)    : P=0.4875  R=0.8667  F1=0.6240
+[DEV] Class-1(Depression): P=0.7273  R=0.2807  F1=0.4051
+[DEV] Macro              : P=0.6074  R=0.5737  F1=0.5145
+
+[DEV] Threshold sweep: best_thr=0.43  sweep_F1=0.6372  argmax_F1=0.5145
+Dev epoch:30, Loss:0.2236782326721228,Acc:53.92156982421875%
+[ES] epoch=30 monitor=macro_f1 cur_macro_f1=0.5145 ema_macro_f1=0.5449 best_macro_f1=0.5781 improved=False
+[Recon][Epoch 31] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 31] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[19 26]
+ [21 36]]
+[DEV] Class-0(Normal)    : P=0.4750  R=0.4222  F1=0.4471
+[DEV] Class-1(Depression): P=0.5806  R=0.6316  F1=0.6050
+[DEV] Macro              : P=0.5278  R=0.5269  F1=0.5261
+
+[DEV] Threshold sweep: best_thr=0.58  sweep_F1=0.5578  argmax_F1=0.5261
+Dev epoch:31, Loss:0.2030842235455146,Acc:53.92156982421875%
+[ES] epoch=31 monitor=macro_f1 cur_macro_f1=0.5261 ema_macro_f1=0.5393 best_macro_f1=0.5781 improved=False
+[Recon][Epoch 32] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 32] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[25 20]
+ [22 35]]
+[DEV] Class-0(Normal)    : P=0.5319  R=0.5556  F1=0.5435
+[DEV] Class-1(Depression): P=0.6364  R=0.6140  F1=0.6250
+[DEV] Macro              : P=0.5841  R=0.5848  F1=0.5842
+
+[DEV] Threshold sweep: best_thr=0.47  sweep_F1=0.5892  argmax_F1=0.5842
+Dev epoch:32, Loss:0.22690112315691435,Acc:58.82352828979492%
+[ES] epoch=32 monitor=macro_f1 cur_macro_f1=0.5842 ema_macro_f1=0.5527 best_macro_f1=0.5781 improved=False
+[Recon][Epoch 33] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 33] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[14 31]
+ [ 8 49]]
+[DEV] Class-0(Normal)    : P=0.6364  R=0.3111  F1=0.4179
+[DEV] Class-1(Depression): P=0.6125  R=0.8596  F1=0.7153
+[DEV] Macro              : P=0.6244  R=0.5854  F1=0.5666
+
+[DEV] Threshold sweep: best_thr=0.60  sweep_F1=0.6065  argmax_F1=0.5666
+Dev epoch:33, Loss:0.18993471333613762,Acc:61.764705657958984%
+[ES] epoch=33 monitor=macro_f1 cur_macro_f1=0.5666 ema_macro_f1=0.5569 best_macro_f1=0.5781 improved=False
+[Recon][Epoch 34] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 34] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[22 23]
+ [19 38]]
+[DEV] Class-0(Normal)    : P=0.5366  R=0.4889  F1=0.5116
+[DEV] Class-1(Depression): P=0.6230  R=0.6667  F1=0.6441
+[DEV] Macro              : P=0.5798  R=0.5778  F1=0.5778
+
+[DEV] Threshold sweep: best_thr=0.49  sweep_F1=0.5778  argmax_F1=0.5778
+Dev epoch:34, Loss:0.2384116741327139,Acc:58.82352828979492%
+[ES] epoch=34 monitor=macro_f1 cur_macro_f1=0.5778 ema_macro_f1=0.5632 best_macro_f1=0.5781 improved=False
+[Recon][Epoch 35] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 35] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[21 24]
+ [24 33]]
+[DEV] Class-0(Normal)    : P=0.4667  R=0.4667  F1=0.4667
+[DEV] Class-1(Depression): P=0.5789  R=0.5789  F1=0.5789
+[DEV] Macro              : P=0.5228  R=0.5228  F1=0.5228
+
+[DEV] Threshold sweep: best_thr=0.59  sweep_F1=0.6054  argmax_F1=0.5228
+Dev epoch:35, Loss:0.23898380880172437,Acc:52.94117736816406%
+[ES] epoch=35 monitor=macro_f1 cur_macro_f1=0.5228 ema_macro_f1=0.5511 best_macro_f1=0.5781 improved=False
+[Recon][Epoch 36] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 36] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[20 25]
+ [19 38]]
+[DEV] Class-0(Normal)    : P=0.5128  R=0.4444  F1=0.4762
+[DEV] Class-1(Depression): P=0.6032  R=0.6667  F1=0.6333
+[DEV] Macro              : P=0.5580  R=0.5556  F1=0.5548
+
+[DEV] Threshold sweep: best_thr=0.64  sweep_F1=0.5980  argmax_F1=0.5548
+Dev epoch:36, Loss:0.2510623668248837,Acc:56.86274337768555%
+[ES] epoch=36 monitor=macro_f1 cur_macro_f1=0.5548 ema_macro_f1=0.5522 best_macro_f1=0.5781 improved=False
+[Recon][Epoch 37] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 37] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[16 29]
+ [10 47]]
+[DEV] Class-0(Normal)    : P=0.6154  R=0.3556  F1=0.4507
+[DEV] Class-1(Depression): P=0.6184  R=0.8246  F1=0.7068
+[DEV] Macro              : P=0.6169  R=0.5901  F1=0.5787
+
+[DEV] Threshold sweep: best_thr=0.53  sweep_F1=0.6056  argmax_F1=0.5787
+Dev epoch:37, Loss:0.20207011298491404,Acc:61.764705657958984%
+[ES] epoch=37 monitor=macro_f1 cur_macro_f1=0.5787 ema_macro_f1=0.5601 best_macro_f1=0.5781 improved=False
+[Recon][Epoch 38] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 38] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[14 31]
+ [14 43]]
+[DEV] Class-0(Normal)    : P=0.5000  R=0.3111  F1=0.3836
+[DEV] Class-1(Depression): P=0.5811  R=0.7544  F1=0.6565
+[DEV] Macro              : P=0.5405  R=0.5327  F1=0.5200
+
+[DEV] Threshold sweep: best_thr=0.66  sweep_F1=0.5876  argmax_F1=0.5200
+Dev epoch:38, Loss:0.24983443377109674,Acc:55.882354736328125%
+[ES] epoch=38 monitor=macro_f1 cur_macro_f1=0.5200 ema_macro_f1=0.5481 best_macro_f1=0.5781 improved=False
+[Recon][Epoch 39] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 39] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[19 26]
+ [13 44]]
+[DEV] Class-0(Normal)    : P=0.5938  R=0.4222  F1=0.4935
+[DEV] Class-1(Depression): P=0.6286  R=0.7719  F1=0.6929
+[DEV] Macro              : P=0.6112  R=0.5971  F1=0.5932
+
+[DEV] Threshold sweep: best_thr=0.53  sweep_F1=0.6126  argmax_F1=0.5932
+Dev epoch:39, Loss:0.20407987042115286,Acc:61.764705657958984%
+[ES] epoch=39 monitor=macro_f1 cur_macro_f1=0.5932 ema_macro_f1=0.5616 best_macro_f1=0.5781 improved=False
+[Recon][Epoch 40] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 40] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[31 14]
+ [33 24]]
+[DEV] Class-0(Normal)    : P=0.4844  R=0.6889  F1=0.5688
+[DEV] Class-1(Depression): P=0.6316  R=0.4211  F1=0.5053
+[DEV] Macro              : P=0.5580  R=0.5550  F1=0.5370
+
+[DEV] Threshold sweep: best_thr=0.37  sweep_F1=0.6126  argmax_F1=0.5370
+Dev epoch:40, Loss:0.2344010088306207,Acc:53.92156982421875%
+[ES] epoch=40 monitor=macro_f1 cur_macro_f1=0.5370 ema_macro_f1=0.5543 best_macro_f1=0.5781 improved=False
+[Recon][Epoch 41] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 41] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[27 18]
+ [21 36]]
+[DEV] Class-0(Normal)    : P=0.5625  R=0.6000  F1=0.5806
+[DEV] Class-1(Depression): P=0.6667  R=0.6316  F1=0.6486
+[DEV] Macro              : P=0.6146  R=0.6158  F1=0.6146
+
+[DEV] Threshold sweep: best_thr=0.50  sweep_F1=0.6146  argmax_F1=0.6146
+Dev epoch:41, Loss:0.2329621842274299,Acc:61.764705657958984%
+[ES] epoch=41 monitor=macro_f1 cur_macro_f1=0.6146 ema_macro_f1=0.5724 best_macro_f1=0.5781 improved=False
+[Recon][Epoch 42] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 42] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[31 14]
+ [31 26]]
+[DEV] Class-0(Normal)    : P=0.5000  R=0.6889  F1=0.5794
+[DEV] Class-1(Depression): P=0.6500  R=0.4561  F1=0.5361
+[DEV] Macro              : P=0.5750  R=0.5725  F1=0.5578
+
+[DEV] Threshold sweep: best_thr=0.41  sweep_F1=0.5922  argmax_F1=0.5578
+Dev epoch:42, Loss:0.20372425994047752,Acc:55.882354736328125%
+[ES] epoch=42 monitor=macro_f1 cur_macro_f1=0.5578 ema_macro_f1=0.5680 best_macro_f1=0.5781 improved=False
+[Recon][Epoch 43] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 43] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[24 21]
+ [21 36]]
+[DEV] Class-0(Normal)    : P=0.5333  R=0.5333  F1=0.5333
+[DEV] Class-1(Depression): P=0.6316  R=0.6316  F1=0.6316
+[DEV] Macro              : P=0.5825  R=0.5825  F1=0.5825
+
+[DEV] Threshold sweep: best_thr=0.45  sweep_F1=0.6099  argmax_F1=0.5825
+Dev epoch:43, Loss:0.1958900225850252,Acc:58.82352828979492%
+[ES] epoch=43 monitor=macro_f1 cur_macro_f1=0.5825 ema_macro_f1=0.5723 best_macro_f1=0.5781 improved=False
+[Recon][Epoch 44] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 44] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[34 11]
+ [35 22]]
+[DEV] Class-0(Normal)    : P=0.4928  R=0.7556  F1=0.5965
+[DEV] Class-1(Depression): P=0.6667  R=0.3860  F1=0.4889
+[DEV] Macro              : P=0.5797  R=0.5708  F1=0.5427
+
+[DEV] Threshold sweep: best_thr=0.45  sweep_F1=0.5980  argmax_F1=0.5427
+Dev epoch:44, Loss:0.22831121373635072,Acc:54.90196228027344%
+[ES] epoch=44 monitor=macro_f1 cur_macro_f1=0.5427 ema_macro_f1=0.5634 best_macro_f1=0.5781 improved=False
+Early stopping triggered! (EMA Macro-F1=0.5634)
+Training Finished. Running A/B/C checkpoint comparison on Final Test...
+[CKPT-LOAD] A(argmax): epoch=13, path=models/DVLOG_concat_04_02__11_13/seed_42/best_model_by_argmax_f1.pth
+[THR] A(argmax): thr=0.50 from models/DVLOG_concat_04_02__11_13/seed_42/best_thr_for_best_argmax_model.json
+******* FINAL TEST A(argmax) ********
+[FINAL-A(argmax)] Acc=59.91% P=0.6084 R=0.5991 F1=0.6015 thr=0.50 epoch=13
+[CKPT-LOAD] B(sweep): epoch=10, path=models/DVLOG_concat_04_02__11_13/seed_42/best_model_by_sweep_f1.pth
+[THR] B(sweep): thr=0.43 from models/DVLOG_concat_04_02__11_13/seed_42/best_thr_for_best_sweep_model.json
+******* FINAL TEST B(sweep) ********
+[FINAL-B(sweep)] Acc=62.26% P=0.6137 R=0.6226 F1=0.6084 thr=0.43 epoch=10
+[CKPT-LOAD] C(ema_macro): epoch=24, path=models/DVLOG_concat_04_02__11_13/seed_42/best_model_by_ema_macro_f1.pth
+[THR] C(ema_macro): thr=0.51 from models/DVLOG_concat_04_02__11_13/seed_42/best_thr_for_best_ema_macro_f1_model.json
+******* FINAL TEST C(ema_macro) ********
+[FINAL-C(ema_macro)] Acc=41.98% P=0.1762 R=0.4198 F1=0.2483 thr=0.51 epoch=24
+
+--- Final Test Comparison (A/B/C) ---
+B(sweep): Acc=62.26%  P=0.6137  R=0.6226  F1=0.6084  thr=0.43  epoch=10
+A(argmax): Acc=59.91%  P=0.6084  R=0.5991  F1=0.6015  thr=0.50  epoch=13
+C(ema_macro): Acc=41.98%  P=0.1762  R=0.4198  F1=0.2483  thr=0.51  epoch=24
+[FINAL-DECISION] 本 fold 最优 test checkpoint = B(sweep)
+[set_all_seeds] seed=43, cudnn.deterministic=True, strict_deterministic_algos=False
+
+==================== Seed 43 ====================
+[ES-INIT] monitor=macro_f1 best_monitor=-inf ema_monitor=-inf ema_loss_val=None
+[IMPORT-CHECK] MultiModalLoaderClass from /root/autodl-tmp/LMVD_new/model/vitGCN/data/dvlog_loader.py
+[IMPORT-CHECK] collate_fn_multimodal from /root/autodl-tmp/LMVD_new/model/vitGCN/kfoldLoader_multimodal.py
+[IMPORT-CHECK] ViT_GCN_Fusion from /root/autodl-tmp/LMVD_new/model/vitGCN/Vit_gcnmodel.py
+[IMPORT-CHECK] MultiModalLoaderClass.__init__ signature(defaults only): (self, *args, **kwargs)
+[IMPORT-CHECK] MultiModalLoaderClass wrapper detected; base=MultiModalDataLoader.__init__ signature: (self, file_list, video_feature_path, audio_feature_path, face_landmark_path, label_path, T_target=915, mode='train', dataset='LMVD', uniform_ratio=0.7, dvlog_aug_noise_std=0.005, dvlog_audio_mask_ratio=0.0, segment_len=0, use_two_clip_train=False, two_clip_mode='center_random', use_three_clip_train=False, three_clip_mode='center_lr', quality_candidate_count=5, region_partition_scheme='legacy6', enable_feature_cache=True, feature_cache_size=256, np_load_mmap=False, lmvd_face_region_cache_dir=None, lmvd_face_cache_readonly=False)
+[IMPORT-CHECK] Runtime DATASET_SELECT=DVLOG
+[IMPORT-CHECK] FocalBCELoss.forward signature: (self, logits, target, sample_weight=None)
+[DL-CFG] workers=8, pin_memory=True, persistent=True, prefetch_factor=4
+[CACHE-CFG] enable_feature_cache=True, feature_cache_size=256, np_load_mmap=False, lmvd_face_cache_dir=data/LMVD_Feature/face_regions_cache
+[MultiModalDataLoader] DVLOG 标签已缓存: 961 条
+[MultiModalDataLoader] DVLOG aug config: noise_std=0.005, audio_mask_ratio=0.0, uniform_ratio=0.7
+[MultiModalDataLoader] cache: enable=True, size=256, mmap=False
+[MultiModalDataLoader] DVLOG 标签已缓存: 961 条
+[MultiModalDataLoader] DVLOG aug config: noise_std=0.005, audio_mask_ratio=0.0, uniform_ratio=0.7
+[MultiModalDataLoader] cache: enable=True, size=256, mmap=False
+[MultiModalDataLoader] DVLOG 标签已缓存: 961 条
+[MultiModalDataLoader] DVLOG aug config: noise_std=0.005, audio_mask_ratio=0.0, uniform_ratio=0.7
+[MultiModalDataLoader] cache: enable=True, size=256, mmap=False
+DataLoaders Ready: Train=41, Dev=13, Test=27
+[DATASET-CHECK] trainSet.dataset=DVLOG, devSet.dataset=DVLOG, testSet.dataset=DVLOG
+[SEG] train_T=870, train_segment_len=0, eval_sliding_cfg=True, eval_sliding_effective=True, eval_stride=128, dataset=DVLOG, seg_len=300
+[EVAL-AGG-CFG] mode=meanmax, topk=2, meanmax_alpha=0.3
+[DEVICE] device=cuda, cuda_available=True
+[MODEL-INIT] start
+[Model] mode=video_only, fusion_mode=av_backbone_only, sd=0.0, dropout=0.1
+[FS-ENC] enabled=True, v_local=2, a_local=3, v_global=4, a_global=2, dilated_audio=True, fusion_dropout=0.05
+[AV-BACKBONE] legacy=False
+[MODEL-INIT] done
+[EMA] USE_MODEL_EMA=True, decay=0.995
+[VIT-STEM] temporal_conv_stem=True, for=audio, kernel=3, dvlog_only=True, effective=True
+[AUDIO-TCN] enabled=False, kernel=3, dropout=0.0, dvlog_only=False, effective=False
+[VIT-STEM] effective_conv video_k=(1,), video_p=(0,), audio_k=(3,), audio_p=(1,)
+[AUDIO-TCN] encoder=Identity
+[FS-ENC] path=single-modality encoders -> post-encoder AV fusion
+[AUG] DVLOG preset=weak, noise_std=0.005, audio_mask_ratio=0.0, uniform_ratio=0.7
+[MIL] USE_SEGMENT_MIL=False, seg_len=300, k_train=4, k_eval=4, train_agg=weighted_mean, eval_agg=weighted_mean
+[train/seed_43] FocalBCE  gamma=2.0  (no pos_weight, ViT-only)
+[train/seed_43] eff_lr=1.00e-04  (base_lr=1.00e-04, fusion_mode=concat, LOSS_MODE=focal_no_pw)
+[Recon][Epoch 1] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 2] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 3] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 4] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 5] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 6] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 7] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 8] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 9] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 10] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 10] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[12 33]
+ [ 4 53]]
+[DEV] Class-0(Normal)    : P=0.7500  R=0.2667  F1=0.3934
+[DEV] Class-1(Depression): P=0.6163  R=0.9298  F1=0.7413
+[DEV] Macro              : P=0.6831  R=0.5982  F1=0.5674
+
+[DEV] Threshold sweep: best_thr=0.54  sweep_F1=0.6528  argmax_F1=0.5674
+  [CKPT-A] argmax_F1=0.5674 @epoch 10 | thr=0.54
+  [CKPT-B] sweep_F1=0.6528 @epoch 10 | thr=0.54
+Dev epoch:10, Loss:0.1620618299796031,Acc:63.72549057006836%
+[ES] epoch=10 monitor=macro_f1 cur_macro_f1=0.5674 ema_macro_f1=0.5674 best_macro_f1=-inf improved=True
+  [CKPT-C] ema_macro_f1=0.5674 @epoch 10 | thr=0.54
+[Recon][Epoch 11] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 11] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[43  2]
+ [42 15]]
+[DEV] Class-0(Normal)    : P=0.5059  R=0.9556  F1=0.6615
+[DEV] Class-1(Depression): P=0.8824  R=0.2632  F1=0.4054
+[DEV] Macro              : P=0.6941  R=0.6094  F1=0.5335
+
+[DEV] Threshold sweep: best_thr=0.47  sweep_F1=0.6566  argmax_F1=0.5335
+  [CKPT-B] sweep_F1=0.6566 @epoch 11 | thr=0.47
+Dev epoch:11, Loss:0.16896206255142504,Acc:56.86274337768555%
+[ES] epoch=11 monitor=macro_f1 cur_macro_f1=0.5335 ema_macro_f1=0.5572 best_macro_f1=0.5674 improved=False
+[Recon][Epoch 12] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 12] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 1 44]
+ [ 1 56]]
+[DEV] Class-0(Normal)    : P=0.5000  R=0.0222  F1=0.0426
+[DEV] Class-1(Depression): P=0.5600  R=0.9825  F1=0.7134
+[DEV] Macro              : P=0.5300  R=0.5023  F1=0.3780
+
+[DEV] Threshold sweep: best_thr=0.57  sweep_F1=0.6560  argmax_F1=0.3780
+Dev epoch:12, Loss:0.17214322090148926,Acc:55.882354736328125%
+[ES] epoch=12 monitor=macro_f1 cur_macro_f1=0.3780 ema_macro_f1=0.5034 best_macro_f1=0.5674 improved=False
+[Recon][Epoch 13] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 13] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[10 35]
+ [ 3 54]]
+[DEV] Class-0(Normal)    : P=0.7692  R=0.2222  F1=0.3448
+[DEV] Class-1(Depression): P=0.6067  R=0.9474  F1=0.7397
+[DEV] Macro              : P=0.6880  R=0.5848  F1=0.5423
+
+[DEV] Threshold sweep: best_thr=0.55  sweep_F1=0.6552  argmax_F1=0.5423
+Dev epoch:13, Loss:0.16368762862223846,Acc:62.74509811401367%
+[ES] epoch=13 monitor=macro_f1 cur_macro_f1=0.5423 ema_macro_f1=0.5151 best_macro_f1=0.5674 improved=False
+[Recon][Epoch 14] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 14] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 5 40]
+ [ 1 56]]
+[DEV] Class-0(Normal)    : P=0.8333  R=0.1111  F1=0.1961
+[DEV] Class-1(Depression): P=0.5833  R=0.9825  F1=0.7320
+[DEV] Macro              : P=0.7083  R=0.5468  F1=0.4641
+
+[DEV] Threshold sweep: best_thr=0.56  sweep_F1=0.6449  argmax_F1=0.4641
+Dev epoch:14, Loss:0.1675911431129162,Acc:59.80392074584961%
+[ES] epoch=14 monitor=macro_f1 cur_macro_f1=0.4641 ema_macro_f1=0.4998 best_macro_f1=0.5674 improved=False
+[Recon][Epoch 15] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 15] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 5 40]
+ [ 1 56]]
+[DEV] Class-0(Normal)    : P=0.8333  R=0.1111  F1=0.1961
+[DEV] Class-1(Depression): P=0.5833  R=0.9825  F1=0.7320
+[DEV] Macro              : P=0.7083  R=0.5468  F1=0.4641
+
+[DEV] Threshold sweep: best_thr=0.56  sweep_F1=0.6560  argmax_F1=0.4641
+Dev epoch:15, Loss:0.1671051881634272,Acc:59.80392074584961%
+[ES] epoch=15 monitor=macro_f1 cur_macro_f1=0.4641 ema_macro_f1=0.4891 best_macro_f1=0.5674 improved=False
+[Recon][Epoch 16] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 16] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[37  8]
+ [27 30]]
+[DEV] Class-0(Normal)    : P=0.5781  R=0.8222  F1=0.6789
+[DEV] Class-1(Depression): P=0.7895  R=0.5263  F1=0.6316
+[DEV] Macro              : P=0.6838  R=0.6743  F1=0.6552
+
+[DEV] Threshold sweep: best_thr=0.48  sweep_F1=0.6764  argmax_F1=0.6552
+  [CKPT-A] argmax_F1=0.6552 @epoch 16 | thr=0.48
+  [CKPT-B] sweep_F1=0.6764 @epoch 16 | thr=0.48
+Dev epoch:16, Loss:0.1686862804568731,Acc:65.68627166748047%
+[ES] epoch=16 monitor=macro_f1 cur_macro_f1=0.6552 ema_macro_f1=0.5389 best_macro_f1=0.5674 improved=False
+[Recon][Epoch 17] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 17] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 4 41]
+ [ 1 56]]
+[DEV] Class-0(Normal)    : P=0.8000  R=0.0889  F1=0.1600
+[DEV] Class-1(Depression): P=0.5773  R=0.9825  F1=0.7273
+[DEV] Macro              : P=0.6887  R=0.5357  F1=0.4436
+
+[DEV] Threshold sweep: best_thr=0.56  sweep_F1=0.6493  argmax_F1=0.4436
+Dev epoch:17, Loss:0.17194701788517144,Acc:58.82352828979492%
+[ES] epoch=17 monitor=macro_f1 cur_macro_f1=0.4436 ema_macro_f1=0.5103 best_macro_f1=0.5674 improved=False
+[Recon][Epoch 18] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 18] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[38  7]
+ [30 27]]
+[DEV] Class-0(Normal)    : P=0.5588  R=0.8444  F1=0.6726
+[DEV] Class-1(Depression): P=0.7941  R=0.4737  F1=0.5934
+[DEV] Macro              : P=0.6765  R=0.6591  F1=0.6330
+
+[DEV] Threshold sweep: best_thr=0.47  sweep_F1=0.6542  argmax_F1=0.6330
+Dev epoch:18, Loss:0.16802954157957664,Acc:63.72549057006836%
+[ES] epoch=18 monitor=macro_f1 cur_macro_f1=0.6330 ema_macro_f1=0.5471 best_macro_f1=0.5674 improved=False
+[Recon][Epoch 19] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 19] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[35 10]
+ [27 30]]
+[DEV] Class-0(Normal)    : P=0.5645  R=0.7778  F1=0.6542
+[DEV] Class-1(Depression): P=0.7500  R=0.5263  F1=0.6186
+[DEV] Macro              : P=0.6573  R=0.6520  F1=0.6364
+
+[DEV] Threshold sweep: best_thr=0.48  sweep_F1=0.6749  argmax_F1=0.6364
+Dev epoch:19, Loss:0.16414096378363097,Acc:63.72549057006836%
+[ES] epoch=19 monitor=macro_f1 cur_macro_f1=0.6364 ema_macro_f1=0.5739 best_macro_f1=0.5674 improved=True
+  [CKPT-C] ema_macro_f1=0.5739 @epoch 19 | thr=0.48
+[Recon][Epoch 20] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 20] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[36  9]
+ [28 29]]
+[DEV] Class-0(Normal)    : P=0.5625  R=0.8000  F1=0.6606
+[DEV] Class-1(Depression): P=0.7632  R=0.5088  F1=0.6105
+[DEV] Macro              : P=0.6628  R=0.6544  F1=0.6355
+
+[DEV] Threshold sweep: best_thr=0.49  sweep_F1=0.6862  argmax_F1=0.6355
+  [CKPT-B] sweep_F1=0.6862 @epoch 20 | thr=0.49
+Dev epoch:20, Loss:0.16373999588764632,Acc:63.72549057006836%
+[ES] epoch=20 monitor=macro_f1 cur_macro_f1=0.6355 ema_macro_f1=0.5924 best_macro_f1=0.5739 improved=True
+  [CKPT-C] ema_macro_f1=0.5924 @epoch 20 | thr=0.49
+[Recon][Epoch 21] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 21] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[41  4]
+ [29 28]]
+[DEV] Class-0(Normal)    : P=0.5857  R=0.9111  F1=0.7130
+[DEV] Class-1(Depression): P=0.8750  R=0.4912  F1=0.6292
+[DEV] Macro              : P=0.7304  R=0.7012  F1=0.6711
+
+[DEV] Threshold sweep: best_thr=0.49  sweep_F1=0.6762  argmax_F1=0.6711
+  [CKPT-A] argmax_F1=0.6711 @epoch 21 | thr=0.49
+Dev epoch:21, Loss:0.16680581065324637,Acc:67.64705657958984%
+[ES] epoch=21 monitor=macro_f1 cur_macro_f1=0.6711 ema_macro_f1=0.6160 best_macro_f1=0.5924 improved=True
+  [CKPT-C] ema_macro_f1=0.6160 @epoch 21 | thr=0.49
+[Recon][Epoch 22] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 22] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[28 17]
+ [18 39]]
+[DEV] Class-0(Normal)    : P=0.6087  R=0.6222  F1=0.6154
+[DEV] Class-1(Depression): P=0.6964  R=0.6842  F1=0.6903
+[DEV] Macro              : P=0.6526  R=0.6532  F1=0.6528
+
+[DEV] Threshold sweep: best_thr=0.52  sweep_F1=0.6832  argmax_F1=0.6528
+Dev epoch:22, Loss:0.16345320298121527,Acc:65.68627166748047%
+[ES] epoch=22 monitor=macro_f1 cur_macro_f1=0.6528 ema_macro_f1=0.6271 best_macro_f1=0.6160 improved=True
+  [CKPT-C] ema_macro_f1=0.6271 @epoch 22 | thr=0.52
+[Recon][Epoch 23] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 23] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[17 28]
+ [10 47]]
+[DEV] Class-0(Normal)    : P=0.6296  R=0.3778  F1=0.4722
+[DEV] Class-1(Depression): P=0.6267  R=0.8246  F1=0.7121
+[DEV] Macro              : P=0.6281  R=0.6012  F1=0.5922
+
+[DEV] Threshold sweep: best_thr=0.52  sweep_F1=0.6862  argmax_F1=0.5922
+Dev epoch:23, Loss:0.1636239393399312,Acc:62.74509811401367%
+[ES] epoch=23 monitor=macro_f1 cur_macro_f1=0.5922 ema_macro_f1=0.6166 best_macro_f1=0.6271 improved=False
+[Recon][Epoch 24] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 24] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[39  6]
+ [30 27]]
+[DEV] Class-0(Normal)    : P=0.5652  R=0.8667  F1=0.6842
+[DEV] Class-1(Depression): P=0.8182  R=0.4737  F1=0.6000
+[DEV] Macro              : P=0.6917  R=0.6702  F1=0.6421
+
+[DEV] Threshold sweep: best_thr=0.45  sweep_F1=0.6603  argmax_F1=0.6421
+Dev epoch:24, Loss:0.1723324954509735,Acc:64.70587921142578%
+[ES] epoch=24 monitor=macro_f1 cur_macro_f1=0.6421 ema_macro_f1=0.6242 best_macro_f1=0.6271 improved=False
+[Recon][Epoch 25] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 25] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[42  3]
+ [47 10]]
+[DEV] Class-0(Normal)    : P=0.4719  R=0.9333  F1=0.6269
+[DEV] Class-1(Depression): P=0.7692  R=0.1754  F1=0.2857
+[DEV] Macro              : P=0.6206  R=0.5544  F1=0.4563
+
+[DEV] Threshold sweep: best_thr=0.41  sweep_F1=0.6762  argmax_F1=0.4563
+Dev epoch:25, Loss:0.18565471900197175,Acc:50.98039245605469%
+[ES] epoch=25 monitor=macro_f1 cur_macro_f1=0.4563 ema_macro_f1=0.5739 best_macro_f1=0.6271 improved=False
+[Recon][Epoch 26] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 26] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[10 35]
+ [ 2 55]]
+[DEV] Class-0(Normal)    : P=0.8333  R=0.2222  F1=0.3509
+[DEV] Class-1(Depression): P=0.6111  R=0.9649  F1=0.7483
+[DEV] Macro              : P=0.7222  R=0.5936  F1=0.5496
+
+[DEV] Threshold sweep: best_thr=0.59  sweep_F1=0.6552  argmax_F1=0.5496
+Dev epoch:26, Loss:0.1701583438194715,Acc:63.72549057006836%
+[ES] epoch=26 monitor=macro_f1 cur_macro_f1=0.5496 ema_macro_f1=0.5666 best_macro_f1=0.6271 improved=False
+[Recon][Epoch 27] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 27] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[39  6]
+ [27 30]]
+[DEV] Class-0(Normal)    : P=0.5909  R=0.8667  F1=0.7027
+[DEV] Class-1(Depression): P=0.8333  R=0.5263  F1=0.6452
+[DEV] Macro              : P=0.7121  R=0.6965  F1=0.6739
+
+[DEV] Threshold sweep: best_thr=0.50  sweep_F1=0.6739  argmax_F1=0.6739
+  [CKPT-A] argmax_F1=0.6739 @epoch 27 | thr=0.50
+Dev epoch:27, Loss:0.1665812570315141,Acc:67.64705657958984%
+[ES] epoch=27 monitor=macro_f1 cur_macro_f1=0.6739 ema_macro_f1=0.5988 best_macro_f1=0.6271 improved=False
+[Recon][Epoch 28] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 28] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[22 23]
+ [20 37]]
+[DEV] Class-0(Normal)    : P=0.5238  R=0.4889  F1=0.5057
+[DEV] Class-1(Depression): P=0.6167  R=0.6491  F1=0.6325
+[DEV] Macro              : P=0.5702  R=0.5690  F1=0.5691
+
+[DEV] Threshold sweep: best_thr=0.51  sweep_F1=0.6364  argmax_F1=0.5691
+Dev epoch:28, Loss:0.15950313439736,Acc:57.843135833740234%
+[ES] epoch=28 monitor=macro_f1 cur_macro_f1=0.5691 ema_macro_f1=0.5899 best_macro_f1=0.6271 improved=False
+[Recon][Epoch 29] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 29] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[25 20]
+ [19 38]]
+[DEV] Class-0(Normal)    : P=0.5682  R=0.5556  F1=0.5618
+[DEV] Class-1(Depression): P=0.6552  R=0.6667  F1=0.6609
+[DEV] Macro              : P=0.6117  R=0.6111  F1=0.6113
+
+[DEV] Threshold sweep: best_thr=0.55  sweep_F1=0.6449  argmax_F1=0.6113
+Dev epoch:29, Loss:0.16263492176165947,Acc:61.764705657958984%
+[ES] epoch=29 monitor=macro_f1 cur_macro_f1=0.6113 ema_macro_f1=0.5963 best_macro_f1=0.6271 improved=False
+[Recon][Epoch 30] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 30] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[16 29]
+ [ 9 48]]
+[DEV] Class-0(Normal)    : P=0.6400  R=0.3556  F1=0.4571
+[DEV] Class-1(Depression): P=0.6234  R=0.8421  F1=0.7164
+[DEV] Macro              : P=0.6317  R=0.5988  F1=0.5868
+
+[DEV] Threshold sweep: best_thr=0.55  sweep_F1=0.6465  argmax_F1=0.5868
+Dev epoch:30, Loss:0.16440914284724456,Acc:62.74509811401367%
+[ES] epoch=30 monitor=macro_f1 cur_macro_f1=0.5868 ema_macro_f1=0.5935 best_macro_f1=0.6271 improved=False
+[Recon][Epoch 31] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 31] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[26 19]
+ [18 39]]
+[DEV] Class-0(Normal)    : P=0.5909  R=0.5778  F1=0.5843
+[DEV] Class-1(Depression): P=0.6724  R=0.6842  F1=0.6783
+[DEV] Macro              : P=0.6317  R=0.6310  F1=0.6313
+
+[DEV] Threshold sweep: best_thr=0.51  sweep_F1=0.6449  argmax_F1=0.6313
+Dev epoch:31, Loss:0.16180035242667565,Acc:63.72549057006836%
+[ES] epoch=31 monitor=macro_f1 cur_macro_f1=0.6313 ema_macro_f1=0.6048 best_macro_f1=0.6271 improved=False
+[Recon][Epoch 32] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 32] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[14 31]
+ [10 47]]
+[DEV] Class-0(Normal)    : P=0.5833  R=0.3111  F1=0.4058
+[DEV] Class-1(Depression): P=0.6026  R=0.8246  F1=0.6963
+[DEV] Macro              : P=0.5929  R=0.5678  F1=0.5510
+
+[DEV] Threshold sweep: best_thr=0.57  sweep_F1=0.6262  argmax_F1=0.5510
+Dev epoch:32, Loss:0.1684682323382451,Acc:59.80392074584961%
+[ES] epoch=32 monitor=macro_f1 cur_macro_f1=0.5510 ema_macro_f1=0.5887 best_macro_f1=0.6271 improved=False
+[Recon][Epoch 33] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 33] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[34 11]
+ [27 30]]
+[DEV] Class-0(Normal)    : P=0.5574  R=0.7556  F1=0.6415
+[DEV] Class-1(Depression): P=0.7317  R=0.5263  F1=0.6122
+[DEV] Macro              : P=0.6445  R=0.6409  F1=0.6269
+
+[DEV] Threshold sweep: best_thr=0.40  sweep_F1=0.6710  argmax_F1=0.6269
+Dev epoch:33, Loss:0.1843353699033077,Acc:62.74509811401367%
+[ES] epoch=33 monitor=macro_f1 cur_macro_f1=0.6269 ema_macro_f1=0.6001 best_macro_f1=0.6271 improved=False
+[Recon][Epoch 34] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 34] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[27 18]
+ [21 36]]
+[DEV] Class-0(Normal)    : P=0.5625  R=0.6000  F1=0.5806
+[DEV] Class-1(Depression): P=0.6667  R=0.6316  F1=0.6486
+[DEV] Macro              : P=0.6146  R=0.6158  F1=0.6146
+
+[DEV] Threshold sweep: best_thr=0.52  sweep_F1=0.6469  argmax_F1=0.6146
+Dev epoch:34, Loss:0.16967564133497384,Acc:61.764705657958984%
+[ES] epoch=34 monitor=macro_f1 cur_macro_f1=0.6146 ema_macro_f1=0.6045 best_macro_f1=0.6271 improved=False
+[Recon][Epoch 35] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 35] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[28 17]
+ [22 35]]
+[DEV] Class-0(Normal)    : P=0.5600  R=0.6222  F1=0.5895
+[DEV] Class-1(Depression): P=0.6731  R=0.6140  F1=0.6422
+[DEV] Macro              : P=0.6165  R=0.6181  F1=0.6158
+
+[DEV] Threshold sweep: best_thr=0.53  sweep_F1=0.6372  argmax_F1=0.6158
+Dev epoch:35, Loss:0.1766433882025572,Acc:61.764705657958984%
+[ES] epoch=35 monitor=macro_f1 cur_macro_f1=0.6158 ema_macro_f1=0.6079 best_macro_f1=0.6271 improved=False
+[Recon][Epoch 36] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 36] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[33 12]
+ [32 25]]
+[DEV] Class-0(Normal)    : P=0.5077  R=0.7333  F1=0.6000
+[DEV] Class-1(Depression): P=0.6757  R=0.4386  F1=0.5319
+[DEV] Macro              : P=0.5917  R=0.5860  F1=0.5660
+
+[DEV] Threshold sweep: best_thr=0.44  sweep_F1=0.5972  argmax_F1=0.5660
+Dev epoch:36, Loss:0.1762692114481559,Acc:56.86274337768555%
+[ES] epoch=36 monitor=macro_f1 cur_macro_f1=0.5660 ema_macro_f1=0.5953 best_macro_f1=0.6271 improved=False
+[Recon][Epoch 37] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 37] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[26 19]
+ [17 40]]
+[DEV] Class-0(Normal)    : P=0.6047  R=0.5778  F1=0.5909
+[DEV] Class-1(Depression): P=0.6780  R=0.7018  F1=0.6897
+[DEV] Macro              : P=0.6413  R=0.6398  F1=0.6403
+
+[DEV] Threshold sweep: best_thr=0.52  sweep_F1=0.6449  argmax_F1=0.6403
+Dev epoch:37, Loss:0.1803522900893138,Acc:64.70587921142578%
+[ES] epoch=37 monitor=macro_f1 cur_macro_f1=0.6403 ema_macro_f1=0.6088 best_macro_f1=0.6271 improved=False
+[Recon][Epoch 38] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 38] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[18 27]
+ [18 39]]
+[DEV] Class-0(Normal)    : P=0.5000  R=0.4000  F1=0.4444
+[DEV] Class-1(Depression): P=0.5909  R=0.6842  F1=0.6341
+[DEV] Macro              : P=0.5455  R=0.5421  F1=0.5393
+
+[DEV] Threshold sweep: best_thr=0.55  sweep_F1=0.6054  argmax_F1=0.5393
+Dev epoch:38, Loss:0.18838492608987367,Acc:55.882354736328125%
+[ES] epoch=38 monitor=macro_f1 cur_macro_f1=0.5393 ema_macro_f1=0.5880 best_macro_f1=0.6271 improved=False
+[Recon][Epoch 39] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 39] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[13 32]
+ [ 8 49]]
+[DEV] Class-0(Normal)    : P=0.6190  R=0.2889  F1=0.3939
+[DEV] Class-1(Depression): P=0.6049  R=0.8596  F1=0.7101
+[DEV] Macro              : P=0.6120  R=0.5743  F1=0.5520
+
+[DEV] Threshold sweep: best_thr=0.61  sweep_F1=0.6471  argmax_F1=0.5520
+Dev epoch:39, Loss:0.18102376277630144,Acc:60.7843132019043%
+[ES] epoch=39 monitor=macro_f1 cur_macro_f1=0.5520 ema_macro_f1=0.5772 best_macro_f1=0.6271 improved=False
+[Recon][Epoch 40] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 40] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[25 20]
+ [18 39]]
+[DEV] Class-0(Normal)    : P=0.5814  R=0.5556  F1=0.5682
+[DEV] Class-1(Depression): P=0.6610  R=0.6842  F1=0.6724
+[DEV] Macro              : P=0.6212  R=0.6199  F1=0.6203
+
+[DEV] Threshold sweep: best_thr=0.59  sweep_F1=0.6369  argmax_F1=0.6203
+Dev epoch:40, Loss:0.20196681698927513,Acc:62.74509811401367%
+[ES] epoch=40 monitor=macro_f1 cur_macro_f1=0.6203 ema_macro_f1=0.5901 best_macro_f1=0.6271 improved=False
+[Recon][Epoch 41] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 41] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[32 13]
+ [24 33]]
+[DEV] Class-0(Normal)    : P=0.5714  R=0.7111  F1=0.6337
+[DEV] Class-1(Depression): P=0.7174  R=0.5789  F1=0.6408
+[DEV] Macro              : P=0.6444  R=0.6450  F1=0.6372
+
+[DEV] Threshold sweep: best_thr=0.49  sweep_F1=0.6852  argmax_F1=0.6372
+Dev epoch:41, Loss:0.19182120378200823,Acc:63.72549057006836%
+[ES] epoch=41 monitor=macro_f1 cur_macro_f1=0.6372 ema_macro_f1=0.6042 best_macro_f1=0.6271 improved=False
+[Recon][Epoch 42] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 42] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[22 23]
+ [12 45]]
+[DEV] Class-0(Normal)    : P=0.6471  R=0.4889  F1=0.5570
+[DEV] Class-1(Depression): P=0.6618  R=0.7895  F1=0.7200
+[DEV] Macro              : P=0.6544  R=0.6392  F1=0.6385
+
+[DEV] Threshold sweep: best_thr=0.51  sweep_F1=0.6621  argmax_F1=0.6385
+Dev epoch:42, Loss:0.20916776588329902,Acc:65.68627166748047%
+[ES] epoch=42 monitor=macro_f1 cur_macro_f1=0.6385 ema_macro_f1=0.6145 best_macro_f1=0.6271 improved=False
+Early stopping triggered! (EMA Macro-F1=0.6145)
+Training Finished. Running A/B/C checkpoint comparison on Final Test...
+[CKPT-LOAD] A(argmax): epoch=27, path=models/DVLOG_concat_04_02__11_13/seed_43/best_model_by_argmax_f1.pth
+[THR] A(argmax): thr=0.50 from models/DVLOG_concat_04_02__11_13/seed_43/best_thr_for_best_argmax_model.json
+******* FINAL TEST A(argmax) ********
+[FINAL-A(argmax)] Acc=61.32% P=0.6402 R=0.6132 F1=0.6142 thr=0.50 epoch=27
+[CKPT-LOAD] B(sweep): epoch=20, path=models/DVLOG_concat_04_02__11_13/seed_43/best_model_by_sweep_f1.pth
+[THR] B(sweep): thr=0.49 from models/DVLOG_concat_04_02__11_13/seed_43/best_thr_for_best_sweep_model.json
+******* FINAL TEST B(sweep) ********
+[FINAL-B(sweep)] Acc=62.74% P=0.6350 R=0.6274 F1=0.6295 thr=0.49 epoch=20
+[CKPT-LOAD] C(ema_macro): epoch=22, path=models/DVLOG_concat_04_02__11_13/seed_43/best_model_by_ema_macro_f1.pth
+[THR] C(ema_macro): thr=0.52 from models/DVLOG_concat_04_02__11_13/seed_43/best_thr_for_best_ema_macro_f1_model.json
+******* FINAL TEST C(ema_macro) ********
+[FINAL-C(ema_macro)] Acc=41.98% P=0.1762 R=0.4198 F1=0.2483 thr=0.52 epoch=22
+
+--- Final Test Comparison (A/B/C) ---
+B(sweep): Acc=62.74%  P=0.6350  R=0.6274  F1=0.6295  thr=0.49  epoch=20
+A(argmax): Acc=61.32%  P=0.6402  R=0.6132  F1=0.6142  thr=0.50  epoch=27
+C(ema_macro): Acc=41.98%  P=0.1762  R=0.4198  F1=0.2483  thr=0.52  epoch=22
+[FINAL-DECISION] 本 fold 最优 test checkpoint = B(sweep)
+[set_all_seeds] seed=44, cudnn.deterministic=True, strict_deterministic_algos=False
+
+==================== Seed 44 ====================
+[ES-INIT] monitor=macro_f1 best_monitor=-inf ema_monitor=-inf ema_loss_val=None
+[IMPORT-CHECK] MultiModalLoaderClass from /root/autodl-tmp/LMVD_new/model/vitGCN/data/dvlog_loader.py
+[IMPORT-CHECK] collate_fn_multimodal from /root/autodl-tmp/LMVD_new/model/vitGCN/kfoldLoader_multimodal.py
+[IMPORT-CHECK] ViT_GCN_Fusion from /root/autodl-tmp/LMVD_new/model/vitGCN/Vit_gcnmodel.py
+[IMPORT-CHECK] MultiModalLoaderClass.__init__ signature(defaults only): (self, *args, **kwargs)
+[IMPORT-CHECK] MultiModalLoaderClass wrapper detected; base=MultiModalDataLoader.__init__ signature: (self, file_list, video_feature_path, audio_feature_path, face_landmark_path, label_path, T_target=915, mode='train', dataset='LMVD', uniform_ratio=0.7, dvlog_aug_noise_std=0.005, dvlog_audio_mask_ratio=0.0, segment_len=0, use_two_clip_train=False, two_clip_mode='center_random', use_three_clip_train=False, three_clip_mode='center_lr', quality_candidate_count=5, region_partition_scheme='legacy6', enable_feature_cache=True, feature_cache_size=256, np_load_mmap=False, lmvd_face_region_cache_dir=None, lmvd_face_cache_readonly=False)
+[IMPORT-CHECK] Runtime DATASET_SELECT=DVLOG
+[IMPORT-CHECK] FocalBCELoss.forward signature: (self, logits, target, sample_weight=None)
+[DL-CFG] workers=8, pin_memory=True, persistent=True, prefetch_factor=4
+[CACHE-CFG] enable_feature_cache=True, feature_cache_size=256, np_load_mmap=False, lmvd_face_cache_dir=data/LMVD_Feature/face_regions_cache
+[MultiModalDataLoader] DVLOG 标签已缓存: 961 条
+[MultiModalDataLoader] DVLOG aug config: noise_std=0.005, audio_mask_ratio=0.0, uniform_ratio=0.7
+[MultiModalDataLoader] cache: enable=True, size=256, mmap=False
+[MultiModalDataLoader] DVLOG 标签已缓存: 961 条
+[MultiModalDataLoader] DVLOG aug config: noise_std=0.005, audio_mask_ratio=0.0, uniform_ratio=0.7
+[MultiModalDataLoader] cache: enable=True, size=256, mmap=False
+[MultiModalDataLoader] DVLOG 标签已缓存: 961 条
+[MultiModalDataLoader] DVLOG aug config: noise_std=0.005, audio_mask_ratio=0.0, uniform_ratio=0.7
+[MultiModalDataLoader] cache: enable=True, size=256, mmap=False
+DataLoaders Ready: Train=41, Dev=13, Test=27
+[DATASET-CHECK] trainSet.dataset=DVLOG, devSet.dataset=DVLOG, testSet.dataset=DVLOG
+[SEG] train_T=870, train_segment_len=0, eval_sliding_cfg=True, eval_sliding_effective=True, eval_stride=128, dataset=DVLOG, seg_len=300
+[EVAL-AGG-CFG] mode=meanmax, topk=2, meanmax_alpha=0.3
+[DEVICE] device=cuda, cuda_available=True
+[MODEL-INIT] start
+[Model] mode=video_only, fusion_mode=av_backbone_only, sd=0.0, dropout=0.1
+[FS-ENC] enabled=True, v_local=2, a_local=3, v_global=4, a_global=2, dilated_audio=True, fusion_dropout=0.05
+[AV-BACKBONE] legacy=False
+[MODEL-INIT] done
+[EMA] USE_MODEL_EMA=True, decay=0.995
+[VIT-STEM] temporal_conv_stem=True, for=audio, kernel=3, dvlog_only=True, effective=True
+[AUDIO-TCN] enabled=False, kernel=3, dropout=0.0, dvlog_only=False, effective=False
+[VIT-STEM] effective_conv video_k=(1,), video_p=(0,), audio_k=(3,), audio_p=(1,)
+[AUDIO-TCN] encoder=Identity
+[FS-ENC] path=single-modality encoders -> post-encoder AV fusion
+[AUG] DVLOG preset=weak, noise_std=0.005, audio_mask_ratio=0.0, uniform_ratio=0.7
+[MIL] USE_SEGMENT_MIL=False, seg_len=300, k_train=4, k_eval=4, train_agg=weighted_mean, eval_agg=weighted_mean
+[train/seed_44] FocalBCE  gamma=2.0  (no pos_weight, ViT-only)
+[train/seed_44] eff_lr=1.00e-04  (base_lr=1.00e-04, fusion_mode=concat, LOSS_MODE=focal_no_pw)
+[Recon][Epoch 1] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 2] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 3] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 4] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 5] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 6] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 7] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 8] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 9] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 10] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 10] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[19 26]
+ [ 9 48]]
+[DEV] Class-0(Normal)    : P=0.6786  R=0.4222  F1=0.5205
+[DEV] Class-1(Depression): P=0.6486  R=0.8421  F1=0.7328
+[DEV] Macro              : P=0.6636  R=0.6322  F1=0.6267
+
+[DEV] Threshold sweep: best_thr=0.51  sweep_F1=0.6964  argmax_F1=0.6267
+  [CKPT-A] argmax_F1=0.6267 @epoch 10 | thr=0.51
+  [CKPT-B] sweep_F1=0.6964 @epoch 10 | thr=0.51
+Dev epoch:10, Loss:0.15983915271667334,Acc:65.68627166748047%
+[ES] epoch=10 monitor=macro_f1 cur_macro_f1=0.6267 ema_macro_f1=0.6267 best_macro_f1=-inf improved=True
+  [CKPT-C] ema_macro_f1=0.6267 @epoch 10 | thr=0.51
+[Recon][Epoch 11] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 11] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[26 19]
+ [14 43]]
+[DEV] Class-0(Normal)    : P=0.6500  R=0.5778  F1=0.6118
+[DEV] Class-1(Depression): P=0.6935  R=0.7544  F1=0.7227
+[DEV] Macro              : P=0.6718  R=0.6661  F1=0.6672
+
+[DEV] Threshold sweep: best_thr=0.50  sweep_F1=0.6672  argmax_F1=0.6672
+  [CKPT-A] argmax_F1=0.6672 @epoch 11 | thr=0.50
+Dev epoch:11, Loss:0.16153758993515602,Acc:67.64705657958984%
+[ES] epoch=11 monitor=macro_f1 cur_macro_f1=0.6672 ema_macro_f1=0.6388 best_macro_f1=0.6267 improved=True
+  [CKPT-C] ema_macro_f1=0.6388 @epoch 11 | thr=0.50
+[Recon][Epoch 12] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 12] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 1 44]
+ [ 0 57]]
+[DEV] Class-0(Normal)    : P=1.0000  R=0.0222  F1=0.0435
+[DEV] Class-1(Depression): P=0.5644  R=1.0000  F1=0.7215
+[DEV] Macro              : P=0.7822  R=0.5111  F1=0.3825
+
+[DEV] Threshold sweep: best_thr=0.55  sweep_F1=0.6603  argmax_F1=0.3825
+Dev epoch:12, Loss:0.1729899518764936,Acc:56.86274337768555%
+[ES] epoch=12 monitor=macro_f1 cur_macro_f1=0.3825 ema_macro_f1=0.5619 best_macro_f1=0.6388 improved=False
+[Recon][Epoch 13] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 13] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[14 31]
+ [ 6 51]]
+[DEV] Class-0(Normal)    : P=0.7000  R=0.3111  F1=0.4308
+[DEV] Class-1(Depression): P=0.6220  R=0.8947  F1=0.7338
+[DEV] Macro              : P=0.6610  R=0.6029  F1=0.5823
+
+[DEV] Threshold sweep: best_thr=0.51  sweep_F1=0.6648  argmax_F1=0.5823
+Dev epoch:13, Loss:0.16277037790188423,Acc:63.72549057006836%
+[ES] epoch=13 monitor=macro_f1 cur_macro_f1=0.5823 ema_macro_f1=0.5680 best_macro_f1=0.6388 improved=False
+[Recon][Epoch 14] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 14] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 8 37]
+ [ 2 55]]
+[DEV] Class-0(Normal)    : P=0.8000  R=0.1778  F1=0.2909
+[DEV] Class-1(Depression): P=0.5978  R=0.9649  F1=0.7383
+[DEV] Macro              : P=0.6989  R=0.5713  F1=0.5146
+
+[DEV] Threshold sweep: best_thr=0.54  sweep_F1=0.6469  argmax_F1=0.5146
+Dev epoch:14, Loss:0.1629871794810662,Acc:61.764705657958984%
+[ES] epoch=14 monitor=macro_f1 cur_macro_f1=0.5146 ema_macro_f1=0.5520 best_macro_f1=0.6388 improved=False
+[Recon][Epoch 15] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 15] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 3 42]
+ [ 1 56]]
+[DEV] Class-0(Normal)    : P=0.7500  R=0.0667  F1=0.1224
+[DEV] Class-1(Depression): P=0.5714  R=0.9825  F1=0.7226
+[DEV] Macro              : P=0.6607  R=0.5246  F1=0.4225
+
+[DEV] Threshold sweep: best_thr=0.55  sweep_F1=0.6385  argmax_F1=0.4225
+Dev epoch:15, Loss:0.17173450382856223,Acc:57.843135833740234%
+[ES] epoch=15 monitor=macro_f1 cur_macro_f1=0.4225 ema_macro_f1=0.5132 best_macro_f1=0.6388 improved=False
+[Recon][Epoch 16] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 16] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[25 20]
+ [17 40]]
+[DEV] Class-0(Normal)    : P=0.5952  R=0.5556  F1=0.5747
+[DEV] Class-1(Depression): P=0.6667  R=0.7018  F1=0.6838
+[DEV] Macro              : P=0.6310  R=0.6287  F1=0.6292
+
+[DEV] Threshold sweep: best_thr=0.51  sweep_F1=0.6364  argmax_F1=0.6292
+Dev epoch:16, Loss:0.16458390309260443,Acc:63.72549057006836%
+[ES] epoch=16 monitor=macro_f1 cur_macro_f1=0.6292 ema_macro_f1=0.5480 best_macro_f1=0.6388 improved=False
+[Recon][Epoch 17] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 17] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[40  5]
+ [43 14]]
+[DEV] Class-0(Normal)    : P=0.4819  R=0.8889  F1=0.6250
+[DEV] Class-1(Depression): P=0.7368  R=0.2456  F1=0.3684
+[DEV] Macro              : P=0.6094  R=0.5673  F1=0.4967
+
+[DEV] Threshold sweep: best_thr=0.47  sweep_F1=0.6560  argmax_F1=0.4967
+Dev epoch:17, Loss:0.16998260067059442,Acc:52.94117736816406%
+[ES] epoch=17 monitor=macro_f1 cur_macro_f1=0.4967 ema_macro_f1=0.5326 best_macro_f1=0.6388 improved=False
+[Recon][Epoch 18] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 18] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 1 44]
+ [ 1 56]]
+[DEV] Class-0(Normal)    : P=0.5000  R=0.0222  F1=0.0426
+[DEV] Class-1(Depression): P=0.5600  R=0.9825  F1=0.7134
+[DEV] Macro              : P=0.5300  R=0.5023  F1=0.3780
+
+[DEV] Threshold sweep: best_thr=0.56  sweep_F1=0.6528  argmax_F1=0.3780
+Dev epoch:18, Loss:0.17282784157074416,Acc:55.882354736328125%
+[ES] epoch=18 monitor=macro_f1 cur_macro_f1=0.3780 ema_macro_f1=0.4862 best_macro_f1=0.6388 improved=False
+[Recon][Epoch 19] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 19] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[36  9]
+ [28 29]]
+[DEV] Class-0(Normal)    : P=0.5625  R=0.8000  F1=0.6606
+[DEV] Class-1(Depression): P=0.7632  R=0.5088  F1=0.6105
+[DEV] Macro              : P=0.6628  R=0.6544  F1=0.6355
+
+[DEV] Threshold sweep: best_thr=0.48  sweep_F1=0.6727  argmax_F1=0.6355
+Dev epoch:19, Loss:0.16447246762422416,Acc:63.72549057006836%
+[ES] epoch=19 monitor=macro_f1 cur_macro_f1=0.6355 ema_macro_f1=0.5310 best_macro_f1=0.6388 improved=False
+[Recon][Epoch 20] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 20] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[13 32]
+ [ 7 50]]
+[DEV] Class-0(Normal)    : P=0.6500  R=0.2889  F1=0.4000
+[DEV] Class-1(Depression): P=0.6098  R=0.8772  F1=0.7194
+[DEV] Macro              : P=0.6299  R=0.5830  F1=0.5597
+
+[DEV] Threshold sweep: best_thr=0.51  sweep_F1=0.6349  argmax_F1=0.5597
+Dev epoch:20, Loss:0.16412787655225167,Acc:61.764705657958984%
+[ES] epoch=20 monitor=macro_f1 cur_macro_f1=0.5597 ema_macro_f1=0.5396 best_macro_f1=0.6388 improved=False
+[Recon][Epoch 21] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 21] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 7 38]
+ [ 3 54]]
+[DEV] Class-0(Normal)    : P=0.7000  R=0.1556  F1=0.2545
+[DEV] Class-1(Depression): P=0.5870  R=0.9474  F1=0.7248
+[DEV] Macro              : P=0.6435  R=0.5515  F1=0.4897
+
+[DEV] Threshold sweep: best_thr=0.55  sweep_F1=0.6665  argmax_F1=0.4897
+Dev epoch:21, Loss:0.16390181905948198,Acc:59.80392074584961%
+[ES] epoch=21 monitor=macro_f1 cur_macro_f1=0.4897 ema_macro_f1=0.5246 best_macro_f1=0.6388 improved=False
+[Recon][Epoch 22] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 22] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[35 10]
+ [29 28]]
+[DEV] Class-0(Normal)    : P=0.5469  R=0.7778  F1=0.6422
+[DEV] Class-1(Depression): P=0.7368  R=0.4912  F1=0.5895
+[DEV] Macro              : P=0.6419  R=0.6345  F1=0.6158
+
+[DEV] Threshold sweep: best_thr=0.48  sweep_F1=0.6445  argmax_F1=0.6158
+Dev epoch:22, Loss:0.16551213768812326,Acc:61.764705657958984%
+[ES] epoch=22 monitor=macro_f1 cur_macro_f1=0.6158 ema_macro_f1=0.5520 best_macro_f1=0.6388 improved=False
+[Recon][Epoch 23] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 23] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 1 44]
+ [ 1 56]]
+[DEV] Class-0(Normal)    : P=0.5000  R=0.0222  F1=0.0426
+[DEV] Class-1(Depression): P=0.5600  R=0.9825  F1=0.7134
+[DEV] Macro              : P=0.5300  R=0.5023  F1=0.3780
+
+[DEV] Threshold sweep: best_thr=0.57  sweep_F1=0.6146  argmax_F1=0.3780
+Dev epoch:23, Loss:0.17248849513439032,Acc:55.882354736328125%
+[ES] epoch=23 monitor=macro_f1 cur_macro_f1=0.3780 ema_macro_f1=0.4998 best_macro_f1=0.6388 improved=False
+[Recon][Epoch 24] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 24] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 5 40]
+ [ 3 54]]
+[DEV] Class-0(Normal)    : P=0.6250  R=0.1111  F1=0.1887
+[DEV] Class-1(Depression): P=0.5745  R=0.9474  F1=0.7152
+[DEV] Macro              : P=0.5997  R=0.5292  F1=0.4520
+
+[DEV] Threshold sweep: best_thr=0.53  sweep_F1=0.6269  argmax_F1=0.4520
+Dev epoch:24, Loss:0.1678644842826403,Acc:57.843135833740234%
+[ES] epoch=24 monitor=macro_f1 cur_macro_f1=0.4520 ema_macro_f1=0.4854 best_macro_f1=0.6388 improved=False
+[Recon][Epoch 25] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 25] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 9 36]
+ [ 5 52]]
+[DEV] Class-0(Normal)    : P=0.6429  R=0.2000  F1=0.3051
+[DEV] Class-1(Depression): P=0.5909  R=0.9123  F1=0.7172
+[DEV] Macro              : P=0.6169  R=0.5561  F1=0.5112
+
+[DEV] Threshold sweep: best_thr=0.55  sweep_F1=0.6364  argmax_F1=0.5112
+Dev epoch:25, Loss:0.16801976813719824,Acc:59.80392074584961%
+[ES] epoch=25 monitor=macro_f1 cur_macro_f1=0.5112 ema_macro_f1=0.4932 best_macro_f1=0.6388 improved=False
+[Recon][Epoch 26] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 26] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[34 11]
+ [25 32]]
+[DEV] Class-0(Normal)    : P=0.5763  R=0.7556  F1=0.6538
+[DEV] Class-1(Depression): P=0.7442  R=0.5614  F1=0.6400
+[DEV] Macro              : P=0.6602  R=0.6585  F1=0.6469
+
+[DEV] Threshold sweep: best_thr=0.50  sweep_F1=0.6469  argmax_F1=0.6469
+Dev epoch:26, Loss:0.16593068494246557,Acc:64.70587921142578%
+[ES] epoch=26 monitor=macro_f1 cur_macro_f1=0.6469 ema_macro_f1=0.5393 best_macro_f1=0.6388 improved=False
+[Recon][Epoch 27] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 27] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[37  8]
+ [30 27]]
+[DEV] Class-0(Normal)    : P=0.5522  R=0.8222  F1=0.6607
+[DEV] Class-1(Depression): P=0.7714  R=0.4737  F1=0.5870
+[DEV] Macro              : P=0.6618  R=0.6480  F1=0.6238
+
+[DEV] Threshold sweep: best_thr=0.48  sweep_F1=0.6542  argmax_F1=0.6238
+Dev epoch:27, Loss:0.16242628831129807,Acc:62.74509811401367%
+[ES] epoch=27 monitor=macro_f1 cur_macro_f1=0.6238 ema_macro_f1=0.5647 best_macro_f1=0.6388 improved=False
+[Recon][Epoch 28] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 28] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 3 42]
+ [ 6 51]]
+[DEV] Class-0(Normal)    : P=0.3333  R=0.0667  F1=0.1111
+[DEV] Class-1(Depression): P=0.5484  R=0.8947  F1=0.6800
+[DEV] Macro              : P=0.4409  R=0.4807  F1=0.3956
+
+[DEV] Threshold sweep: best_thr=0.56  sweep_F1=0.5278  argmax_F1=0.3956
+Dev epoch:28, Loss:0.18579320666881707,Acc:52.94117736816406%
+[ES] epoch=28 monitor=macro_f1 cur_macro_f1=0.3956 ema_macro_f1=0.5139 best_macro_f1=0.6388 improved=False
+[Recon][Epoch 29] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 29] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 3 42]
+ [ 1 56]]
+[DEV] Class-0(Normal)    : P=0.7500  R=0.0667  F1=0.1224
+[DEV] Class-1(Depression): P=0.5714  R=0.9825  F1=0.7226
+[DEV] Macro              : P=0.6607  R=0.5246  F1=0.4225
+
+[DEV] Threshold sweep: best_thr=0.58  sweep_F1=0.6372  argmax_F1=0.4225
+Dev epoch:29, Loss:0.1770173804118083,Acc:57.843135833740234%
+[ES] epoch=29 monitor=macro_f1 cur_macro_f1=0.4225 ema_macro_f1=0.4865 best_macro_f1=0.6388 improved=False
+[Recon][Epoch 30] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 30] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[34 11]
+ [26 31]]
+[DEV] Class-0(Normal)    : P=0.5667  R=0.7556  F1=0.6476
+[DEV] Class-1(Depression): P=0.7381  R=0.5439  F1=0.6263
+[DEV] Macro              : P=0.6524  R=0.6497  F1=0.6369
+
+[DEV] Threshold sweep: best_thr=0.50  sweep_F1=0.6369  argmax_F1=0.6369
+Dev epoch:30, Loss:0.16636783686967996,Acc:63.72549057006836%
+[ES] epoch=30 monitor=macro_f1 cur_macro_f1=0.6369 ema_macro_f1=0.5316 best_macro_f1=0.6388 improved=False
+[Recon][Epoch 31] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 31] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[18 27]
+ [15 42]]
+[DEV] Class-0(Normal)    : P=0.5455  R=0.4000  F1=0.4615
+[DEV] Class-1(Depression): P=0.6087  R=0.7368  F1=0.6667
+[DEV] Macro              : P=0.5771  R=0.5684  F1=0.5641
+
+[DEV] Threshold sweep: best_thr=0.54  sweep_F1=0.6273  argmax_F1=0.5641
+Dev epoch:31, Loss:0.1642071346823986,Acc:58.82352828979492%
+[ES] epoch=31 monitor=macro_f1 cur_macro_f1=0.5641 ema_macro_f1=0.5414 best_macro_f1=0.6388 improved=False
+Early stopping triggered! (EMA Macro-F1=0.5414)
+Training Finished. Running A/B/C checkpoint comparison on Final Test...
+[CKPT-LOAD] A(argmax): epoch=11, path=models/DVLOG_concat_04_02__11_13/seed_44/best_model_by_argmax_f1.pth
+[THR] A(argmax): thr=0.50 from models/DVLOG_concat_04_02__11_13/seed_44/best_thr_for_best_argmax_model.json
+******* FINAL TEST A(argmax) ********
+[FINAL-A(argmax)] Acc=64.15% P=0.6355 R=0.6415 F1=0.6348 thr=0.50 epoch=11
+[CKPT-LOAD] B(sweep): epoch=10, path=models/DVLOG_concat_04_02__11_13/seed_44/best_model_by_sweep_f1.pth
+[THR] B(sweep): thr=0.51 from models/DVLOG_concat_04_02__11_13/seed_44/best_thr_for_best_sweep_model.json
+******* FINAL TEST B(sweep) ********
+[FINAL-B(sweep)] Acc=62.26% P=0.6139 R=0.6226 F1=0.6100 thr=0.51 epoch=10
+[CKPT-LOAD] C(ema_macro): epoch=11, path=models/DVLOG_concat_04_02__11_13/seed_44/best_model_by_ema_macro_f1.pth
+[THR] C(ema_macro): thr=0.50 from models/DVLOG_concat_04_02__11_13/seed_44/best_thr_for_best_ema_macro_f1_model.json
+******* FINAL TEST C(ema_macro) ********
+[FINAL-C(ema_macro)] Acc=56.60% P=0.5492 R=0.5660 F1=0.5477 thr=0.50 epoch=11
+
+--- Final Test Comparison (A/B/C) ---
+A(argmax): Acc=64.15%  P=0.6355  R=0.6415  F1=0.6348  thr=0.50  epoch=11
+B(sweep): Acc=62.26%  P=0.6139  R=0.6226  F1=0.6100  thr=0.51  epoch=10
+C(ema_macro): Acc=56.60%  P=0.5492  R=0.5660  F1=0.5477  thr=0.50  epoch=11
+[FINAL-DECISION] 本 fold 最优 test checkpoint = A(argmax)
+[set_all_seeds] seed=45, cudnn.deterministic=True, strict_deterministic_algos=False
+
+==================== Seed 45 ====================
+[ES-INIT] monitor=macro_f1 best_monitor=-inf ema_monitor=-inf ema_loss_val=None
+[IMPORT-CHECK] MultiModalLoaderClass from /root/autodl-tmp/LMVD_new/model/vitGCN/data/dvlog_loader.py
+[IMPORT-CHECK] collate_fn_multimodal from /root/autodl-tmp/LMVD_new/model/vitGCN/kfoldLoader_multimodal.py
+[IMPORT-CHECK] ViT_GCN_Fusion from /root/autodl-tmp/LMVD_new/model/vitGCN/Vit_gcnmodel.py
+[IMPORT-CHECK] MultiModalLoaderClass.__init__ signature(defaults only): (self, *args, **kwargs)
+[IMPORT-CHECK] MultiModalLoaderClass wrapper detected; base=MultiModalDataLoader.__init__ signature: (self, file_list, video_feature_path, audio_feature_path, face_landmark_path, label_path, T_target=915, mode='train', dataset='LMVD', uniform_ratio=0.7, dvlog_aug_noise_std=0.005, dvlog_audio_mask_ratio=0.0, segment_len=0, use_two_clip_train=False, two_clip_mode='center_random', use_three_clip_train=False, three_clip_mode='center_lr', quality_candidate_count=5, region_partition_scheme='legacy6', enable_feature_cache=True, feature_cache_size=256, np_load_mmap=False, lmvd_face_region_cache_dir=None, lmvd_face_cache_readonly=False)
+[IMPORT-CHECK] Runtime DATASET_SELECT=DVLOG
+[IMPORT-CHECK] FocalBCELoss.forward signature: (self, logits, target, sample_weight=None)
+[DL-CFG] workers=8, pin_memory=True, persistent=True, prefetch_factor=4
+[CACHE-CFG] enable_feature_cache=True, feature_cache_size=256, np_load_mmap=False, lmvd_face_cache_dir=data/LMVD_Feature/face_regions_cache
+[MultiModalDataLoader] DVLOG 标签已缓存: 961 条
+[MultiModalDataLoader] DVLOG aug config: noise_std=0.005, audio_mask_ratio=0.0, uniform_ratio=0.7
+[MultiModalDataLoader] cache: enable=True, size=256, mmap=False
+[MultiModalDataLoader] DVLOG 标签已缓存: 961 条
+[MultiModalDataLoader] DVLOG aug config: noise_std=0.005, audio_mask_ratio=0.0, uniform_ratio=0.7
+[MultiModalDataLoader] cache: enable=True, size=256, mmap=False
+[MultiModalDataLoader] DVLOG 标签已缓存: 961 条
+[MultiModalDataLoader] DVLOG aug config: noise_std=0.005, audio_mask_ratio=0.0, uniform_ratio=0.7
+[MultiModalDataLoader] cache: enable=True, size=256, mmap=False
+DataLoaders Ready: Train=41, Dev=13, Test=27
+[DATASET-CHECK] trainSet.dataset=DVLOG, devSet.dataset=DVLOG, testSet.dataset=DVLOG
+[SEG] train_T=870, train_segment_len=0, eval_sliding_cfg=True, eval_sliding_effective=True, eval_stride=128, dataset=DVLOG, seg_len=300
+[EVAL-AGG-CFG] mode=meanmax, topk=2, meanmax_alpha=0.3
+[DEVICE] device=cuda, cuda_available=True
+[MODEL-INIT] start
+[Model] mode=video_only, fusion_mode=av_backbone_only, sd=0.0, dropout=0.1
+[FS-ENC] enabled=True, v_local=2, a_local=3, v_global=4, a_global=2, dilated_audio=True, fusion_dropout=0.05
+[AV-BACKBONE] legacy=False
+[MODEL-INIT] done
+[EMA] USE_MODEL_EMA=True, decay=0.995
+[VIT-STEM] temporal_conv_stem=True, for=audio, kernel=3, dvlog_only=True, effective=True
+[AUDIO-TCN] enabled=False, kernel=3, dropout=0.0, dvlog_only=False, effective=False
+[VIT-STEM] effective_conv video_k=(1,), video_p=(0,), audio_k=(3,), audio_p=(1,)
+[AUDIO-TCN] encoder=Identity
+[FS-ENC] path=single-modality encoders -> post-encoder AV fusion
+[AUG] DVLOG preset=weak, noise_std=0.005, audio_mask_ratio=0.0, uniform_ratio=0.7
+[MIL] USE_SEGMENT_MIL=False, seg_len=300, k_train=4, k_eval=4, train_agg=weighted_mean, eval_agg=weighted_mean
+[train/seed_45] FocalBCE  gamma=2.0  (no pos_weight, ViT-only)
+[train/seed_45] eff_lr=1.00e-04  (base_lr=1.00e-04, fusion_mode=concat, LOSS_MODE=focal_no_pw)
+[Recon][Epoch 1] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 2] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 3] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 4] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 5] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 6] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 7] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 8] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 9] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 10] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 10] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[18 27]
+ [15 42]]
+[DEV] Class-0(Normal)    : P=0.5455  R=0.4000  F1=0.4615
+[DEV] Class-1(Depression): P=0.6087  R=0.7368  F1=0.6667
+[DEV] Macro              : P=0.5771  R=0.5684  F1=0.5641
+
+[DEV] Threshold sweep: best_thr=0.52  sweep_F1=0.6458  argmax_F1=0.5641
+  [CKPT-A] argmax_F1=0.5641 @epoch 10 | thr=0.52
+  [CKPT-B] sweep_F1=0.6458 @epoch 10 | thr=0.52
+Dev epoch:10, Loss:0.16897136775346902,Acc:58.82352828979492%
+[ES] epoch=10 monitor=macro_f1 cur_macro_f1=0.5641 ema_macro_f1=0.5641 best_macro_f1=-inf improved=True
+  [CKPT-C] ema_macro_f1=0.5641 @epoch 10 | thr=0.52
+[Recon][Epoch 11] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 11] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 1 44]
+ [ 1 56]]
+[DEV] Class-0(Normal)    : P=0.5000  R=0.0222  F1=0.0426
+[DEV] Class-1(Depression): P=0.5600  R=0.9825  F1=0.7134
+[DEV] Macro              : P=0.5300  R=0.5023  F1=0.3780
+
+[DEV] Threshold sweep: best_thr=0.58  sweep_F1=0.6568  argmax_F1=0.3780
+  [CKPT-B] sweep_F1=0.6568 @epoch 11 | thr=0.58
+Dev epoch:11, Loss:0.17939931498124048,Acc:55.882354736328125%
+[ES] epoch=11 monitor=macro_f1 cur_macro_f1=0.3780 ema_macro_f1=0.5083 best_macro_f1=0.5641 improved=False
+[Recon][Epoch 12] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 12] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 3 42]
+ [ 2 55]]
+[DEV] Class-0(Normal)    : P=0.6000  R=0.0667  F1=0.1200
+[DEV] Class-1(Depression): P=0.5670  R=0.9649  F1=0.7143
+[DEV] Macro              : P=0.5835  R=0.5158  F1=0.4171
+
+[DEV] Threshold sweep: best_thr=0.53  sweep_F1=0.6040  argmax_F1=0.4171
+Dev epoch:12, Loss:0.16863204825382966,Acc:56.86274337768555%
+[ES] epoch=12 monitor=macro_f1 cur_macro_f1=0.4171 ema_macro_f1=0.4809 best_macro_f1=0.5641 improved=False
+[Recon][Epoch 13] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 13] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 4 41]
+ [ 1 56]]
+[DEV] Class-0(Normal)    : P=0.8000  R=0.0889  F1=0.1600
+[DEV] Class-1(Depression): P=0.5773  R=0.9825  F1=0.7273
+[DEV] Macro              : P=0.6887  R=0.5357  F1=0.4436
+
+[DEV] Threshold sweep: best_thr=0.56  sweep_F1=0.6552  argmax_F1=0.4436
+Dev epoch:13, Loss:0.17206357362178656,Acc:58.82352828979492%
+[ES] epoch=13 monitor=macro_f1 cur_macro_f1=0.4436 ema_macro_f1=0.4697 best_macro_f1=0.5641 improved=False
+[Recon][Epoch 14] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 14] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 3 42]
+ [ 1 56]]
+[DEV] Class-0(Normal)    : P=0.7500  R=0.0667  F1=0.1224
+[DEV] Class-1(Depression): P=0.5714  R=0.9825  F1=0.7226
+[DEV] Macro              : P=0.6607  R=0.5246  F1=0.4225
+
+[DEV] Threshold sweep: best_thr=0.56  sweep_F1=0.6528  argmax_F1=0.4225
+Dev epoch:14, Loss:0.17101183533668518,Acc:57.843135833740234%
+[ES] epoch=14 monitor=macro_f1 cur_macro_f1=0.4225 ema_macro_f1=0.4556 best_macro_f1=0.5641 improved=False
+[Recon][Epoch 15] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 15] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[12 33]
+ [ 7 50]]
+[DEV] Class-0(Normal)    : P=0.6316  R=0.2667  F1=0.3750
+[DEV] Class-1(Depression): P=0.6024  R=0.8772  F1=0.7143
+[DEV] Macro              : P=0.6170  R=0.5719  F1=0.5446
+
+[DEV] Threshold sweep: best_thr=0.51  sweep_F1=0.6382  argmax_F1=0.5446
+Dev epoch:15, Loss:0.1651392109118975,Acc:60.7843132019043%
+[ES] epoch=15 monitor=macro_f1 cur_macro_f1=0.5446 ema_macro_f1=0.4823 best_macro_f1=0.5641 improved=False
+[Recon][Epoch 16] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 16] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[14 31]
+ [ 4 53]]
+[DEV] Class-0(Normal)    : P=0.7778  R=0.3111  F1=0.4444
+[DEV] Class-1(Depression): P=0.6310  R=0.9298  F1=0.7518
+[DEV] Macro              : P=0.7044  R=0.6205  F1=0.5981
+
+[DEV] Threshold sweep: best_thr=0.54  sweep_F1=0.6665  argmax_F1=0.5981
+  [CKPT-A] argmax_F1=0.5981 @epoch 16 | thr=0.54
+  [CKPT-B] sweep_F1=0.6665 @epoch 16 | thr=0.54
+Dev epoch:16, Loss:0.16397826774762228,Acc:65.68627166748047%
+[ES] epoch=16 monitor=macro_f1 cur_macro_f1=0.5981 ema_macro_f1=0.5170 best_macro_f1=0.5641 improved=False
+[Recon][Epoch 17] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 17] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 3 42]
+ [ 1 56]]
+[DEV] Class-0(Normal)    : P=0.7500  R=0.0667  F1=0.1224
+[DEV] Class-1(Depression): P=0.5714  R=0.9825  F1=0.7226
+[DEV] Macro              : P=0.6607  R=0.5246  F1=0.4225
+
+[DEV] Threshold sweep: best_thr=0.57  sweep_F1=0.6344  argmax_F1=0.4225
+Dev epoch:17, Loss:0.17135176635705507,Acc:57.843135833740234%
+[ES] epoch=17 monitor=macro_f1 cur_macro_f1=0.4225 ema_macro_f1=0.4887 best_macro_f1=0.5641 improved=False
+[Recon][Epoch 18] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 18] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[27 18]
+ [21 36]]
+[DEV] Class-0(Normal)    : P=0.5625  R=0.6000  F1=0.5806
+[DEV] Class-1(Depression): P=0.6667  R=0.6316  F1=0.6486
+[DEV] Macro              : P=0.6146  R=0.6158  F1=0.6146
+
+[DEV] Threshold sweep: best_thr=0.51  sweep_F1=0.6471  argmax_F1=0.6146
+  [CKPT-A] argmax_F1=0.6146 @epoch 18 | thr=0.51
+Dev epoch:18, Loss:0.16466369537206796,Acc:61.764705657958984%
+[ES] epoch=18 monitor=macro_f1 cur_macro_f1=0.6146 ema_macro_f1=0.5265 best_macro_f1=0.5641 improved=False
+[Recon][Epoch 19] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 19] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[23 22]
+ [17 40]]
+[DEV] Class-0(Normal)    : P=0.5750  R=0.5111  F1=0.5412
+[DEV] Class-1(Depression): P=0.6452  R=0.7018  F1=0.6723
+[DEV] Macro              : P=0.6101  R=0.6064  F1=0.6067
+
+[DEV] Threshold sweep: best_thr=0.54  sweep_F1=0.6313  argmax_F1=0.6067
+Dev epoch:19, Loss:0.16681491468961424,Acc:61.764705657958984%
+[ES] epoch=19 monitor=macro_f1 cur_macro_f1=0.6067 ema_macro_f1=0.5505 best_macro_f1=0.5641 improved=False
+[Recon][Epoch 20] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 20] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[25 20]
+ [16 41]]
+[DEV] Class-0(Normal)    : P=0.6098  R=0.5556  F1=0.5814
+[DEV] Class-1(Depression): P=0.6721  R=0.7193  F1=0.6949
+[DEV] Macro              : P=0.6409  R=0.6374  F1=0.6382
+
+[DEV] Threshold sweep: best_thr=0.51  sweep_F1=0.6620  argmax_F1=0.6382
+  [CKPT-A] argmax_F1=0.6382 @epoch 20 | thr=0.51
+Dev epoch:20, Loss:0.1671662193078261,Acc:64.70587921142578%
+[ES] epoch=20 monitor=macro_f1 cur_macro_f1=0.6382 ema_macro_f1=0.5768 best_macro_f1=0.5641 improved=True
+  [CKPT-C] ema_macro_f1=0.5768 @epoch 20 | thr=0.51
+[Recon][Epoch 21] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 21] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[17 28]
+ [ 9 48]]
+[DEV] Class-0(Normal)    : P=0.6538  R=0.3778  F1=0.4789
+[DEV] Class-1(Depression): P=0.6316  R=0.8421  F1=0.7218
+[DEV] Macro              : P=0.6427  R=0.6099  F1=0.6003
+
+[DEV] Threshold sweep: best_thr=0.53  sweep_F1=0.6852  argmax_F1=0.6003
+  [CKPT-B] sweep_F1=0.6852 @epoch 21 | thr=0.53
+Dev epoch:21, Loss:0.1664283499121666,Acc:63.72549057006836%
+[ES] epoch=21 monitor=macro_f1 cur_macro_f1=0.6003 ema_macro_f1=0.5839 best_macro_f1=0.5768 improved=True
+  [CKPT-C] ema_macro_f1=0.5839 @epoch 21 | thr=0.53
+[Recon][Epoch 22] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 22] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[20 25]
+ [16 41]]
+[DEV] Class-0(Normal)    : P=0.5556  R=0.4444  F1=0.4938
+[DEV] Class-1(Depression): P=0.6212  R=0.7193  F1=0.6667
+[DEV] Macro              : P=0.5884  R=0.5819  F1=0.5802
+
+[DEV] Threshold sweep: best_thr=0.53  sweep_F1=0.6471  argmax_F1=0.5802
+Dev epoch:22, Loss:0.16668551587141478,Acc:59.80392074584961%
+[ES] epoch=22 monitor=macro_f1 cur_macro_f1=0.5802 ema_macro_f1=0.5828 best_macro_f1=0.5839 improved=False
+[Recon][Epoch 23] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 23] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 2 43]
+ [ 4 53]]
+[DEV] Class-0(Normal)    : P=0.3333  R=0.0444  F1=0.0784
+[DEV] Class-1(Depression): P=0.5521  R=0.9298  F1=0.6928
+[DEV] Macro              : P=0.4427  R=0.4871  F1=0.3856
+
+[DEV] Threshold sweep: best_thr=0.55  sweep_F1=0.5922  argmax_F1=0.3856
+Dev epoch:23, Loss:0.17783670929762033,Acc:53.92156982421875%
+[ES] epoch=23 monitor=macro_f1 cur_macro_f1=0.3856 ema_macro_f1=0.5236 best_macro_f1=0.5839 improved=False
+[Recon][Epoch 24] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 24] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[29 16]
+ [19 38]]
+[DEV] Class-0(Normal)    : P=0.6042  R=0.6444  F1=0.6237
+[DEV] Class-1(Depression): P=0.7037  R=0.6667  F1=0.6847
+[DEV] Macro              : P=0.6539  R=0.6556  F1=0.6542
+
+[DEV] Threshold sweep: best_thr=0.51  sweep_F1=0.6749  argmax_F1=0.6542
+  [CKPT-A] argmax_F1=0.6542 @epoch 24 | thr=0.51
+Dev epoch:24, Loss:0.1641435416845175,Acc:65.68627166748047%
+[ES] epoch=24 monitor=macro_f1 cur_macro_f1=0.6542 ema_macro_f1=0.5628 best_macro_f1=0.5839 improved=False
+[Recon][Epoch 25] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 25] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[20 25]
+ [17 40]]
+[DEV] Class-0(Normal)    : P=0.5405  R=0.4444  F1=0.4878
+[DEV] Class-1(Depression): P=0.6154  R=0.7018  F1=0.6557
+[DEV] Macro              : P=0.5780  R=0.5731  F1=0.5718
+
+[DEV] Threshold sweep: best_thr=0.53  sweep_F1=0.6176  argmax_F1=0.5718
+Dev epoch:25, Loss:0.17022645530792382,Acc:58.82352828979492%
+[ES] epoch=25 monitor=macro_f1 cur_macro_f1=0.5718 ema_macro_f1=0.5655 best_macro_f1=0.5839 improved=False
+[Recon][Epoch 26] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 26] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[40  5]
+ [38 19]]
+[DEV] Class-0(Normal)    : P=0.5128  R=0.8889  F1=0.6504
+[DEV] Class-1(Depression): P=0.7917  R=0.3333  F1=0.4691
+[DEV] Macro              : P=0.6522  R=0.6111  F1=0.5598
+
+[DEV] Threshold sweep: best_thr=0.45  sweep_F1=0.6465  argmax_F1=0.5598
+Dev epoch:26, Loss:0.1895666397534884,Acc:57.843135833740234%
+[ES] epoch=26 monitor=macro_f1 cur_macro_f1=0.5598 ema_macro_f1=0.5638 best_macro_f1=0.5839 improved=False
+[Recon][Epoch 27] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 27] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[38  7]
+ [34 23]]
+[DEV] Class-0(Normal)    : P=0.5278  R=0.8444  F1=0.6496
+[DEV] Class-1(Depression): P=0.7667  R=0.4035  F1=0.5287
+[DEV] Macro              : P=0.6472  R=0.6240  F1=0.5892
+
+[DEV] Threshold sweep: best_thr=0.46  sweep_F1=0.6620  argmax_F1=0.5892
+Dev epoch:27, Loss:0.17014919450649849,Acc:59.80392074584961%
+[ES] epoch=27 monitor=macro_f1 cur_macro_f1=0.5892 ema_macro_f1=0.5714 best_macro_f1=0.5839 improved=False
+[Recon][Epoch 28] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 28] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[23 22]
+ [20 37]]
+[DEV] Class-0(Normal)    : P=0.5349  R=0.5111  F1=0.5227
+[DEV] Class-1(Depression): P=0.6271  R=0.6491  F1=0.6379
+[DEV] Macro              : P=0.5810  R=0.5801  F1=0.5803
+
+[DEV] Threshold sweep: best_thr=0.51  sweep_F1=0.5876  argmax_F1=0.5803
+Dev epoch:28, Loss:0.16794930742337152,Acc:58.82352828979492%
+[ES] epoch=28 monitor=macro_f1 cur_macro_f1=0.5803 ema_macro_f1=0.5741 best_macro_f1=0.5839 improved=False
+[Recon][Epoch 29] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 29] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[31 14]
+ [26 31]]
+[DEV] Class-0(Normal)    : P=0.5439  R=0.6889  F1=0.6078
+[DEV] Class-1(Depression): P=0.6889  R=0.5439  F1=0.6078
+[DEV] Macro              : P=0.6164  R=0.6164  F1=0.6078
+
+[DEV] Threshold sweep: best_thr=0.50  sweep_F1=0.6078  argmax_F1=0.6078
+Dev epoch:29, Loss:0.17181181506468698,Acc:60.7843132019043%
+[ES] epoch=29 monitor=macro_f1 cur_macro_f1=0.6078 ema_macro_f1=0.5842 best_macro_f1=0.5839 improved=True
+  [CKPT-C] ema_macro_f1=0.5842 @epoch 29 | thr=0.50
+[Recon][Epoch 30] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 30] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[39  6]
+ [41 16]]
+[DEV] Class-0(Normal)    : P=0.4875  R=0.8667  F1=0.6240
+[DEV] Class-1(Depression): P=0.7273  R=0.2807  F1=0.4051
+[DEV] Macro              : P=0.6074  R=0.5737  F1=0.5145
+
+[DEV] Threshold sweep: best_thr=0.46  sweep_F1=0.6262  argmax_F1=0.5145
+Dev epoch:30, Loss:0.18257372654401338,Acc:53.92156982421875%
+[ES] epoch=30 monitor=macro_f1 cur_macro_f1=0.5145 ema_macro_f1=0.5633 best_macro_f1=0.5842 improved=False
+[Recon][Epoch 31] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 31] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[35 10]
+ [40 17]]
+[DEV] Class-0(Normal)    : P=0.4667  R=0.7778  F1=0.5833
+[DEV] Class-1(Depression): P=0.6296  R=0.2982  F1=0.4048
+[DEV] Macro              : P=0.5481  R=0.5380  F1=0.4940
+
+[DEV] Threshold sweep: best_thr=0.39  sweep_F1=0.5723  argmax_F1=0.4940
+Dev epoch:31, Loss:0.20463484525680542,Acc:50.98039245605469%
+[ES] epoch=31 monitor=macro_f1 cur_macro_f1=0.4940 ema_macro_f1=0.5425 best_macro_f1=0.5842 improved=False
+[Recon][Epoch 32] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 32] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[16 29]
+ [17 40]]
+[DEV] Class-0(Normal)    : P=0.4848  R=0.3556  F1=0.4103
+[DEV] Class-1(Depression): P=0.5797  R=0.7018  F1=0.6349
+[DEV] Macro              : P=0.5323  R=0.5287  F1=0.5226
+
+[DEV] Threshold sweep: best_thr=0.54  sweep_F1=0.5338  argmax_F1=0.5226
+Dev epoch:32, Loss:0.21783091242496783,Acc:54.90196228027344%
+[ES] epoch=32 monitor=macro_f1 cur_macro_f1=0.5226 ema_macro_f1=0.5365 best_macro_f1=0.5842 improved=False
+[Recon][Epoch 33] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 33] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[21 24]
+ [17 40]]
+[DEV] Class-0(Normal)    : P=0.5526  R=0.4667  F1=0.5060
+[DEV] Class-1(Depression): P=0.6250  R=0.7018  F1=0.6612
+[DEV] Macro              : P=0.5888  R=0.5842  F1=0.5836
+
+[DEV] Threshold sweep: best_thr=0.49  sweep_F1=0.6007  argmax_F1=0.5836
+Dev epoch:33, Loss:0.19788463413715363,Acc:59.80392074584961%
+[ES] epoch=33 monitor=macro_f1 cur_macro_f1=0.5836 ema_macro_f1=0.5507 best_macro_f1=0.5842 improved=False
+[Recon][Epoch 34] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 34] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[30 15]
+ [31 26]]
+[DEV] Class-0(Normal)    : P=0.4918  R=0.6667  F1=0.5660
+[DEV] Class-1(Depression): P=0.6341  R=0.4561  F1=0.5306
+[DEV] Macro              : P=0.5630  R=0.5614  F1=0.5483
+
+[DEV] Threshold sweep: best_thr=0.47  sweep_F1=0.5671  argmax_F1=0.5483
+Dev epoch:34, Loss:0.1983013296356568,Acc:54.90196228027344%
+[ES] epoch=34 monitor=macro_f1 cur_macro_f1=0.5483 ema_macro_f1=0.5500 best_macro_f1=0.5842 improved=False
+[Recon][Epoch 35] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 35] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[22 23]
+ [25 32]]
+[DEV] Class-0(Normal)    : P=0.4681  R=0.4889  F1=0.4783
+[DEV] Class-1(Depression): P=0.5818  R=0.5614  F1=0.5714
+[DEV] Macro              : P=0.5250  R=0.5251  F1=0.5248
+
+[DEV] Threshold sweep: best_thr=0.45  sweep_F1=0.5750  argmax_F1=0.5248
+Dev epoch:35, Loss:0.21559255512861106,Acc:52.94117736816406%
+[ES] epoch=35 monitor=macro_f1 cur_macro_f1=0.5248 ema_macro_f1=0.5424 best_macro_f1=0.5842 improved=False
+[Recon][Epoch 36] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 36] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[28 17]
+ [31 26]]
+[DEV] Class-0(Normal)    : P=0.4746  R=0.6222  F1=0.5385
+[DEV] Class-1(Depression): P=0.6047  R=0.4561  F1=0.5200
+[DEV] Macro              : P=0.5396  R=0.5392  F1=0.5292
+
+[DEV] Threshold sweep: best_thr=0.58  sweep_F1=0.5558  argmax_F1=0.5292
+Dev epoch:36, Loss:0.22949209751991126,Acc:52.94117736816406%
+[ES] epoch=36 monitor=macro_f1 cur_macro_f1=0.5292 ema_macro_f1=0.5385 best_macro_f1=0.5842 improved=False
+[Recon][Epoch 37] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 37] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[23 22]
+ [25 32]]
+[DEV] Class-0(Normal)    : P=0.4792  R=0.5111  F1=0.4946
+[DEV] Class-1(Depression): P=0.5926  R=0.5614  F1=0.5766
+[DEV] Macro              : P=0.5359  R=0.5363  F1=0.5356
+
+[DEV] Threshold sweep: best_thr=0.51  sweep_F1=0.5370  argmax_F1=0.5356
+Dev epoch:37, Loss:0.23798380849453118,Acc:53.92156982421875%
+[ES] epoch=37 monitor=macro_f1 cur_macro_f1=0.5356 ema_macro_f1=0.5376 best_macro_f1=0.5842 improved=False
+[Recon][Epoch 38] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 38] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[21 24]
+ [24 33]]
+[DEV] Class-0(Normal)    : P=0.4667  R=0.4667  F1=0.4667
+[DEV] Class-1(Depression): P=0.5789  R=0.5789  F1=0.5789
+[DEV] Macro              : P=0.5228  R=0.5228  F1=0.5228
+
+[DEV] Threshold sweep: best_thr=0.58  sweep_F1=0.5784  argmax_F1=0.5228
+Dev epoch:38, Loss:0.2529833270953252,Acc:52.94117736816406%
+[ES] epoch=38 monitor=macro_f1 cur_macro_f1=0.5228 ema_macro_f1=0.5332 best_macro_f1=0.5842 improved=False
+[Recon][Epoch 39] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 39] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[26 19]
+ [26 31]]
+[DEV] Class-0(Normal)    : P=0.5000  R=0.5778  F1=0.5361
+[DEV] Class-1(Depression): P=0.6200  R=0.5439  F1=0.5794
+[DEV] Macro              : P=0.5600  R=0.5608  F1=0.5578
+
+[DEV] Threshold sweep: best_thr=0.57  sweep_F1=0.5825  argmax_F1=0.5578
+Dev epoch:39, Loss:0.2113563114633927,Acc:55.882354736328125%
+[ES] epoch=39 monitor=macro_f1 cur_macro_f1=0.5578 ema_macro_f1=0.5405 best_macro_f1=0.5842 improved=False
+[Recon][Epoch 40] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 40] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[23 22]
+ [25 32]]
+[DEV] Class-0(Normal)    : P=0.4792  R=0.5111  F1=0.4946
+[DEV] Class-1(Depression): P=0.5926  R=0.5614  F1=0.5766
+[DEV] Macro              : P=0.5359  R=0.5363  F1=0.5356
+
+[DEV] Threshold sweep: best_thr=0.55  sweep_F1=0.5588  argmax_F1=0.5356
+Dev epoch:40, Loss:0.23369439805929476,Acc:53.92156982421875%
+[ES] epoch=40 monitor=macro_f1 cur_macro_f1=0.5356 ema_macro_f1=0.5391 best_macro_f1=0.5842 improved=False
+[Recon][Epoch 41] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 41] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[31 14]
+ [33 24]]
+[DEV] Class-0(Normal)    : P=0.4844  R=0.6889  F1=0.5688
+[DEV] Class-1(Depression): P=0.6316  R=0.4211  F1=0.5053
+[DEV] Macro              : P=0.5580  R=0.5550  F1=0.5370
+
+[DEV] Threshold sweep: best_thr=0.50  sweep_F1=0.5370  argmax_F1=0.5370
+Dev epoch:41, Loss:0.35032851650164676,Acc:53.92156982421875%
+[ES] epoch=41 monitor=macro_f1 cur_macro_f1=0.5370 ema_macro_f1=0.5385 best_macro_f1=0.5842 improved=False
+[Recon][Epoch 42] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 42] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[16 29]
+ [21 36]]
+[DEV] Class-0(Normal)    : P=0.4324  R=0.3556  F1=0.3902
+[DEV] Class-1(Depression): P=0.5538  R=0.6316  F1=0.5902
+[DEV] Macro              : P=0.4931  R=0.4936  F1=0.4902
+
+[DEV] Threshold sweep: best_thr=0.56  sweep_F1=0.5292  argmax_F1=0.4902
+Dev epoch:42, Loss:0.2211720456297581,Acc:50.98039245605469%
+[ES] epoch=42 monitor=macro_f1 cur_macro_f1=0.4902 ema_macro_f1=0.5240 best_macro_f1=0.5842 improved=False
+[Recon][Epoch 43] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 43] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[17 28]
+ [22 35]]
+[DEV] Class-0(Normal)    : P=0.4359  R=0.3778  F1=0.4048
+[DEV] Class-1(Depression): P=0.5556  R=0.6140  F1=0.5833
+[DEV] Macro              : P=0.4957  R=0.4959  F1=0.4940
+
+[DEV] Threshold sweep: best_thr=0.58  sweep_F1=0.5462  argmax_F1=0.4940
+Dev epoch:43, Loss:0.2549844298225183,Acc:50.98039245605469%
+[ES] epoch=43 monitor=macro_f1 cur_macro_f1=0.4940 ema_macro_f1=0.5150 best_macro_f1=0.5842 improved=False
+[Recon][Epoch 44] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 44] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[20 25]
+ [25 32]]
+[DEV] Class-0(Normal)    : P=0.4444  R=0.4444  F1=0.4444
+[DEV] Class-1(Depression): P=0.5614  R=0.5614  F1=0.5614
+[DEV] Macro              : P=0.5029  R=0.5029  F1=0.5029
+
+[DEV] Threshold sweep: best_thr=0.48  sweep_F1=0.5204  argmax_F1=0.5029
+Dev epoch:44, Loss:0.2128434433386876,Acc:50.98039245605469%
+[ES] epoch=44 monitor=macro_f1 cur_macro_f1=0.5029 ema_macro_f1=0.5114 best_macro_f1=0.5842 improved=False
+[Recon][Epoch 45] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 45] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[21 24]
+ [27 30]]
+[DEV] Class-0(Normal)    : P=0.4375  R=0.4667  F1=0.4516
+[DEV] Class-1(Depression): P=0.5556  R=0.5263  F1=0.5405
+[DEV] Macro              : P=0.4965  R=0.4965  F1=0.4961
+
+[DEV] Threshold sweep: best_thr=0.55  sweep_F1=0.5554  argmax_F1=0.4961
+Dev epoch:45, Loss:0.19330823306853956,Acc:50.0%
+[ES] epoch=45 monitor=macro_f1 cur_macro_f1=0.4961 ema_macro_f1=0.5068 best_macro_f1=0.5842 improved=False
+[Recon][Epoch 46] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 46] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[17 28]
+ [13 44]]
+[DEV] Class-0(Normal)    : P=0.5667  R=0.3778  F1=0.4533
+[DEV] Class-1(Depression): P=0.6111  R=0.7719  F1=0.6822
+[DEV] Macro              : P=0.5889  R=0.5749  F1=0.5678
+
+[DEV] Threshold sweep: best_thr=0.50  sweep_F1=0.5678  argmax_F1=0.5678
+Dev epoch:46, Loss:0.2563488535009898,Acc:59.80392074584961%
+[ES] epoch=46 monitor=macro_f1 cur_macro_f1=0.5678 ema_macro_f1=0.5251 best_macro_f1=0.5842 improved=False
+[Recon][Epoch 47] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 47] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[18 27]
+ [16 41]]
+[DEV] Class-0(Normal)    : P=0.5294  R=0.4000  F1=0.4557
+[DEV] Class-1(Depression): P=0.6029  R=0.7193  F1=0.6560
+[DEV] Macro              : P=0.5662  R=0.5596  F1=0.5558
+
+[DEV] Threshold sweep: best_thr=0.57  sweep_F1=0.5774  argmax_F1=0.5558
+Dev epoch:47, Loss:0.21192209136027557,Acc:57.843135833740234%
+[ES] epoch=47 monitor=macro_f1 cur_macro_f1=0.5558 ema_macro_f1=0.5343 best_macro_f1=0.5842 improved=False
+[Recon][Epoch 48] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 48] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[12 33]
+ [13 44]]
+[DEV] Class-0(Normal)    : P=0.4800  R=0.2667  F1=0.3429
+[DEV] Class-1(Depression): P=0.5714  R=0.7719  F1=0.6567
+[DEV] Macro              : P=0.5257  R=0.5193  F1=0.4998
+
+[DEV] Threshold sweep: best_thr=0.55  sweep_F1=0.5433  argmax_F1=0.4998
+Dev epoch:48, Loss:0.25977501502403844,Acc:54.90196228027344%
+[ES] epoch=48 monitor=macro_f1 cur_macro_f1=0.4998 ema_macro_f1=0.5240 best_macro_f1=0.5842 improved=False
+[Recon][Epoch 49] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 49] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[20 25]
+ [22 35]]
+[DEV] Class-0(Normal)    : P=0.4762  R=0.4444  F1=0.4598
+[DEV] Class-1(Depression): P=0.5833  R=0.6140  F1=0.5983
+[DEV] Macro              : P=0.5298  R=0.5292  F1=0.5290
+
+[DEV] Threshold sweep: best_thr=0.53  sweep_F1=0.5554  argmax_F1=0.5290
+Dev epoch:49, Loss:0.2473150583413931,Acc:53.92156982421875%
+[ES] epoch=49 monitor=macro_f1 cur_macro_f1=0.5290 ema_macro_f1=0.5255 best_macro_f1=0.5842 improved=False
+Early stopping triggered! (EMA Macro-F1=0.5255)
+Training Finished. Running A/B/C checkpoint comparison on Final Test...
+[CKPT-LOAD] A(argmax): epoch=24, path=models/DVLOG_concat_04_02__11_13/seed_45/best_model_by_argmax_f1.pth
+[THR] A(argmax): thr=0.51 from models/DVLOG_concat_04_02__11_13/seed_45/best_thr_for_best_argmax_model.json
+******* FINAL TEST A(argmax) ********
+[FINAL-A(argmax)] Acc=63.68% P=0.6374 R=0.6368 F1=0.6371 thr=0.51 epoch=24
+[CKPT-LOAD] B(sweep): epoch=21, path=models/DVLOG_concat_04_02__11_13/seed_45/best_model_by_sweep_f1.pth
+[THR] B(sweep): thr=0.53 from models/DVLOG_concat_04_02__11_13/seed_45/best_thr_for_best_sweep_model.json
+******* FINAL TEST B(sweep) ********
+[FINAL-B(sweep)] Acc=61.79% P=0.6211 R=0.6179 F1=0.6192 thr=0.53 epoch=21
+[CKPT-LOAD] C(ema_macro): epoch=29, path=models/DVLOG_concat_04_02__11_13/seed_45/best_model_by_ema_macro_f1.pth
+[THR] C(ema_macro): thr=0.50 from models/DVLOG_concat_04_02__11_13/seed_45/best_thr_for_best_ema_macro_f1_model.json
+******* FINAL TEST C(ema_macro) ********
+[FINAL-C(ema_macro)] Acc=41.98% P=0.1762 R=0.4198 F1=0.2483 thr=0.50 epoch=29
+
+--- Final Test Comparison (A/B/C) ---
+A(argmax): Acc=63.68%  P=0.6374  R=0.6368  F1=0.6371  thr=0.51  epoch=24
+B(sweep): Acc=61.79%  P=0.6211  R=0.6179  F1=0.6192  thr=0.53  epoch=21
+C(ema_macro): Acc=41.98%  P=0.1762  R=0.4198  F1=0.2483  thr=0.50  epoch=29
+[FINAL-DECISION] 本 fold 最优 test checkpoint = A(argmax)
+[set_all_seeds] seed=46, cudnn.deterministic=True, strict_deterministic_algos=False
+
+==================== Seed 46 ====================
+[ES-INIT] monitor=macro_f1 best_monitor=-inf ema_monitor=-inf ema_loss_val=None
+[IMPORT-CHECK] MultiModalLoaderClass from /root/autodl-tmp/LMVD_new/model/vitGCN/data/dvlog_loader.py
+[IMPORT-CHECK] collate_fn_multimodal from /root/autodl-tmp/LMVD_new/model/vitGCN/kfoldLoader_multimodal.py
+[IMPORT-CHECK] ViT_GCN_Fusion from /root/autodl-tmp/LMVD_new/model/vitGCN/Vit_gcnmodel.py
+[IMPORT-CHECK] MultiModalLoaderClass.__init__ signature(defaults only): (self, *args, **kwargs)
+[IMPORT-CHECK] MultiModalLoaderClass wrapper detected; base=MultiModalDataLoader.__init__ signature: (self, file_list, video_feature_path, audio_feature_path, face_landmark_path, label_path, T_target=915, mode='train', dataset='LMVD', uniform_ratio=0.7, dvlog_aug_noise_std=0.005, dvlog_audio_mask_ratio=0.0, segment_len=0, use_two_clip_train=False, two_clip_mode='center_random', use_three_clip_train=False, three_clip_mode='center_lr', quality_candidate_count=5, region_partition_scheme='legacy6', enable_feature_cache=True, feature_cache_size=256, np_load_mmap=False, lmvd_face_region_cache_dir=None, lmvd_face_cache_readonly=False)
+[IMPORT-CHECK] Runtime DATASET_SELECT=DVLOG
+[IMPORT-CHECK] FocalBCELoss.forward signature: (self, logits, target, sample_weight=None)
+[DL-CFG] workers=8, pin_memory=True, persistent=True, prefetch_factor=4
+[CACHE-CFG] enable_feature_cache=True, feature_cache_size=256, np_load_mmap=False, lmvd_face_cache_dir=data/LMVD_Feature/face_regions_cache
+[MultiModalDataLoader] DVLOG 标签已缓存: 961 条
+[MultiModalDataLoader] DVLOG aug config: noise_std=0.005, audio_mask_ratio=0.0, uniform_ratio=0.7
+[MultiModalDataLoader] cache: enable=True, size=256, mmap=False
+[MultiModalDataLoader] DVLOG 标签已缓存: 961 条
+[MultiModalDataLoader] DVLOG aug config: noise_std=0.005, audio_mask_ratio=0.0, uniform_ratio=0.7
+[MultiModalDataLoader] cache: enable=True, size=256, mmap=False
+[MultiModalDataLoader] DVLOG 标签已缓存: 961 条
+[MultiModalDataLoader] DVLOG aug config: noise_std=0.005, audio_mask_ratio=0.0, uniform_ratio=0.7
+[MultiModalDataLoader] cache: enable=True, size=256, mmap=False
+DataLoaders Ready: Train=41, Dev=13, Test=27
+[DATASET-CHECK] trainSet.dataset=DVLOG, devSet.dataset=DVLOG, testSet.dataset=DVLOG
+[SEG] train_T=870, train_segment_len=0, eval_sliding_cfg=True, eval_sliding_effective=True, eval_stride=128, dataset=DVLOG, seg_len=300
+[EVAL-AGG-CFG] mode=meanmax, topk=2, meanmax_alpha=0.3
+[DEVICE] device=cuda, cuda_available=True
+[MODEL-INIT] start
+[Model] mode=video_only, fusion_mode=av_backbone_only, sd=0.0, dropout=0.1
+[FS-ENC] enabled=True, v_local=2, a_local=3, v_global=4, a_global=2, dilated_audio=True, fusion_dropout=0.05
+[AV-BACKBONE] legacy=False
+[MODEL-INIT] done
+[EMA] USE_MODEL_EMA=True, decay=0.995
+[VIT-STEM] temporal_conv_stem=True, for=audio, kernel=3, dvlog_only=True, effective=True
+[AUDIO-TCN] enabled=False, kernel=3, dropout=0.0, dvlog_only=False, effective=False
+[VIT-STEM] effective_conv video_k=(1,), video_p=(0,), audio_k=(3,), audio_p=(1,)
+[AUDIO-TCN] encoder=Identity
+[FS-ENC] path=single-modality encoders -> post-encoder AV fusion
+[AUG] DVLOG preset=weak, noise_std=0.005, audio_mask_ratio=0.0, uniform_ratio=0.7
+[MIL] USE_SEGMENT_MIL=False, seg_len=300, k_train=4, k_eval=4, train_agg=weighted_mean, eval_agg=weighted_mean
+[train/seed_46] FocalBCE  gamma=2.0  (no pos_weight, ViT-only)
+[train/seed_46] eff_lr=1.00e-04  (base_lr=1.00e-04, fusion_mode=concat, LOSS_MODE=focal_no_pw)
+[Recon][Epoch 1] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 2] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 3] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 4] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 5] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 6] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 7] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 8] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 9] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+[Recon][Epoch 10] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 10] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 3 42]
+ [ 1 56]]
+[DEV] Class-0(Normal)    : P=0.7500  R=0.0667  F1=0.1224
+[DEV] Class-1(Depression): P=0.5714  R=0.9825  F1=0.7226
+[DEV] Macro              : P=0.6607  R=0.5246  F1=0.4225
+
+[DEV] Threshold sweep: best_thr=0.57  sweep_F1=0.6560  argmax_F1=0.4225
+  [CKPT-A] argmax_F1=0.4225 @epoch 10 | thr=0.57
+  [CKPT-B] sweep_F1=0.6560 @epoch 10 | thr=0.57
+Dev epoch:10, Loss:0.17037221388174936,Acc:57.843135833740234%
+[ES] epoch=10 monitor=macro_f1 cur_macro_f1=0.4225 ema_macro_f1=0.4225 best_macro_f1=-inf improved=True
+  [CKPT-C] ema_macro_f1=0.4225 @epoch 10 | thr=0.57
+[Recon][Epoch 11] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 11] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[29 16]
+ [19 38]]
+[DEV] Class-0(Normal)    : P=0.6042  R=0.6444  F1=0.6237
+[DEV] Class-1(Depression): P=0.7037  R=0.6667  F1=0.6847
+[DEV] Macro              : P=0.6539  R=0.6556  F1=0.6542
+
+[DEV] Threshold sweep: best_thr=0.50  sweep_F1=0.6542  argmax_F1=0.6542
+  [CKPT-A] argmax_F1=0.6542 @epoch 11 | thr=0.50
+Dev epoch:11, Loss:0.16102890039865786,Acc:65.68627166748047%
+[ES] epoch=11 monitor=macro_f1 cur_macro_f1=0.6542 ema_macro_f1=0.4920 best_macro_f1=0.4225 improved=True
+  [CKPT-C] ema_macro_f1=0.4920 @epoch 11 | thr=0.50
+[Recon][Epoch 12] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 12] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[28 17]
+ [22 35]]
+[DEV] Class-0(Normal)    : P=0.5600  R=0.6222  F1=0.5895
+[DEV] Class-1(Depression): P=0.6731  R=0.6140  F1=0.6422
+[DEV] Macro              : P=0.6165  R=0.6181  F1=0.6158
+
+[DEV] Threshold sweep: best_thr=0.50  sweep_F1=0.6158  argmax_F1=0.6158
+Dev epoch:12, Loss:0.16459652208364928,Acc:61.764705657958984%
+[ES] epoch=12 monitor=macro_f1 cur_macro_f1=0.6158 ema_macro_f1=0.5292 best_macro_f1=0.4920 improved=True
+  [CKPT-C] ema_macro_f1=0.5292 @epoch 12 | thr=0.50
+[Recon][Epoch 13] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 13] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[18 27]
+ [15 42]]
+[DEV] Class-0(Normal)    : P=0.5455  R=0.4000  F1=0.4615
+[DEV] Class-1(Depression): P=0.6087  R=0.7368  F1=0.6667
+[DEV] Macro              : P=0.5771  R=0.5684  F1=0.5641
+
+[DEV] Threshold sweep: best_thr=0.52  sweep_F1=0.6344  argmax_F1=0.5641
+Dev epoch:13, Loss:0.16333222045348242,Acc:58.82352828979492%
+[ES] epoch=13 monitor=macro_f1 cur_macro_f1=0.5641 ema_macro_f1=0.5396 best_macro_f1=0.5292 improved=True
+  [CKPT-C] ema_macro_f1=0.5396 @epoch 13 | thr=0.52
+[Recon][Epoch 14] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 14] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[30 15]
+ [21 36]]
+[DEV] Class-0(Normal)    : P=0.5882  R=0.6667  F1=0.6250
+[DEV] Class-1(Depression): P=0.7059  R=0.6316  F1=0.6667
+[DEV] Macro              : P=0.6471  R=0.6491  F1=0.6458
+
+[DEV] Threshold sweep: best_thr=0.49  sweep_F1=0.6894  argmax_F1=0.6458
+  [CKPT-B] sweep_F1=0.6894 @epoch 14 | thr=0.49
+Dev epoch:14, Loss:0.16039550992158744,Acc:64.70587921142578%
+[ES] epoch=14 monitor=macro_f1 cur_macro_f1=0.6458 ema_macro_f1=0.5715 best_macro_f1=0.5396 improved=True
+  [CKPT-C] ema_macro_f1=0.5715 @epoch 14 | thr=0.49
+[Recon][Epoch 15] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 15] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[34 11]
+ [25 32]]
+[DEV] Class-0(Normal)    : P=0.5763  R=0.7556  F1=0.6538
+[DEV] Class-1(Depression): P=0.7442  R=0.5614  F1=0.6400
+[DEV] Macro              : P=0.6602  R=0.6585  F1=0.6469
+
+[DEV] Threshold sweep: best_thr=0.50  sweep_F1=0.6469  argmax_F1=0.6469
+Dev epoch:15, Loss:0.1635260501733193,Acc:64.70587921142578%
+[ES] epoch=15 monitor=macro_f1 cur_macro_f1=0.6469 ema_macro_f1=0.5941 best_macro_f1=0.5715 improved=True
+  [CKPT-C] ema_macro_f1=0.5941 @epoch 15 | thr=0.50
+[Recon][Epoch 16] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 16] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 3 42]
+ [ 1 56]]
+[DEV] Class-0(Normal)    : P=0.7500  R=0.0667  F1=0.1224
+[DEV] Class-1(Depression): P=0.5714  R=0.9825  F1=0.7226
+[DEV] Macro              : P=0.6607  R=0.5246  F1=0.4225
+
+[DEV] Threshold sweep: best_thr=0.56  sweep_F1=0.6566  argmax_F1=0.4225
+Dev epoch:16, Loss:0.16878114124903312,Acc:57.843135833740234%
+[ES] epoch=16 monitor=macro_f1 cur_macro_f1=0.4225 ema_macro_f1=0.5426 best_macro_f1=0.5941 improved=False
+[Recon][Epoch 17] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 17] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 1 44]
+ [ 1 56]]
+[DEV] Class-0(Normal)    : P=0.5000  R=0.0222  F1=0.0426
+[DEV] Class-1(Depression): P=0.5600  R=0.9825  F1=0.7134
+[DEV] Macro              : P=0.5300  R=0.5023  F1=0.3780
+
+[DEV] Threshold sweep: best_thr=0.60  sweep_F1=0.6385  argmax_F1=0.3780
+Dev epoch:17, Loss:0.19214795587154535,Acc:55.882354736328125%
+[ES] epoch=17 monitor=macro_f1 cur_macro_f1=0.3780 ema_macro_f1=0.4932 best_macro_f1=0.5941 improved=False
+[Recon][Epoch 18] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 18] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 1 44]
+ [ 0 57]]
+[DEV] Class-0(Normal)    : P=1.0000  R=0.0222  F1=0.0435
+[DEV] Class-1(Depression): P=0.5644  R=1.0000  F1=0.7215
+[DEV] Macro              : P=0.7822  R=0.5111  F1=0.3825
+
+[DEV] Threshold sweep: best_thr=0.58  sweep_F1=0.6436  argmax_F1=0.3825
+Dev epoch:18, Loss:0.17500618042854163,Acc:56.86274337768555%
+[ES] epoch=18 monitor=macro_f1 cur_macro_f1=0.3825 ema_macro_f1=0.4600 best_macro_f1=0.5941 improved=False
+[Recon][Epoch 19] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 19] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[32 13]
+ [23 34]]
+[DEV] Class-0(Normal)    : P=0.5818  R=0.7111  F1=0.6400
+[DEV] Class-1(Depression): P=0.7234  R=0.5965  F1=0.6538
+[DEV] Macro              : P=0.6526  R=0.6538  F1=0.6469
+
+[DEV] Threshold sweep: best_thr=0.52  sweep_F1=0.6620  argmax_F1=0.6469
+Dev epoch:19, Loss:0.1616815970494197,Acc:64.70587921142578%
+[ES] epoch=19 monitor=macro_f1 cur_macro_f1=0.6469 ema_macro_f1=0.5161 best_macro_f1=0.5941 improved=False
+[Recon][Epoch 20] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 20] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 5 40]
+ [ 2 55]]
+[DEV] Class-0(Normal)    : P=0.7143  R=0.1111  F1=0.1923
+[DEV] Class-1(Depression): P=0.5789  R=0.9649  F1=0.7237
+[DEV] Macro              : P=0.6466  R=0.5380  F1=0.4580
+
+[DEV] Threshold sweep: best_thr=0.56  sweep_F1=0.6634  argmax_F1=0.4580
+Dev epoch:20, Loss:0.1671266143138592,Acc:58.82352828979492%
+[ES] epoch=20 monitor=macro_f1 cur_macro_f1=0.4580 ema_macro_f1=0.4987 best_macro_f1=0.5941 improved=False
+[Recon][Epoch 21] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 21] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[42  3]
+ [44 13]]
+[DEV] Class-0(Normal)    : P=0.4884  R=0.9333  F1=0.6412
+[DEV] Class-1(Depression): P=0.8125  R=0.2281  F1=0.3562
+[DEV] Macro              : P=0.6504  R=0.5807  F1=0.4987
+
+[DEV] Threshold sweep: best_thr=0.48  sweep_F1=0.6528  argmax_F1=0.4987
+Dev epoch:21, Loss:0.16921623051166534,Acc:53.92156982421875%
+[ES] epoch=21 monitor=macro_f1 cur_macro_f1=0.4987 ema_macro_f1=0.4987 best_macro_f1=0.5941 improved=False
+[Recon][Epoch 22] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 22] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[21 24]
+ [12 45]]
+[DEV] Class-0(Normal)    : P=0.6364  R=0.4667  F1=0.5385
+[DEV] Class-1(Depression): P=0.6522  R=0.7895  F1=0.7143
+[DEV] Macro              : P=0.6443  R=0.6281  F1=0.6264
+
+[DEV] Threshold sweep: best_thr=0.57  sweep_F1=0.6313  argmax_F1=0.6264
+Dev epoch:22, Loss:0.16382646216795996,Acc:64.70587921142578%
+[ES] epoch=22 monitor=macro_f1 cur_macro_f1=0.6264 ema_macro_f1=0.5370 best_macro_f1=0.5941 improved=False
+[Recon][Epoch 23] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 23] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[30 15]
+ [22 35]]
+[DEV] Class-0(Normal)    : P=0.5769  R=0.6667  F1=0.6186
+[DEV] Class-1(Depression): P=0.7000  R=0.6140  F1=0.6542
+[DEV] Macro              : P=0.6385  R=0.6404  F1=0.6364
+
+[DEV] Threshold sweep: best_thr=0.48  sweep_F1=0.6737  argmax_F1=0.6364
+Dev epoch:23, Loss:0.16300215285557967,Acc:63.72549057006836%
+[ES] epoch=23 monitor=macro_f1 cur_macro_f1=0.6364 ema_macro_f1=0.5668 best_macro_f1=0.5941 improved=False
+[Recon][Epoch 24] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 24] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[ 5 40]
+ [ 3 54]]
+[DEV] Class-0(Normal)    : P=0.6250  R=0.1111  F1=0.1887
+[DEV] Class-1(Depression): P=0.5745  R=0.9474  F1=0.7152
+[DEV] Macro              : P=0.5997  R=0.5292  F1=0.4520
+
+[DEV] Threshold sweep: best_thr=0.55  sweep_F1=0.5961  argmax_F1=0.4520
+Dev epoch:24, Loss:0.16682371267905602,Acc:57.843135833740234%
+[ES] epoch=24 monitor=macro_f1 cur_macro_f1=0.4520 ema_macro_f1=0.5323 best_macro_f1=0.5941 improved=False
+[Recon][Epoch 25] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 25] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[28 17]
+ [17 40]]
+[DEV] Class-0(Normal)    : P=0.6222  R=0.6222  F1=0.6222
+[DEV] Class-1(Depression): P=0.7018  R=0.7018  F1=0.7018
+[DEV] Macro              : P=0.6620  R=0.6620  F1=0.6620
+
+[DEV] Threshold sweep: best_thr=0.50  sweep_F1=0.6620  argmax_F1=0.6620
+  [CKPT-A] argmax_F1=0.6620 @epoch 25 | thr=0.50
+Dev epoch:25, Loss:0.1603121149998445,Acc:66.66666412353516%
+[ES] epoch=25 monitor=macro_f1 cur_macro_f1=0.6620 ema_macro_f1=0.5712 best_macro_f1=0.5941 improved=False
+[Recon][Epoch 26] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 26] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[17 28]
+ [11 46]]
+[DEV] Class-0(Normal)    : P=0.6071  R=0.3778  F1=0.4658
+[DEV] Class-1(Depression): P=0.6216  R=0.8070  F1=0.7023
+[DEV] Macro              : P=0.6144  R=0.5924  F1=0.5840
+
+[DEV] Threshold sweep: best_thr=0.54  sweep_F1=0.6262  argmax_F1=0.5840
+Dev epoch:26, Loss:0.16352968032543475,Acc:61.764705657958984%
+[ES] epoch=26 monitor=macro_f1 cur_macro_f1=0.5840 ema_macro_f1=0.5751 best_macro_f1=0.5941 improved=False
+[Recon][Epoch 27] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 27] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[11 34]
+ [12 45]]
+[DEV] Class-0(Normal)    : P=0.4783  R=0.2444  F1=0.3235
+[DEV] Class-1(Depression): P=0.5696  R=0.7895  F1=0.6618
+[DEV] Macro              : P=0.5239  R=0.5170  F1=0.4926
+
+[DEV] Threshold sweep: best_thr=0.53  sweep_F1=0.6065  argmax_F1=0.4926
+Dev epoch:27, Loss:0.16439722306453264,Acc:54.90196228027344%
+[ES] epoch=27 monitor=macro_f1 cur_macro_f1=0.4926 ema_macro_f1=0.5503 best_macro_f1=0.5941 improved=False
+[Recon][Epoch 28] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 28] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[14 31]
+ [13 44]]
+[DEV] Class-0(Normal)    : P=0.5185  R=0.3111  F1=0.3889
+[DEV] Class-1(Depression): P=0.5867  R=0.7719  F1=0.6667
+[DEV] Macro              : P=0.5526  R=0.5415  F1=0.5278
+
+[DEV] Threshold sweep: best_thr=0.56  sweep_F1=0.6155  argmax_F1=0.5278
+Dev epoch:28, Loss:0.16885756586606687,Acc:56.86274337768555%
+[ES] epoch=28 monitor=macro_f1 cur_macro_f1=0.5278 ema_macro_f1=0.5436 best_macro_f1=0.5941 improved=False
+[Recon][Epoch 29] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 29] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[27 18]
+ [22 35]]
+[DEV] Class-0(Normal)    : P=0.5510  R=0.6000  F1=0.5745
+[DEV] Class-1(Depression): P=0.6604  R=0.6140  F1=0.6364
+[DEV] Macro              : P=0.6057  R=0.6070  F1=0.6054
+
+[DEV] Threshold sweep: best_thr=0.54  sweep_F1=0.6493  argmax_F1=0.6054
+Dev epoch:29, Loss:0.1602397354749533,Acc:60.7843132019043%
+[ES] epoch=29 monitor=macro_f1 cur_macro_f1=0.6054 ema_macro_f1=0.5621 best_macro_f1=0.5941 improved=False
+[Recon][Epoch 30] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 30] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[10 35]
+ [ 9 48]]
+[DEV] Class-0(Normal)    : P=0.5263  R=0.2222  F1=0.3125
+[DEV] Class-1(Depression): P=0.5783  R=0.8421  F1=0.6857
+[DEV] Macro              : P=0.5523  R=0.5322  F1=0.4991
+
+[DEV] Threshold sweep: best_thr=0.59  sweep_F1=0.6023  argmax_F1=0.4991
+Dev epoch:30, Loss:0.16504042423688448,Acc:56.86274337768555%
+[ES] epoch=30 monitor=macro_f1 cur_macro_f1=0.4991 ema_macro_f1=0.5432 best_macro_f1=0.5941 improved=False
+[Recon][Epoch 31] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 31] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[33 12]
+ [27 30]]
+[DEV] Class-0(Normal)    : P=0.5500  R=0.7333  F1=0.6286
+[DEV] Class-1(Depression): P=0.7143  R=0.5263  F1=0.6061
+[DEV] Macro              : P=0.6321  R=0.6298  F1=0.6173
+
+[DEV] Threshold sweep: best_thr=0.46  sweep_F1=0.6436  argmax_F1=0.6173
+Dev epoch:31, Loss:0.17012979491398886,Acc:61.764705657958984%
+[ES] epoch=31 monitor=macro_f1 cur_macro_f1=0.6173 ema_macro_f1=0.5654 best_macro_f1=0.5941 improved=False
+[Recon][Epoch 32] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 32] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[14 31]
+ [14 43]]
+[DEV] Class-0(Normal)    : P=0.5000  R=0.3111  F1=0.3836
+[DEV] Class-1(Depression): P=0.5811  R=0.7544  F1=0.6565
+[DEV] Macro              : P=0.5405  R=0.5327  F1=0.5200
+
+[DEV] Threshold sweep: best_thr=0.54  sweep_F1=0.6238  argmax_F1=0.5200
+Dev epoch:32, Loss:0.1732603941972439,Acc:55.882354736328125%
+[ES] epoch=32 monitor=macro_f1 cur_macro_f1=0.5200 ema_macro_f1=0.5518 best_macro_f1=0.5941 improved=False
+[Recon][Epoch 33] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 33] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[19 26]
+ [17 40]]
+[DEV] Class-0(Normal)    : P=0.5278  R=0.4222  F1=0.4691
+[DEV] Class-1(Depression): P=0.6061  R=0.7018  F1=0.6504
+[DEV] Macro              : P=0.5669  R=0.5620  F1=0.5598
+
+[DEV] Threshold sweep: best_thr=0.51  sweep_F1=0.5914  argmax_F1=0.5598
+Dev epoch:33, Loss:0.17737985574282134,Acc:57.843135833740234%
+[ES] epoch=33 monitor=macro_f1 cur_macro_f1=0.5598 ema_macro_f1=0.5542 best_macro_f1=0.5941 improved=False
+[Recon][Epoch 34] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 34] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[32 13]
+ [23 34]]
+[DEV] Class-0(Normal)    : P=0.5818  R=0.7111  F1=0.6400
+[DEV] Class-1(Depression): P=0.7234  R=0.5965  F1=0.6538
+[DEV] Macro              : P=0.6526  R=0.6538  F1=0.6469
+
+[DEV] Threshold sweep: best_thr=0.50  sweep_F1=0.6469  argmax_F1=0.6469
+Dev epoch:34, Loss:0.17613243082394966,Acc:64.70587921142578%
+[ES] epoch=34 monitor=macro_f1 cur_macro_f1=0.6469 ema_macro_f1=0.5820 best_macro_f1=0.5941 improved=False
+[Recon][Epoch 35] recon_v_mse=0.000000  recon_g_mse=0.000000  recon_total_weighted=0.000000  recon_lam=0.02  steps=0
+*******dev********
+
+[DEV Epoch 35] Confusion Matrix (rows=true, cols=pred, label order [0,1]):
+[[20 25]
+ [20 37]]
+[DEV] Class-0(Normal)    : P=0.5000  R=0.4444  F1=0.4706
+[DEV] Class-1(Depression): P=0.5968  R=0.6491  F1=0.6218
+[DEV] Macro              : P=0.5484  R=0.5468  F1=0.5462
+
+[DEV] Threshold sweep: best_thr=0.56  sweep_F1=0.5567  argmax_F1=0.5462
+Dev epoch:35, Loss:0.1946850843154467,Acc:55.882354736328125%
+[ES] epoch=35 monitor=macro_f1 cur_macro_f1=0.5462 ema_macro_f1=0.5713 best_macro_f1=0.5941 improved=False
+Early stopping triggered! (EMA Macro-F1=0.5713)
+Training Finished. Running A/B/C checkpoint comparison on Final Test...
+[CKPT-LOAD] A(argmax): epoch=25, path=models/DVLOG_concat_04_02__11_13/seed_46/best_model_by_argmax_f1.pth
+[THR] A(argmax): thr=0.50 from models/DVLOG_concat_04_02__11_13/seed_46/best_thr_for_best_argmax_model.json
+******* FINAL TEST A(argmax) ********
+[FINAL-A(argmax)] Acc=65.09% P=0.6499 R=0.6509 F1=0.6504 thr=0.50 epoch=25
+[CKPT-LOAD] B(sweep): epoch=14, path=models/DVLOG_concat_04_02__11_13/seed_46/best_model_by_sweep_f1.pth
+[THR] B(sweep): thr=0.49 from models/DVLOG_concat_04_02__11_13/seed_46/best_thr_for_best_sweep_model.json
+******* FINAL TEST B(sweep) ********
+[FINAL-B(sweep)] Acc=62.74% P=0.6203 R=0.6274 F1=0.6197 thr=0.49 epoch=14
+[CKPT-LOAD] C(ema_macro): epoch=15, path=models/DVLOG_concat_04_02__11_13/seed_46/best_model_by_ema_macro_f1.pth
+[THR] C(ema_macro): thr=0.50 from models/DVLOG_concat_04_02__11_13/seed_46/best_thr_for_best_ema_macro_f1_model.json
+******* FINAL TEST C(ema_macro) ********
+[FINAL-C(ema_macro)] Acc=58.49% P=0.5637 R=0.5849 F1=0.4964 thr=0.50 epoch=15
+
+--- Final Test Comparison (A/B/C) ---
+A(argmax): Acc=65.09%  P=0.6499  R=0.6509  F1=0.6504  thr=0.50  epoch=25
+B(sweep): Acc=62.74%  P=0.6203  R=0.6274  F1=0.6197  thr=0.49  epoch=14
+C(ema_macro): Acc=58.49%  P=0.5637  R=0.5849  F1=0.4964  thr=0.50  epoch=15
+[FINAL-DECISION] 本 fold 最优 test checkpoint = A(argmax)
+
+*************** FINAL MULTI-SEED RESULTS (DVLOG, seeds=[41, 42, 43, 44, 45, 46]) ***************
+Seed            Acc    Precision     Recall         F1
+------------------------------------------------------
+41           65.57%       0.6525     0.6557     0.6534
+42           62.26%       0.6137     0.6226     0.6084
+43           62.74%       0.6350     0.6274     0.6295
+44           64.15%       0.6355     0.6415     0.6348
+45           63.68%       0.6374     0.6368     0.6371
+46           65.09%       0.6499     0.6509     0.6504
+------------------------------------------------------
+Mean ACC       : 63.92% ± 1.18%
+Mean PRECISION : 0.6373 ± 0.0126
+Mean RECALL    : 0.6392 ± 0.0118
+Mean F1        : 0.6356 ± 0.0148
+[DELTA] registry updated: key=video_only, path=logs/dvlog_mode_metrics_registry.json
+[DELTA] --- Increment Summary ---
+[DELTA] AV+GCN - AV-only: unavailable (need av_gcn and av_only_new)
+[DELTA] AV-only - GCN-only: ΔAcc=10.06%  ΔF1=0.1027
+[DELTA] AV-only - Video-only: ΔAcc=4.87%  ΔF1=0.0480
+[DELTA] Video-only - Audio-only: ΔAcc=-3.30%  ΔF1=-0.0373
+[DELTA] New AV-only - Old AV-only: ΔAcc=1.73%  ΔF1=0.0200

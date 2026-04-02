@@ -10,6 +10,211 @@
 
 ---
 
+## 0. 直接回答你的 4 个问题（含代码证据）
+
+### 0.1 Large-Scale 项目是如何对 DVLOG 音视频做“单独编码”的？
+
+结论：它先把输入按维度切开，再分别送入两个独立编码器。
+
+在 `Large-Scale-Multimodal-Depression-Detection-main/models/MultiModalDepDet.py` 的 `feature_extractor`：
+
+1. `xa = x[:, :, 136:]`，取音频 25 维。
+2. `xv = x[:, :, :136]`，取视频 136 维。
+3. 音频先过 `conv_audio`，再过 `AudioTransformerModel`（AST 风格）。
+4. 视频先过 `conv_video`，再过 `GenerateVisualModel`（VisualMAE 路线）。
+5. 当 `fusion='audio'` 时，只对音频特征池化并分类。
+6. 当 `fusion='video'` 时，只对视频特征池化并分类。
+
+所以它确实支持严格的单模态编码/训练（audio-only 或 video-only），不是把两模态先混在一起再分离。
+
+### 0.2 那个项目用的是原始音视频吗？
+
+结论：不是。它用的是预提取 `.npy` 特征，不是直接解码 `.mp4/.wav`。
+
+证据在 `Large-Scale-Multimodal-Depression-Detection-main/datasets_process/dvlog.py`：
+
+1. 直接读取 `{id}_visual.npy` 和 `{id}_acoustic.npy`。
+2. 按最短时长截断后做特征拼接（`136 + 25 = 161`）。
+3. DataLoader 输出的是 `[T, 161]` 的特征序列与 padding mask。
+
+这意味着该项目的“强”主要来自编码器和融合策略，而不是“端到端原始音视频输入”。
+
+### 0.3 和你当前 vitGCN 方法具体哪里不同？
+
+核心差异有 4 个：
+
+1. 分支结构不同：
+   Large-Scale 主要是 AV 双分支；你是 AV + Face-Graph(GCN) 三分支。
+
+2. 主干先验不同：
+   Large-Scale 使用 AST/VisualMAE 路线（带外部预训练权重）；你当前 DVLOG 路径是轻量投影 + 时序建模，从头学习比例更高。
+
+3. 人脸利用方式不同：
+   Large-Scale 不走单独 face graph；你从 136 维里解码 68 点后再做区域 GCN。
+
+4. 训练目标复杂度不同：
+   你有 quality gate、time mask、aux/recon、多融合策略与 segment 相关配置；Large-Scale 的主路径更“纯 AV 主干 + fusion 选择”。
+
+### 0.4 为什么你的 AV 只有不到 70？
+
+先给结论：更可能是“系统层面因素叠加”，不只是某一个 fusion 头的问题。
+
+最常见的 6 个原因：
+
+1. 评测口径不一致：
+   若和论文对比时 split、阈值策略、指标定义（weighted F1 / macro F1）不完全一致，差 5~15 个点很常见。
+
+2. 特征域偏移：
+   虽然都用 `{visual, acoustic}.npy`，但预处理版本、归一化方式、异常值处理不同，会直接拉低 AV 上限。
+
+3. 模型容量与预训练强度差异：
+   Large-Scale 的 AV 主干预训练更强；你当前 AV 主干偏轻量，导致 video/audio 单模态判别力不足。
+
+4. GCN 干预主任务：
+   你是三分支耦合训练，若 face 分支增益有限或噪声偏大，会稀释 AV 分支学习信号。
+
+5. 数据不平衡与阈值敏感：
+   DVLOG 正负样本和长度分布不均，若 loss/threshold 调度不稳，Acc 与 F1 会卡在 60~70 区间。
+
+6. 训练细节差异：
+   batch size、学习率、epoch、warmup、dropout、seed 等任一项不匹配论文设置，都会显著掉点。
+
+一句话：你的 AV < 70 并不等于“结构一定错”，更可能是“输入特征域 + 主干强度 + 评测口径”共同造成。
+
+### 0.5 你的“新版 DVLOG 音视频编码”现在还算轻量吗？
+
+结论：仍然是轻量路线，但比旧版更强一些。
+
+依据当前配置与实现：
+
+1. 你在 DVLOG 下默认用的是较小主干规模（例如 D_EMB=192、DEPTH=4、HEADS=4），属于小模型配置。
+2. 新版加入了 feature-sequence encoder（本地时序卷积 + 小深度时序 Transformer），提升了表达力，但仍是轻量堆叠，不是大规模预训练骨干替换。
+3. 你的输入仍是预提取的 136/25 特征序列，不是端到端原始视频帧与波形建模。
+
+所以“新版比旧版强”与“仍然偏轻量”这两句话可以同时成立。
+
+### 0.6 你点名的 1/2/3：具体差异到底在哪里（你的模型 vs Large-Scale）
+
+下面按你提出的三个方向做“逐项对照 + 为什么会掉点”的详细说明。
+
+#### 0.6.1 评测口径不一致（split / 阈值 / 指标）
+
+你的模型与 Large-Scale 项目在评测口径上的潜在差异，重点看 4 个维度。
+
+1. split 与样本划分来源：
+   你的实现：常用本地标签与 fold 逻辑（且可切换不同运行配置）。
+   Large-Scale：在其数据脚本与训练入口里使用自身固定的 train/valid/test 划分流程。
+   影响：同一模型在不同 split 上本来就会有明显波动，5~15 点并不少见。
+
+2. 阈值策略：
+   你的实现：既有 argmax 路径，也有 dev 上 sweep 阈值后再评估 test 的路径。
+   Large-Scale：默认更常见的是直接按输出分数做固定判决（通常接近 argmax/固定阈值范式）。
+   影响：F1 尤其对阈值敏感，阈值优化与否常常直接改写最终 F1。
+
+3. 指标定义：
+   你的实现：同时输出 weighted F1、per-class 指标、macro 相关诊断。
+   Large-Scale/论文：经常以某个主指标汇报（如 weighted F1 或 macro F1），但你对比时可能看的是另一种。
+   影响：类别不平衡时，weighted 与 macro 的数值可能相差明显，导致“看起来掉点很多”。
+
+4. 汇总规则：
+   你的实现：可能看单次 run、某个 fold、best epoch、或多 seed 均值。
+   Large-Scale/论文：常按其论文协议汇总（多折/多次）。
+   影响：统计口径不一致会造成“模型强弱误判”。
+
+建议你在对比时固定一条统一协议：
+
+1. 固定同一 split 文件。
+2. 固定同一阈值策略（都用 argmax 或都用 dev-sweep）。
+3. 固定同一主指标（推荐同时报 weighted F1 与 macro F1）。
+4. 固定同一汇总方式（例如 10-fold mean）。
+
+#### 0.6.2 特征域偏移（同样是 npy，也可能不是同一分布）
+
+即使都写着 `{visual, acoustic}.npy`，你的模型与 Large-Scale 仍可能不在同一“特征域”。
+
+1. 时间对齐方式：
+   你的实现：显式对齐 `T_v/T_a`，并配合 segment、滑窗、mask 等策略。
+   Large-Scale：在数据加载阶段做最短长度截断与 pad。
+   影响：时序上下文长度、有效帧比例、噪声帧占比都会变，直接影响 AV 判别上限。
+
+2. 归一化与数值清洗：
+   你的实现：包含 NaN/Inf 清洗、数据增强、质量门控等环节。
+   Large-Scale：数据脚本流程更直接，归一化策略与触发时机不一定一致。
+   影响：模型见到的输入分布不同，预训练编码器或轻量编码器的有效工作点也会不同。
+
+3. 低质量样本处理：
+   你的实现：有 `quality`、`face_valid_thresh`、`time_mask`、sample weight 等机制。
+   Large-Scale：主路径不强调 face 质量门控链路。
+   影响：你会“更保守地丢弃或降权”部分样本，鲁棒性可能提升，但上限也可能被压低。
+
+4. 特征版本差异：
+   你的实现：读取本地 `{id}_visual.npy/{id}_acoustic.npy`，若上游提取脚本版本变化，分布会变化。
+   Large-Scale：默认假设其论文配套特征生成流程。
+   影响：同名文件并不保证同域，域偏移足以让 AV 掉到 70 以下。
+
+一句话：你现在不是在“同一个输入分布”上和论文比。
+
+#### 0.6.3 模型容量与预训练强度差异（最关键）
+
+这是你当前结果与 Large-Scale 差距的核心来源之一。
+
+1. 编码器先验强度：
+   Large-Scale：音频使用 AST 路线（AudioSet 预训练），视觉使用 VisualMAE 路线（外部预训练 ckpt 初始化）。
+   你的实现：DVLOG 路径是轻量投影 + 时序编码（即便新版加了 feature-sequence encoder，本质仍是轻量增强）。
+   影响：Large-Scale 的单模态起点更高；你的单模态可分性不足时，融合层很难“凭空补齐”。
+
+2. 主干规模与深度：
+   Large-Scale：主干输出来自较强 Transformer 表征，再接融合。
+   你的实现：DVLOG 默认配置偏小（例如 embedding/depth/head 都走轻量设定）。
+   影响：表达容量不足时，复杂融合收益被限制，表现为 AV 上限偏低。
+
+3. 训练目标耦合复杂度：
+   Large-Scale：主干以 AV 双分支为核心。
+   你的实现：AV + GCN + quality/mask/aux/recon 等多机制耦合。
+   影响：可解释性更强，但优化难度更高，容易出现“训练很稳、但峰值不高”。
+
+4. 融合层与主干的主次关系：
+   Large-Scale：先把单模态编码器做强，再比较 fusion。
+   你的实现：你已经做了多种 fusion 优化，但主干强度与输入域一致性仍是主要瓶颈。
+
+结论：你当前掉点更像“主干先验 + 特征域 + 评测协议”的叠加问题，而不只是 fusion 头问题。
+
+### 0.7 “Large-Scale 使用 AST/VisualMAE 路线（带外部预训练权重）”到底是什么意思
+
+先说结论：通常不是一个权重文件，而是至少两类权重。
+
+1. 音频权重（AST/AudioSet）：
+   在 Large-Scale 代码里，音频模型会找 audioset 预训练权重文件（默认名为 audioset_10_10_0.4593.pth），也支持环境变量指定路径。
+
+2. 视觉权重（VisualMAE）：
+   视觉模型会加载 visualmae_pretrained.pth 作为初始化。
+
+也就是说，这是“音频一个预训练来源 + 视觉一个预训练来源”的双权重初始化，不是单一文件。
+
+#### 0.7.1 在 Large-Scale 项目里怎么用这些权重
+
+按其当前实现，最稳妥的做法：
+
+1. 把 visualmae_pretrained.pth 放到 Large-Scale-Multimodal-Depression-Detection-main/pretrained_models/ 下。
+2. 把 audioset_10_10_0.4593.pth 放到同一目录，或设置环境变量 LMVD_AUDIOSET_CKPT_PATH 指向该文件。
+3. 若你希望自动下载音频权重，可设置 LMVD_AUDIOSET_AUTO_DOWNLOAD=1（网络可用时）。
+
+#### 0.7.2 这些权重能否直接给你当前 vitGCN 用
+
+通常不能直接加载到当前 vitGCN 主干，原因是结构不对齐：
+
+1. 模块命名和层形状不同。
+2. token 化方式不同。
+3. 你还有 GCN 分支与额外融合头。
+
+可行路径是“迁移思路”，不是“直接 strict load”：
+
+1. 先把 AV 主干替换为兼容 AST/VisualMAE 输出的双编码器。
+2. 再用投影层把两者对齐到你当前融合维度。
+3. 最后再接你现有 fusion/GCN 头做联合训练或分阶段微调。
+
+---
+
 ## 1. 当前 vitGCN 的总体思路
 
 当前 `vitGCN` 不是一个“单纯的音视频融合模型”，也不是一个“单纯的人脸关键点 GCN 模型”，而是一个三分支结构：
