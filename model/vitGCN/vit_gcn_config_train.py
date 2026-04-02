@@ -95,9 +95,11 @@ LABEL_PATH = LABEL_PATH
 # 统一实验模式：
 #   'fusion'   -> 当前 ViT + GCN 完整融合
 #   'av_only'  -> 仅跑视频+音频 ViT（不走 GCN）
+#   'video_only' -> 仅跑视频 ViT（音频输入置零）
+#   'audio_only' -> 仅跑音频 ViT（视频输入置零）
 #   'gcn_only' -> 仅跑 GCN 面部关键点分支（仍复用融合训练/评估框架）
-MODEL_MODE = str(PROFILE_OVERRIDES.get('MODEL_MODE', 'fusion')).lower()   # 'fusion' | 'av_only' | 'gcn_only'
-USE_FUSION_MODEL = (MODEL_MODE != 'av_only')
+MODEL_MODE = str(PROFILE_OVERRIDES.get('MODEL_MODE', 'fusion')).lower()   # 'fusion' | 'av_only' | 'video_only' | 'audio_only' | 'gcn_only'
+USE_FUSION_MODEL = (MODEL_MODE in {'fusion', 'gcn_only'})
 
 # ==================== 0401 方案A：Feature-Sequence Encoder ====================
 # 目标：把当前 AV 主干从轻量 projector 升级为“单模态先编码、再后融合”的 feature-sequence encoder
@@ -430,7 +432,20 @@ def _resolve_dvlog_experiment_key(model_mode, use_legacy):
         return 'gcn_only'
     if mode == 'av_only':
         return 'av_only_old' if bool(use_legacy) else 'av_only_new'
+    if mode == 'video_only':
+        return 'video_only'
+    if mode == 'audio_only':
+        return 'audio_only'
     return f'unknown_{mode}'
+
+
+def _apply_av_only_submode(video_x, audio_x):
+    """Apply ablation masking for ViT-only submodes."""
+    if MODEL_MODE == 'video_only':
+        return video_x, torch.zeros_like(audio_x)
+    if MODEL_MODE == 'audio_only':
+        return torch.zeros_like(video_x), audio_x
+    return video_x, audio_x
 
 
 def _update_and_report_dvlog_deltas(mean_metrics):
@@ -464,6 +479,8 @@ def _update_and_report_dvlog_deltas(mean_metrics):
     print("[DELTA] --- Increment Summary ---")
     _delta_line('AV+GCN - AV-only', 'av_gcn', 'av_only_new')
     _delta_line('AV-only - GCN-only', 'av_only_new', 'gcn_only')
+    _delta_line('AV-only - Video-only', 'av_only_new', 'video_only')
+    _delta_line('Video-only - Audio-only', 'video_only', 'audio_only')
     _delta_line('New AV-only - Old AV-only', 'av_only_new', 'av_only_old')
 logging.basicConfig(level=logging.NOTSET,
                     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
@@ -927,7 +944,7 @@ def train(VideoPath, AudioPath, FacePath, X_train, X_dev, X_final_test, labelPat
                     fs_dilated_audio=FS_DILATED_AUDIO,
                     fs_fusion_dropout=FS_FUSION_DROPOUT,
                 ).to(device)
-                print(f"[Model] mode={MODEL_MODE}, fusion_mode=av_only, sd={SD_RATE}, dropout={DROPOUT}")
+                print(f"[Model] mode={MODEL_MODE}, fusion_mode=av_backbone_only, sd={SD_RATE}, dropout={DROPOUT}")
                 print(
                     f"[FS-ENC] enabled={USE_FEATURE_SEQUENCE_ENCODER}, "
                     f"v_local={FS_VIDEO_LOCAL_BLOCKS}, a_local={FS_AUDIO_LOCAL_BLOCKS}, "
@@ -1686,6 +1703,7 @@ def train(VideoPath, AudioPath, FacePath, X_train, X_dev, X_final_test, labelPat
                 # 3. 混合输入 (Mix Data)
                 mixed_video = lam * videoData + (1 - lam) * videoData[index, :]
                 mixed_audio = lam * audioData + (1 - lam) * audioData[index, :]
+                mixed_video, mixed_audio = _apply_av_only_submode(mixed_video, mixed_audio)
 
                 # 4. 混合标签 (Mix Labels)
                 label_a, label_b = label, label[index]
@@ -1816,7 +1834,7 @@ def train(VideoPath, AudioPath, FacePath, X_train, X_dev, X_final_test, labelPat
                             audioData = audioData.to(device)
                             label     = label.to(device)
                         devOutput = model(
-                            videoData, audioData,
+                            *_apply_av_only_submode(videoData, audioData),
                             actual_lens=_actual_lens if DATASET_SELECT == "DVLOG" else None
                         )
                     if USE_FUSION_MODEL:
@@ -2135,7 +2153,7 @@ def train(VideoPath, AudioPath, FacePath, X_train, X_dev, X_final_test, labelPat
                         audioData = audioData.to(device)
                         label = label.to(device)
                     output = model(
-                        videoData, audioData,
+                        *_apply_av_only_submode(videoData, audioData),
                         actual_lens=_actual_lens if DATASET_SELECT == "DVLOG" else None
                     )
 

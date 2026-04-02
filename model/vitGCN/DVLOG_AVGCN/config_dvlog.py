@@ -4,6 +4,8 @@ Use one switch to select among 4 experiments:
     - fusion
     - av_only_new
     - av_only_legacy
+    - video_only
+    - audio_only
     - gcn_only
 
 Priority:
@@ -15,7 +17,7 @@ import os
 
 
 # Main switch: edit this value directly in file for daily use.
-FILE_EXPERIMENT = "fusion"  #'av_only_new' 'av_only_legacy' 'gcn_only'  'fusion'
+FILE_EXPERIMENT = "fusion"  # 'fusion' | 'av_only_new' | 'av_only_legacy' | 'video_only' | 'audio_only' | 'gcn_only'
 
 # Optional override (e.g., train_dvlog.py --exp ... sets env var).
 EXPERIMENT = os.getenv("DVLOG_EXPERIMENT", FILE_EXPERIMENT).strip().lower()
@@ -46,6 +48,16 @@ _MODE_OVERRIDES = {
         "MODEL_MODE": "av_only",
         "USE_LEGACY_AV_BACKBONE": True,
         "USE_FEATURE_SEQUENCE_ENCODER": False,
+    },
+    "video_only": {
+        "MODEL_MODE": "video_only",
+        "USE_LEGACY_AV_BACKBONE": False,
+        "USE_FEATURE_SEQUENCE_ENCODER": True,
+    },
+    "audio_only": {
+        "MODEL_MODE": "audio_only",
+        "USE_LEGACY_AV_BACKBONE": False,
+        "USE_FEATURE_SEQUENCE_ENCODER": True,
     },
     "gcn_only": {
         "MODEL_MODE": "gcn_only",

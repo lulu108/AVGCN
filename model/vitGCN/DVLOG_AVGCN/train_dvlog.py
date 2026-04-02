@@ -12,7 +12,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--exp",
         default=os.getenv("DVLOG_EXPERIMENT", "fusion"),
-        choices=["fusion", "av_only_new", "av_only_legacy", "gcn_only"],
+        choices=["fusion", "av_only_new", "av_only_legacy", "video_only", "audio_only", "gcn_only"],
         help="Experiment mode",
     )
     args = parser.parse_args()
