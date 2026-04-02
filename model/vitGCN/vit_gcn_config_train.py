@@ -455,13 +455,7 @@ def _resolve_dvlog_experiment_key(model_mode, use_legacy):
 
 
 def _apply_av_only_submode(video_x, audio_x):
-    """Apply ablation masking for ViT-only submodes."""
-    if SINGLE_MODALITY_CLEAN_PATH:
-        return video_x, audio_x
-    if MODEL_MODE == 'video_only':
-        return video_x, torch.zeros_like(audio_x)
-    if MODEL_MODE == 'audio_only':
-        return torch.zeros_like(video_x), audio_x
+    """Backbone-internal routing only: keep inputs unchanged here."""
     return video_x, audio_x
 
 
