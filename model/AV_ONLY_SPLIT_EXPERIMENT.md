@@ -33,7 +33,82 @@
 
 在仓库根目录执行。
 
+### 3.0 先改什么文件（A / V / AV）
+
+你有两种方式切换实验：
+
+1. 直接改命令行 `--exp`（推荐，最省事）。
+2. 固定改配置文件里的默认实验，再直接运行训练脚本。
+
+#### 方式 A：命令行直接切换（推荐）
+
+- DVLOG: 改命令参数 `--exp` 即可，不需要改文件。
+- LMVD: 改命令参数 `--exp` 即可，不需要改文件。
+
+#### 方式 B：修改默认实验，再运行脚本
+
+1. DVLOG：修改 `model/vitGCN/DVLOG_AVGCN/config_dvlog.py`
+
+- 改 `FILE_EXPERIMENT` 为：
+  - `audio_only` 跑 A-only
+  - `video_only` 跑 V-only
+  - `av_only_new` 跑新版 AV-only
+  - `fusion` 跑 AV+GCN
+
+2. LMVD：修改 `model/vitGCN/LMVD_AVGCN/config_lmvd.py`
+
+- 改 `FILE_EXPERIMENT` 为：
+  - `audio_only` 跑 A-only
+  - `video_only` 跑 V-only
+  - `av_only` 跑 AV-only
+  - `fusion` 跑 AV+GCN
+
+3. 如果你要改单模态 clean path 或强编码器开关（DVLOG）：修改 `model/vitGCN/DVLOG_AVGCN/config_dvlog.py` 的这些键：
+
+- `SINGLE_MODALITY_CLEAN_PATH`
+- `USE_STRONG_AUDIO_ENCODER`
+- `USE_STRONG_VIDEO_ENCODER`
+- `AUDIO_FIXED_LEN`
+- `VIDEO_FIXED_LEN`
+- `VIDEO_USE_DELTA`
+
 ### 3.1 DVLOG
+
+#### 3.1.1 一条命令直接跑
+
+- A-only（音频）
+
+```bash
+python model/vitGCN/DVLOG_AVGCN/train_dvlog.py --exp audio_only
+```
+
+- V-only（视频）
+
+```bash
+python model/vitGCN/DVLOG_AVGCN/train_dvlog.py --exp video_only
+```
+
+- AV-only（不走 GCN）
+
+```bash
+python model/vitGCN/DVLOG_AVGCN/train_dvlog.py --exp av_only_new
+```
+
+- AV+GCN（完整融合）
+
+```bash
+python model/vitGCN/DVLOG_AVGCN/train_dvlog.py --exp fusion
+```
+
+#### 3.1.2 先改配置再跑
+
+1. 打开 `model/vitGCN/DVLOG_AVGCN/config_dvlog.py`。
+2. 修改 `FILE_EXPERIMENT`。
+3. 运行：
+
+```bash
+python model/vitGCN/DVLOG_AVGCN/train_dvlog.py
+```
 
 ```bash
 python model/vitGCN/DVLOG_AVGCN/train_dvlog.py --exp fusion
@@ -50,6 +125,42 @@ python model/vitGCN/DVLOG_AVGCN/train_dvlog.py --exp av_only_legacy
 ```
 
 ### 3.2 LMVD
+
+#### 3.2.1 一条命令直接跑
+
+- A-only（音频）
+
+```bash
+python model/vitGCN/LMVD_AVGCN/train_lmvd.py --exp audio_only
+```
+
+- V-only（视频）
+
+```bash
+python model/vitGCN/LMVD_AVGCN/train_lmvd.py --exp video_only
+```
+
+- AV-only（不走 GCN）
+
+```bash
+python model/vitGCN/LMVD_AVGCN/train_lmvd.py --exp av_only
+```
+
+- AV+GCN（完整融合）
+
+```bash
+python model/vitGCN/LMVD_AVGCN/train_lmvd.py --exp fusion
+```
+
+#### 3.2.2 先改配置再跑
+
+1. 打开 `model/vitGCN/LMVD_AVGCN/config_lmvd.py`。
+2. 修改 `FILE_EXPERIMENT`。
+3. 运行：
+
+```bash
+python model/vitGCN/LMVD_AVGCN/train_lmvd.py
+```
 
 ```bash
 python model/vitGCN/LMVD_AVGCN/train_lmvd.py --exp fusion
