@@ -50,7 +50,11 @@ _MODE_OVERRIDES = {
     "av_only_new": {
         "MODEL_MODE": "av_only",
         "USE_LEGACY_AV_BACKBONE": False,
-        "USE_FEATURE_SEQUENCE_ENCODER": False,
+        "USE_FEATURE_SEQUENCE_ENCODER": True,
+        "SINGLE_MODALITY_CLEAN_PATH": True,
+        "USE_STRONG_AUDIO_ENCODER": True,
+        "USE_STRONG_VIDEO_ENCODER": True,
+        "DVLOG_USE_AV_CROSS": True,
     },
     "av_only_legacy": {
         "MODEL_MODE": "av_only",

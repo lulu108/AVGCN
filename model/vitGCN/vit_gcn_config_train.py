@@ -157,8 +157,8 @@ CONCAT_BLEND_INIT = 0.3
 
 # ==================== AV Cross-Attn 开关（ViT 内部视频↔音频交互）====================
 # DVLOG：低成本开启；LMVD：保留作为 baseline
-DVLOG_USE_AV_CROSS = True
-LMVD_USE_AV_CROSS = True
+DVLOG_USE_AV_CROSS = bool(PROFILE_OVERRIDES.get('DVLOG_USE_AV_CROSS', True))
+LMVD_USE_AV_CROSS = bool(PROFILE_OVERRIDES.get('LMVD_USE_AV_CROSS', True))
 USE_AV_CROSS_ATTN = DVLOG_USE_AV_CROSS if DATASET_SELECT == "DVLOG" else LMVD_USE_AV_CROSS
 # 低成本 AV cross-attn 头数（DVLOG 降头数，LMVD 保持默认）
 DVLOG_AV_CROSS_HEADS = 2
