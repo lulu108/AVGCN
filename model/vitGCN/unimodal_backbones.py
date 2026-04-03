@@ -148,6 +148,18 @@ def _pool_mask(mask, target_len):
     return pooled > 0.0
 
 
+class _AvgMaxPool1D(nn.Module):
+    def __init__(self, target_len, alpha=0.5):
+        super().__init__()
+        self.target_len = int(target_len)
+        self.alpha = float(alpha)
+
+    def forward(self, x):
+        avg_x = F.adaptive_avg_pool1d(x, self.target_len)
+        max_x = F.adaptive_max_pool1d(x, self.target_len)
+        return self.alpha * avg_x + (1.0 - self.alpha) * max_x
+
+
 class StrongAudioEncoder(nn.Module):
     def __init__(
         self,
@@ -240,7 +252,7 @@ class StrongLandmarkVideoEncoder(nn.Module):
             )
             for i in range(max(1, int(local_blocks)))
         ])
-        self.length_pool = nn.AdaptiveAvgPool1d(self.target_len)
+        self.length_pool = _AvgMaxPool1D(self.target_len, alpha=0.5)
         self.global_encoder = _TemporalTransformerStack(
             dim=model_dim,
             depth=global_depth,

@@ -449,7 +449,7 @@ class ViT(nn.Module):
                  use_strong_audio_encoder=False,
                  use_strong_video_encoder=False,
                  audio_fixed_len=128,
-                 video_fixed_len=128,
+                 video_fixed_len=192,
                  video_use_delta=True,
                  audio_strong_stem_kernel=3,
                  video_strong_stem_kernel=5,

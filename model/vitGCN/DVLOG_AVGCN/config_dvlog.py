@@ -17,7 +17,7 @@ import os
 
 
 # Main switch: edit this value directly in file for daily use.
-FILE_EXPERIMENT = "av_only_new"  # 'fusion' | 'av_only_new' | 'av_only_legacy' | 'video_only' | 'audio_only' | 'gcn_only'
+FILE_EXPERIMENT = "video_only"  # 'fusion' | 'av_only_new' | 'av_only_legacy' | 'video_only' | 'audio_only' | 'gcn_only'
 
 # Optional override (e.g., train_dvlog.py --exp ... sets env var).
 EXPERIMENT = os.getenv("DVLOG_EXPERIMENT", FILE_EXPERIMENT).strip().lower()
@@ -35,7 +35,7 @@ _BASE = {
     "USE_STRONG_AUDIO_ENCODER": True,
     "USE_STRONG_VIDEO_ENCODER": True,
     "AUDIO_FIXED_LEN": 128,
-    "VIDEO_FIXED_LEN": 128,
+    "VIDEO_FIXED_LEN": 192,
     "VIDEO_USE_DELTA": True,
     "AUDIO_STRONG_STEM_KERNEL": 3,
     "VIDEO_STRONG_STEM_KERNEL": 5,
