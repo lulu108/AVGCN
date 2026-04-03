@@ -160,6 +160,36 @@ class _AvgMaxPool1D(nn.Module):
         return self.alpha * avg_x + (1.0 - self.alpha) * max_x
 
 
+class _LearnableTemporalDownsample(nn.Module):
+    def __init__(self, channels, target_len, dropout=0.05):
+        super().__init__()
+        self.target_len = int(target_len)
+
+        self.down1 = nn.Sequential(
+            nn.Conv1d(channels, channels, kernel_size=3, stride=2, padding=1, groups=channels),
+            nn.Conv1d(channels, channels, kernel_size=1),
+            nn.BatchNorm1d(channels),
+            nn.GELU(),
+            nn.Dropout(dropout) if dropout > 0.0 else nn.Identity(),
+        )
+
+        self.down2 = nn.Sequential(
+            nn.Conv1d(channels, channels, kernel_size=3, stride=2, padding=1, groups=channels),
+            nn.Conv1d(channels, channels, kernel_size=1),
+            nn.BatchNorm1d(channels),
+            nn.GELU(),
+            nn.Dropout(dropout) if dropout > 0.0 else nn.Identity(),
+        )
+
+        self.final_pool = nn.AdaptiveAvgPool1d(self.target_len)
+
+    def forward(self, x):
+        x = self.down1(x)
+        x = self.down2(x)
+        x = self.final_pool(x)
+        return x
+
+
 class StrongAudioEncoder(nn.Module):
     def __init__(
         self,
@@ -252,7 +282,11 @@ class StrongLandmarkVideoEncoder(nn.Module):
             )
             for i in range(max(1, int(local_blocks)))
         ])
-        self.length_pool = _AvgMaxPool1D(self.target_len, alpha=0.5)
+        self.length_pool = _LearnableTemporalDownsample(
+            channels=model_dim,
+            target_len=self.target_len,
+            dropout=dropout * 0.25,
+        )
         self.global_encoder = _TemporalTransformerStack(
             dim=model_dim,
             depth=global_depth,
