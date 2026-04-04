@@ -343,11 +343,13 @@ else:
 # ==================== Step2: 损失函数校准对照 ====================
 # 诊断目的：判断 focal + pos_weight 是否在当前 pipeline 制造不稳定性
 # 对照方案（建议各跑 3 seeds，比较 mean/std/thr 稳定性）:
-#   'focal'       : Focal BCE + pos_weight (sqrt-inverse)  ← 当前默认
-#   'focal_no_pw' : Focal BCE + pos_weight=1.0             ← 去掉类别权重（诊断类别偏置影响）
-#   'smooth_ce'   : Label Smoothing CE (0.05) + class_w    ← CE 基线（thr 是否更稳）
-LOSS_MODE = 'focal_no_pw'    # 实验7：Label Smoothing CE，对照 focal_no_pw 的 thr 稳定性
-FOCAL_GAMMA = 2.0            # Focal loss gamma
+#   'focal'       : Focal BCE + pos_weight (sqrt-inverse)
+#   'focal_no_pw' : Focal BCE without pos_weight
+#   'bce'         : Plain BCEWithLogits
+#   'smooth_ce'   : Label Smoothing CrossEntropy
+LOSS_MODE = str(PROFILE_OVERRIDES.get("LOSS_MODE", "smooth_ce")).lower()
+FOCAL_GAMMA = float(PROFILE_OVERRIDES.get("FOCAL_GAMMA", 2.0))
+SMOOTHING = float(PROFILE_OVERRIDES.get("SMOOTHING", 0.02))
 
 # ==================== Step3: AFI 专用超参（稳健训练）====================
 # AFI scalar gate 初始=0 (tanh(0)=0)，开门过快易致 recon_v_mse 爆炸
@@ -1045,24 +1047,39 @@ def train(VideoPath, AudioPath, FacePath, X_train, X_dev, X_final_test, labelPat
             f"region_scheme={REGION_PARTITION_SCHEME}"
         )
 
-    # ── 损失函数初始化（Step2: LOSS_MODE 分支）────────────────────────────────
-    if USE_FUSION_MODEL:
-        class_w = rt.compute_class_weights(trainSet, num_classes=2, sqrt_inverse=True).to(device)
-        if LOSS_MODE == 'focal':
+    # ── 损失函数初始化（支持 Fusion / ViT-only 统一 LOSS_MODE）────────────────
+    class_w = None
+    if hasattr(trainSet, "file_list") and hasattr(trainSet, "_label_cache"):
+        try:
+            class_w = rt.compute_class_weights(trainSet, num_classes=2, sqrt_inverse=True).to(device)
+        except Exception as _e:
+            print(f"[LOSS-WARN] compute_class_weights failed, fallback to no class weight: {_e}")
+            class_w = None
+
+    if LOSS_MODE == 'focal':
+        pos_weight = None
+        if class_w is not None:
             pos_weight = class_w[1] / class_w[0].clamp(min=1e-6)
-            lossFunc   = rt.FocalBCELoss(gamma=FOCAL_GAMMA, pos_weight=pos_weight).to(device)
-            print(f"[train/{fold_name}] LOSS_MODE=focal  gamma={FOCAL_GAMMA}  pos_weight={pos_weight.item():.4f}")
-        elif LOSS_MODE == 'focal_no_pw':
-            # 诊断：去掉 pos_weight，判断类别权重是否是 thr 乱跳根源
-            lossFunc   = rt.FocalBCELoss(gamma=FOCAL_GAMMA, pos_weight=None).to(device)
-            print(f"[train/{fold_name}] LOSS_MODE=focal_no_pw  gamma={FOCAL_GAMMA}  pos_weight=1.0 (disabled)")
-        else:  # 'smooth_ce'
-            # 诊断：CE 基线——thr 是否更稳定、test 方差是否更小
-            lossFunc   = rt.LabelSmoothingCrossEntropy(smoothing=0.05, weight=class_w).to(device)
-            print(f"[train/{fold_name}] LOSS_MODE=smooth_ce  smoothing=0.05  class_w={[round(v,4) for v in class_w.tolist()]}")
+        lossFunc = rt.FocalBCELoss(gamma=FOCAL_GAMMA, pos_weight=pos_weight).to(device)
+        print(
+            f"[train/{fold_name}] LOSS_MODE=focal gamma={FOCAL_GAMMA} pos_weight={pos_weight.item():.4f}"
+            if pos_weight is not None
+            else f"[train/{fold_name}] LOSS_MODE=focal gamma={FOCAL_GAMMA} pos_weight=None"
+        )
+    elif LOSS_MODE == 'focal_no_pw':
+        lossFunc = rt.FocalBCELoss(gamma=FOCAL_GAMMA, pos_weight=None).to(device)
+        print(f"[train/{fold_name}] LOSS_MODE=focal_no_pw gamma={FOCAL_GAMMA} pos_weight=1.0 (disabled)")
+    elif LOSS_MODE == 'bce':
+        lossFunc = rt.PlainBCELoss(pos_weight=None).to(device)
+        print(f"[train/{fold_name}] LOSS_MODE=bce plain BCEWithLogits (no focal)")
+    elif LOSS_MODE == 'smooth_ce':
+        lossFunc = rt.LabelSmoothingCrossEntropy(smoothing=SMOOTHING, weight=class_w).to(device)
+        print(
+            f"[train/{fold_name}] LOSS_MODE=smooth_ce smoothing={SMOOTHING} class_w="
+            f"{[round(v,4) for v in class_w.tolist()] if class_w is not None else None}"
+        )
     else:
-        lossFunc = rt.FocalBCELoss(gamma=FOCAL_GAMMA).to(device)
-        print(f"[train/{fold_name}] FocalBCE  gamma={FOCAL_GAMMA}  (no pos_weight, ViT-only)")
+        raise ValueError(f"Unknown LOSS_MODE={LOSS_MODE}")
     # Step3: AFI 专用 lr（scalar gate init=0，开门过快易导致 recon_v_mse 爆炸；降一档更稳）
     eff_lr = (AFI_LR_OVERRIDE if (FUSION_MODE == 'afi' and AFI_LR_OVERRIDE is not None) else lr)
     print(f"[train/{fold_name}] eff_lr={eff_lr:.2e}  (base_lr={lr:.2e}, fusion_mode={FUSION_MODE}, LOSS_MODE={LOSS_MODE})")
@@ -1735,6 +1752,11 @@ def train(VideoPath, AudioPath, FacePath, X_train, X_dev, X_final_test, labelPat
                     audioData = audioData.to(device)
                     label = label.to(device)
 
+                if DATASET_SELECT == "DVLOG" and torch.is_tensor(_sample_weight):
+                    _sw = _sample_weight.to(device) if torch.cuda.is_available() else _sample_weight
+                else:
+                    _sw = None
+
                 # 1. 生成 Mixup 系数 lam (0到1之间)
                 alpha = 0.4
                 lam = beta(alpha, alpha)
@@ -1749,6 +1771,7 @@ def train(VideoPath, AudioPath, FacePath, X_train, X_dev, X_final_test, labelPat
 
                 # 4. 混合标签 (Mix Labels)
                 label_a, label_b = label, label[index]
+                mixed_sw = torch.minimum(_sw, _sw[index]) if _sw is not None else None
 
                 # 5. 前向传播（纯 ViT）
                 output = model(
@@ -1757,8 +1780,8 @@ def train(VideoPath, AudioPath, FacePath, X_train, X_dev, X_final_test, labelPat
                 )
 
                 # 6. 计算 Mixup Loss
-                loss_fusion = (lam       * lossFunc(output, label_a.long())
-                               + (1-lam) * lossFunc(output, label_b.long()))
+                loss_fusion = (lam       * lossFunc(output, label_a.long(), sample_weight=mixed_sw)
+                               + (1-lam) * lossFunc(output, label_b.long(), sample_weight=mixed_sw))
                 traLoss = loss_fusion
 
                 traloss_one += traLoss.item()
@@ -1882,7 +1905,8 @@ def train(VideoPath, AudioPath, FacePath, X_train, X_dev, X_final_test, labelPat
                     if USE_FUSION_MODEL:
                         loss = lossFunc(devOutput, label.long(), sample_weight=sample_weight)
                     else:
-                        loss = lossFunc(devOutput, label.long())
+                        _sw = _sample_weight.to(device) if (DATASET_SELECT == "DVLOG" and torch.is_tensor(_sample_weight)) else None
+                        loss = lossFunc(devOutput, label.long(), sample_weight=_sw)
                     loss_one += loss.item()
                     train_num += label.size(0)
 

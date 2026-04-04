@@ -79,6 +79,37 @@ class FocalBCELoss(nn.Module):
         return (loss_vec * sw).sum() / denom
 
 
+class PlainBCELoss(nn.Module):
+    """Plain BCEWithLogits for 2-class logits."""
+
+    def __init__(self, pos_weight=None):
+        super().__init__()
+        if pos_weight is not None:
+            if not torch.is_tensor(pos_weight):
+                pos_weight = torch.tensor(float(pos_weight))
+            self.register_buffer("pos_weight", pos_weight.float())
+        else:
+            self.pos_weight = None
+
+    def forward(self, logits, target, sample_weight=None):
+        logit_bin = logits[:, 1] - logits[:, 0]
+        target_f = target.float()
+
+        loss_vec = F.binary_cross_entropy_with_logits(
+            logit_bin,
+            target_f,
+            pos_weight=self.pos_weight,
+            reduction="none",
+        )
+
+        if sample_weight is None:
+            return loss_vec.mean()
+
+        sw = sample_weight.float()
+        denom = sw.sum().clamp(min=1e-6)
+        return (loss_vec * sw).sum() / denom
+
+
 class ModelEMA:
     """Exponential moving average for model parameters."""
 
