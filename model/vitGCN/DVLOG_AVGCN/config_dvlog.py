@@ -66,6 +66,7 @@ _MODE_OVERRIDES = {
         "USE_LEGACY_AV_BACKBONE": False,
         "USE_FEATURE_SEQUENCE_ENCODER": True,
         "SINGLE_MODALITY_CLEAN_PATH": True,
+        "LOSS_MODE": "focal_no_pw",#“focal_no_pw”/“bce”/
         "USE_STRONG_AUDIO_ENCODER": False,
         "USE_STRONG_VIDEO_ENCODER": True,
         "VIDEO_USE_DELTA": True,
@@ -89,5 +90,3 @@ if EXPERIMENT not in _MODE_OVERRIDES:
 
 OVERRIDES = dict(_BASE)
 OVERRIDES.update(_MODE_OVERRIDES[EXPERIMENT])
-
-
