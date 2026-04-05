@@ -1757,32 +1757,41 @@ def train(VideoPath, AudioPath, FacePath, X_train, X_dev, X_final_test, labelPat
                 else:
                     _sw = None
 
-                # 1. 生成 Mixup 系数 lam (0到1之间)
-                alpha = 0.4
-                lam = beta(alpha, alpha)
+                if USE_MIXUP:
+                    # 1. 生成 Mixup 系数 lam (0到1之间)
+                    alpha = 0.4
+                    lam = beta(alpha, alpha)
 
-                # 2. 生成随机打乱的索引
-                index = torch.randperm(videoData.size(0)).to(device)
+                    # 2. 生成随机打乱的索引
+                    index = torch.randperm(videoData.size(0)).to(device)
 
-                # 3. 混合输入 (Mix Data)
-                mixed_video = lam * videoData + (1 - lam) * videoData[index, :]
-                mixed_audio = lam * audioData + (1 - lam) * audioData[index, :]
-                mixed_video, mixed_audio = _apply_av_only_submode(mixed_video, mixed_audio)
+                    # 3. 混合输入 (Mix Data)
+                    mixed_video = lam * videoData + (1 - lam) * videoData[index, :]
+                    mixed_audio = lam * audioData + (1 - lam) * audioData[index, :]
+                    mixed_video, mixed_audio = _apply_av_only_submode(mixed_video, mixed_audio)
 
-                # 4. 混合标签 (Mix Labels)
-                label_a, label_b = label, label[index]
-                mixed_sw = torch.minimum(_sw, _sw[index]) if _sw is not None else None
+                    # 4. 混合标签 (Mix Labels)
+                    label_a, label_b = label, label[index]
+                    mixed_sw = torch.minimum(_sw, _sw[index]) if _sw is not None else None
 
-                # 5. 前向传播（纯 ViT）
-                output = model(
-                    mixed_video, mixed_audio,
-                    actual_lens=_actual_lens if DATASET_SELECT == "DVLOG" else None
-                )
+                    # 5. 前向传播（纯 ViT）
+                    output = model(
+                        mixed_video, mixed_audio,
+                        actual_lens=_actual_lens if DATASET_SELECT == "DVLOG" else None
+                    )
 
-                # 6. 计算 Mixup Loss
-                loss_fusion = (lam       * lossFunc(output, label_a.long(), sample_weight=mixed_sw)
-                               + (1-lam) * lossFunc(output, label_b.long(), sample_weight=mixed_sw))
-                traLoss = loss_fusion
+                    # 6. 计算 Mixup Loss
+                    loss_fusion = (lam       * lossFunc(output, label_a.long(), sample_weight=mixed_sw)
+                                   + (1-lam) * lossFunc(output, label_b.long(), sample_weight=mixed_sw))
+                    traLoss = loss_fusion
+                else:
+                    # 无 Mixup：保持原样输入，避免扰动时序几何与微弱动态
+                    video_in, audio_in = _apply_av_only_submode(videoData, audioData)
+                    output = model(
+                        video_in, audio_in,
+                        actual_lens=_actual_lens if DATASET_SELECT == "DVLOG" else None
+                    )
+                    traLoss = lossFunc(output, label.long(), sample_weight=_sw)
 
                 traloss_one += traLoss.item()
                 optimizer.zero_grad()
